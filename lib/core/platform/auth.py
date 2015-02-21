@@ -3,6 +3,9 @@
 
 from time import time
 
+from core.cache.cache import Cache
+
+
 RELEASE_TIMEOUT = 10
 CACHE_KEY = 'platform'
 
@@ -19,6 +22,7 @@ DEFAULT_AUTH_DATA = {
 
 class Auth:
     def __init__(self, cache):
+        """ :type cache: Cache """
         self._cache = cache
 
     def set_data(self, auth_data=None):

@@ -14,7 +14,7 @@ UNAUTHORIZED_STATUS = 401
 class Response(Headers):
     def __init__(self, status, raw):
         Headers.__init__(self)
-        if not status:
+        if status is None:
             raise Exception('Empty status was received')
 
         self.__body = ''

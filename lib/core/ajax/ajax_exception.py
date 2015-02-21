@@ -5,7 +5,9 @@
 class AjaxException(Exception):
     def __init__(self, ajax, prev_exception=None):
         self.__ajax = ajax
-        data = ajax.get_response().get_data()
+        response = ajax.get_response()
+        data = response.get_data() if response else {}
+        status = response.get_status() if response else 500
         message = ''
 
         if 'message' in data:
@@ -20,7 +22,7 @@ class AjaxException(Exception):
 
         message = message or 'Unknown error'
 
-        Exception.__init__(self, ajax.get_response().get_status(), message)
+        Exception.__init__(self, status, message)
 
     def get_ajax(self):
         return self.__ajax
