@@ -31,6 +31,10 @@ class Ajax:
             h_content = h_buf.getvalue()
             raw = (h_content + BODY_SEPARATOR if h_content else '') + content
             self.__response = Response(code, raw)
+
+            if not self.__response.check_status():
+                raise AjaxException(self)
+
         except Exception, e:
             raise AjaxException(self, e)
         finally:
