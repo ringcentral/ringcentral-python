@@ -3,6 +3,7 @@
 
 from time import time
 
+
 RELEASE_TIMEOUT = 10
 CACHE_KEY = 'platform'
 

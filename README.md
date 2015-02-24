@@ -1,10 +1,19 @@
-# Usage
+# Installation
+
+    $ git clone https://github.com/ringcentral/python-sdk.git ./ringcentral-python-sdk
+
+
+## Dependencies
 
 Python 2.6.*
 
+Python SDK uses the __PycURL__ library.
+
+Installation instructions: [http://pycurl.sourceforge.net/doc/install.html](http://pycurl.sourceforge.net/doc/install.html)
+
 ## Test of usage
 
-Create a file `credentials.ini` in the root of project with your credentials:
+Create a file __credentials.ini__ in the root of project with your credentials:
 
     [Credentials]
     USERNAME: 15554443322
