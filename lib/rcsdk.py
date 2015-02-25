@@ -6,7 +6,7 @@ from core.platform.platform import Platform
 
 class RCSDK:
     def __init__(self, cache, key, secret):
-        self.platform = Platform(cache, key, secret)
+        self.__platform = Platform(cache, key, secret)
 
     def get_platform(self):
-        return self.platform
+        return self.__platform

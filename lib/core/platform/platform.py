@@ -100,7 +100,7 @@ class Platform:
     def __api_url(self, url, options):
         built_url = ''
 
-        if 'addServer' in options and options['addServer'] and url.find('http://') < 0 and url.find('https://'):
+        if 'addServer' in options and options['addServer'] and url.find('http://') < 0 and url.find('https://') < 0:
             built_url += self.__server
 
         if url.find(URL_PREFIX) < 0:
