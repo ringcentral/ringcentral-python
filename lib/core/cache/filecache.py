@@ -4,7 +4,7 @@
 import os
 import json
 
-from core.cache.cache import Cache
+from .cache import Cache
 
 
 class FileCache(Cache):

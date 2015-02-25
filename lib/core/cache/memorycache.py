@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from core.cache.cache import Cache
+from .cache import Cache
 
 
 class MemoryCache(Cache):

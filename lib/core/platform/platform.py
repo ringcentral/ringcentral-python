@@ -4,7 +4,7 @@
 import base64
 import time
 
-from core.platform.auth import Auth
+from .auth import Auth
 from core.ajax.request import *
 from core.ajax.ajax import Ajax
 
@@ -50,7 +50,7 @@ class Platform:
     def refresh(self):
         if not self.__auth.is_paused():
 
-            print "Refresh will be performed\n"
+            print("Refresh will be performed\n")
             self.__auth.pause()
 
             if not self.__auth.is_refresh_token_valid():
@@ -70,7 +70,7 @@ class Platform:
         else:
 
             while self.__auth.is_paused():
-                print "Waiting for refresh\n"
+                print("Waiting for refresh\n")
                 time.sleep(1)
             self.is_authorized(False)
 

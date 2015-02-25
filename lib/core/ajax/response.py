@@ -3,7 +3,7 @@
 import json
 import re
 
-from headers import *
+from .headers import *
 
 
 BOUNDARY_SEPARATOR = '--'

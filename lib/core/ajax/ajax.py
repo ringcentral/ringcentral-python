@@ -2,10 +2,10 @@
 # encoding: utf-8
 
 import pycurl
-import StringIO
+from io import StringIO    # for handling unicode strings
 
-from response import *
-from ajax_exception import AjaxException
+from .response import *
+from .ajax_exception import AjaxException
 
 
 class Ajax:
@@ -14,8 +14,8 @@ class Ajax:
         self.__response = None
 
     def send(self):
-        buf = StringIO.StringIO()
-        h_buf = StringIO.StringIO()
+        buf = StringIO()
+        h_buf = StringIO()
         c = pycurl.Curl()
         c.setopt(pycurl.URL, self.__request.get_url_with_query_string())
         c.setopt(pycurl.HTTPHEADER, self.__request.get_headers_array())
@@ -35,7 +35,7 @@ class Ajax:
             if not self.__response.check_status():
                 raise AjaxException(self)
 
-        except Exception, e:
+        except Exception as e:
             raise AjaxException(self, e)
         finally:
             c.close()
