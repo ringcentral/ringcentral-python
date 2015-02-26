@@ -26,7 +26,7 @@ class Ajax:
             status_code = response.status
             headers = dict(response.getheaders())
 
-            self.__response = Response(status_code, dict(headers), body)
+            self.__response = Response(status_code, body, dict(headers))
             if not self.__response.check_status():
                 raise AjaxException(self)
 
