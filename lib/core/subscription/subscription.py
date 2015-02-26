@@ -56,21 +56,23 @@ class Subscription:
             for l in self.__listeners[event]:
                 l(data)
 
-    def register(self, options):
+    def register(self, options=None):
         if self.is_subscribed():
             self.renew(options)
         else:
-            self.register(options)
+            self.subscribe(options)
 
     def add_events(self, events):
         self.__event_filters += events
+        pass
 
     def set_events(self, events):
         self.__event_filters = events
 
     def subscribe(self, options=None):
         options = options if options else {}
-        self.__event_filters = options['events'] if 'events' in options else []
+        if 'events' in options:
+            self.__event_filters = options['events']
         try:
             if not self.__event_filters or len(self.__event_filters) == 0:
                 raise Exception('Events are undefined')
@@ -89,8 +91,9 @@ class Subscription:
         except Exception, e:
             self.un_subscribe()
             self.__emit(EVENTS['subscribeError'], e)
+            raise e
 
-    def renew(self, options):
+    def renew(self, options=None):
         options = options if options else {}
         self.__event_filters = options['events'] if 'events' in options else []
         self.__clear_timeout()
@@ -132,8 +135,10 @@ class Subscription:
         self.__subscription = None
 
     def is_subscribed(self):
-        with self.__subscription as s:
-            return s['deliveryMode'] and s['deliveryMode']['subscribeKey'] and s['deliveryMode']['address']
+        s = self.__subscription
+        return ('deliveryMode' in s and s['deliveryMode']) and \
+               ('subscriberKey' in s['deliveryMode'] and s['deliveryMode']['subscriberKey']) and \
+               ('address' in s['deliveryMode'] and s['deliveryMode']['address'])
 
     def __update_subscription(self, data):
         self.__clear_timeout()
@@ -144,14 +149,18 @@ class Subscription:
         if not self.is_subscribed():
             return
         # TODO check this stuff
-        self.__pubnub = Pubnub(subscribe_key=self.__subscription['deliveryMode']['subscriberKey'], ssl_on=False)
+        s_key = self.__subscription['deliveryMode']['subscriberKey']
+        self.__pubnub = Pubnub(subscribe_key=s_key, ssl_on=False, publish_key='')
 
         def callback(message, channel):
-            key = base64.b64decode(self.__subscription['deliveryMode']['encryptionKey'])
-            data = base64.b64decode(message)
-            obj2 = AES.new(key, AES.MODE_ECB, 'This is an IV456')
-            decrypted = obj2.decrypt(data)
-            self.__notify(decrypted)
+            if self.is_subscribed() and ('encryptionKey' in self.__subscription['deliveryMode']):
+                key = base64.b64decode(self.__subscription['deliveryMode']['encryptionKey'])
+                data = base64.b64decode(message)
+                obj2 = AES.new(key, AES.MODE_ECB, 'This is an IV456')
+                decrypted = obj2.decrypt(data)
+                self.__notify(decrypted)
+            else:
+                self.__notify(message)
 
         def error(message):
             print("ERROR : " + str(message))
@@ -165,15 +174,15 @@ class Subscription:
         def disconnect(message):
             print("DISCONNECTED")
 
-            self.__pubnub.subscribe(self.__subscription['deliveryMode']['address'], callback=callback, error=error,
-                                    connect=connect, reconnect=reconnect, disconnect=disconnect)
+        self.__pubnub.subscribe(self.__subscription['deliveryMode']['address'], callback=callback, error=error,
+                                connect=connect, reconnect=reconnect, disconnect=disconnect)
 
     def __notify(self, message):
         self.__emit(EVENTS['notification'], message)
 
     def __un_subscribe_at_pubnub(self):
         if self.__pubnub and self.is_subscribed():
-            pass  # TODO disconnect from PUBNUB
+            self.__pubnub.unsubscribe(self.__subscription['deliveryMode']['address'])
 
     def __get_full_events_filter(self):
         return [self.__platform.api_url(e) for e in self.__event_filters]

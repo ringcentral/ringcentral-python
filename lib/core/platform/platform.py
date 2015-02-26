@@ -76,7 +76,7 @@ class Platform:
     def api_call(self, request):
         self.is_authorized()
         request.set_header(AUTHORIZATION, self.__get_auth_header())
-        request.set_url(self.__api_url(request.get_url(), {'addServer': True}))
+        request.set_url(self.api_url(request.get_url(), {'addServer': True}))
         ajax = Ajax(request)
         ajax.send()
         return ajax
@@ -84,7 +84,7 @@ class Platform:
     def auth_call(self, request):
         request.set_header(AUTHORIZATION, 'Basic ' + self.__get_api_key())
         request.set_header(CONTENT_TYPE, URL_ENCODED_CONTENT_TYPE)
-        request.set_url(self.__api_url(request.get_url(), {'addServer': True}))
+        request.set_url(self.api_url(request.get_url(), {'addServer': True}))
         request.set_method(POST)
         ajax = Ajax(request)
         ajax.send()
@@ -96,8 +96,9 @@ class Platform:
     def __get_auth_header(self):
         return self.__auth.get_token_type() + ' ' + self.__auth.get_access_token()
 
-    def __api_url(self, url, options):
+    def api_url(self, url, options=None):
         built_url = ''
+        options = options if options else {}
 
         if 'addServer' in options and options['addServer'] and url.find('http://') < 0 and url.find('https://') < 0:
             built_url += self.__server
