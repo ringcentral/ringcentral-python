@@ -3,7 +3,7 @@
 import json
 import urllib
 
-from headers import *
+from .headers import *
 
 
 POST = 'POST'

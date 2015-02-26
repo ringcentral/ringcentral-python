@@ -4,7 +4,7 @@
 import os
 import json
 
-from core.cache.cache import Cache
+from .cache import Cache
 
 
 class FileCache(Cache):
@@ -21,10 +21,14 @@ class FileCache(Cache):
         Cache.save(self, key, obj)
 
     def load(self, key):
-        f = open(self._file_path(key + '.json'), 'r')
-        data = json.load(f)
-        f.close()
-        return data if data else {}
+        try:
+            f = open(self._file_path(key + '.json'), 'r')
+            data = json.load(f)
+            f.close()
+            return data if data else {}
+        except IOError:
+            # This is just a cache, we don't care about errors.
+            return {}
 
     def _file_path(self, name):
         return os.path.join(self.cache_dir, name)

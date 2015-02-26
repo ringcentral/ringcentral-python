@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from core.platform.platform import Platform
+from core.subscription.subscription import Subscription
 
 
 class RCSDK:
@@ -10,3 +11,6 @@ class RCSDK:
 
     def get_platform(self):
         return self.__platform
+
+    def get_subscription(self):
+        return Subscription(self.__platform)

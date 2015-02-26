@@ -1,3 +1,4 @@
 *.pyc
 _cache
 credentials.ini
+dist

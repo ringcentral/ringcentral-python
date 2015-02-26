@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # encoding: utf-8
 import json
 import re
 
-from headers import *
+from .headers import *
 
 
 BOUNDARY_SEPARATOR = '--'
@@ -12,10 +12,9 @@ UNAUTHORIZED_STATUS = 401
 
 
 class Response(Headers):
-    def __init__(self, status, raw):
+
+    def __init__(self, status, raw, headers=None):
         Headers.__init__(self)
-        if status is None:
-            raise Exception('Empty status was received')
 
         self.__body = ''
         self.__raw = raw.replace('\r', '')
@@ -24,13 +23,39 @@ class Response(Headers):
         self.__status = status
         self.__responses = []
 
-        if self.__raw.find(BODY_SEPARATOR) > 0:
+        if status is None:
+            raise Exception('Empty status was received')
+
+        if isinstance(headers, dict):
+            self.set_headers(headers)
+            self.__body = raw
+            self.__parse_headers()
+
+        elif self.__raw.find(BODY_SEPARATOR) > 0:
             self.__raw_headers, self.__body = self.__raw.split(BODY_SEPARATOR, 1)
+
         else:
             self.__body = self.__raw
 
-        self.__parse_headers()
         self.__parse_body()
+
+    def check_status(self):
+        return 200 <= self.__status < 300
+
+    def get_body(self):
+        return self.__body
+
+    def get_data(self):
+        return self.__data
+
+    def get_raw(self):
+        return self.__raw
+
+    def get_status(self):
+        return self.__status
+
+    def get_responses(self):
+        return self.__responses
 
     def __parse_headers(self):
         headers = self.__raw_headers.split('\n')
@@ -58,21 +83,3 @@ class Response(Headers):
             self.__data = json.loads(self.__body)
         else:
             self.__data = self.__body
-
-    def check_status(self):
-        return 200 <= self.__status < 300
-
-    def get_body(self):
-        return self.__body
-
-    def get_data(self):
-        return self.__data
-
-    def get_raw(self):
-        return self.__raw
-
-    def get_status(self):
-        return self.__status
-
-    def get_responses(self):
-        return self.__responses

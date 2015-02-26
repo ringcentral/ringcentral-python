@@ -4,13 +4,16 @@
 import sys
 import os
 import ConfigParser
+from threading import Thread
+from time import sleep
 
-sys.path.insert(0, 'lib/')
+sys.path.insert(0, 'rcsdk/')
 
 from rcsdk import RCSDK
 from core.ajax.request import Request
 from core.cache.filecache import FileCache
 from core.cache.memorycache import MemoryCache
+from core.subscription.subscription import EVENTS
 
 config = ConfigParser.ConfigParser()
 config.read('credentials.ini')
@@ -23,9 +26,9 @@ APP_SECRET = config.get('Credentials', 'APP_SECRET')
 
 
 def main():
-
     print 'Test with memory cache'
-    memory_platform = RCSDK(MemoryCache(), APP_KEY, APP_SECRET).get_platform()
+    memory_sdk = RCSDK(MemoryCache(), APP_KEY, APP_SECRET)
+    memory_platform = memory_sdk.get_platform()
     memory_platform.authorize(USERNAME, EXTENSION, PASSWORD)
     print 'Memory Authorized'
     memory_platform.refresh()
@@ -46,6 +49,24 @@ def main():
     call = file_platform.api_call(Request('GET', '/account/~/extension/~'))
     print 'File User loaded ' + call.get_response().get_data()['name']
 
+    def on_message(msg):
+        print msg
+
+    def pubnub():
+        s = memory_sdk.get_subscription()
+        s.add_events(['/account/~/extension/~/message-store'])
+        s.on(EVENTS['notification'], on_message)
+        s.register()
+        while True:
+            sleep(0.1)
+
+    try:
+        t = Thread(target=pubnub)
+        t.start()
+    except KeyboardInterrupt:
+        pass
+
+    print "Wait for notification..."
 
 
 if __name__ == '__main__':
