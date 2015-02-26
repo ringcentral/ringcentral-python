@@ -7,9 +7,13 @@
 
 Python 2.6.*
 
-Python SDK uses the __PycURL__ library.
+### PycURL.
 
 Installation instructions: [http://pycurl.sourceforge.net/doc/install.html](http://pycurl.sourceforge.net/doc/install.html)
+
+### PubNub:
+
+Installation instructions: [http://www.pubnub.com/docs/python/python-sdk.html](http://www.pubnub.com/docs/python/python-sdk.html)
 
 ## Test of usage
 
