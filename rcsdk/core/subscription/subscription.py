@@ -3,9 +3,6 @@
 import base64
 from threading import Timer
 
-from Pubnub import Pubnub
-from Pubnub import AES
-
 from core.ajax.request import *
 
 
@@ -146,6 +143,9 @@ class Subscription:
         self.__set_timeout()
 
     def __subscribe_at_pubnub(self):
+        from Pubnub import Pubnub
+        from Pubnub import AES
+
         if not self.is_subscribed():
             return
         # TODO check this stuff

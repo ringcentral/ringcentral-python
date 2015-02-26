@@ -36,6 +36,9 @@ def main():
     call = memory_platform.api_call(Request('GET', '/account/~/extension/~'))
     print 'Memory User loaded ' + call.get_response().get_data()['name']
 
+    # call = memory_platform.api_call(Request('GET', '/account/~/extension/~/message-store/527975372020,527966621020,527965464020'))
+    # print 'Memory messages loaded ' + " ".join([str(r.get_data()["uri"]) for r in call.get_response().get_responses()])
+    #
     print 'Test with file cache'
     cache_dir = os.path.join(os.getcwd(), '_cache')
     file_platform = RCSDK(FileCache(cache_dir), APP_KEY, APP_SECRET).get_platform()
@@ -61,8 +64,12 @@ def main():
             sleep(0.1)
 
     try:
-        t = Thread(target=pubnub)
-        t.start()
+        try:
+            import Pubnub
+            t = Thread(target=pubnub)
+            t.start()
+        except ImportError:
+            print "No Pubnub SDK, skipping Pubnub test"
     except KeyboardInterrupt:
         pass
 
