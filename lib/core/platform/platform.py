@@ -35,15 +35,14 @@ class Platform:
             raise Exception('Access token is not valid after refresh timeout')
 
     def authorize(self, user_name, extension, password, remember=False):
-        body = {
+        ajax = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
             'grant_type': 'password',
             'username': user_name,
             'extension': extension,
             'password': password,
             'access_toket_ttl': ACCESS_TOKEN_TTL,
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if remember else REFRESH_TOKEN_TTL
-        }
-        ajax = self.auth_call(Request(POST, TOKEN_ENDPOINT, None, body))
+        }))
         self.__auth.set_data(ajax.get_response().get_data())
         self.__auth.set_remember(remember)
 
@@ -56,7 +55,7 @@ class Platform:
             if not self.__auth.is_refresh_token_valid():
                 raise Exception('Refresh token has expired')
 
-            ajax = self.auth_call(Request(POST, TOKEN_ENDPOINT, None, {
+            ajax = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
                 'grant_type': 'refresh_token',
                 'refresh_token': self.__auth.get_refresh_token(),
                 'access_token_ttl': ACCESS_TOKEN_TTL,
