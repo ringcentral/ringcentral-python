@@ -6,8 +6,7 @@ import time
 
 from .auth import Auth
 from core.ajax.request import *
-from core.ajax.ajax import Ajax
-
+from core.ajax.stdlib_ajax import Ajax
 
 ACCOUNT_ID = '~'
 ACCOUNT_PREFIX = '/account/'
