@@ -7,7 +7,7 @@ import ConfigParser
 from threading import Thread
 from time import sleep
 
-sys.path.insert(0, 'lib/')
+sys.path.insert(0, 'rcsdk/')
 
 from rcsdk import RCSDK
 from core.ajax.request import Request
