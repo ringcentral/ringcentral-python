@@ -151,7 +151,7 @@ class Subscription:
             data = base64.b64decode(message)
             obj2 = AES.new(key, AES.MODE_ECB, 'This is an IV456')
             decrypted = obj2.decrypt(data)
-            print(decrypted)
+            self.__notify(decrypted)
 
         def error(message):
             print("ERROR : " + str(message))
@@ -165,12 +165,10 @@ class Subscription:
         def disconnect(message):
             print("DISCONNECTED")
 
-            self.__pubnub.subscribe(self.__subscription['deliveryMode']['address'], callback=callback, error=callback,
+            self.__pubnub.subscribe(self.__subscription['deliveryMode']['address'], callback=callback, error=error,
                                     connect=connect, reconnect=reconnect, disconnect=disconnect)
 
     def __notify(self, message):
-        if self.is_subscribed() and self.__subscription['deliveryMode']['encriptionKey']:
-            pass  # TODO decrypt AES
         self.__emit(EVENTS['notification'], message)
 
     def __un_subscribe_at_pubnub(self):
