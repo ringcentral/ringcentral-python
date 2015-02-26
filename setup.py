@@ -13,7 +13,7 @@ setup(
     download_url="https://github.com/ringcentral/python-sdk/tarball/%s" % VERSION,
     keywords=['sdk', 'ringcentral', 'ringplatform'],
     install_requires=[
-        'pubnub>=3.*',
+        'pubnub>=3.7.0',
     ],
     classifiers=[],
 )
