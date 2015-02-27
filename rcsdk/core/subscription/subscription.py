@@ -85,7 +85,7 @@ class Subscription:
             self.__update_subscription(data)
             self.__subscribe_at_pubnub()
             self.__emit(EVENTS['subscribeSuccess'], data)
-        except Exception, e:
+        except Exception as e:
             self.un_subscribe()
             self.__emit(EVENTS['subscribeError'], e)
             raise e
@@ -107,7 +107,7 @@ class Subscription:
             data = ajax.get_response().get_data()
             self.__update_subscription(data)
             self.__emit(EVENTS['subscribeSuccess'], data)
-        except Exception, e:
+        except Exception as e:
             self.un_subscribe()
             self.__emit(EVENTS['renewError'], e)
 
@@ -119,7 +119,7 @@ class Subscription:
             self.__platform.api_call(req)
             self.un_subscribe()
             self.__emit(EVENTS['removeSuccess'])
-        except Exception, e:
+        except Exception as e:
             self.un_subscribe()
             self.__emit(EVENTS['removeError'], e)
 
@@ -143,8 +143,7 @@ class Subscription:
         self.__set_timeout()
 
     def __subscribe_at_pubnub(self):
-        from Pubnub import Pubnub
-        from Pubnub import AES
+        from Pubnub import Pubnub, AES
 
         if not self.is_subscribed():
             return
@@ -156,7 +155,7 @@ class Subscription:
             if self.is_subscribed() and ('encryptionKey' in self.__subscription['deliveryMode']):
                 key = base64.b64decode(self.__subscription['deliveryMode']['encryptionKey'])
                 data = base64.b64decode(message)
-                obj2 = AES.new(key, AES.MODE_ECB, 'This is an IV456')
+                obj2 = AES.new(key)
                 decrypted = obj2.decrypt(data)
                 self.__notify(decrypted)
             else:
