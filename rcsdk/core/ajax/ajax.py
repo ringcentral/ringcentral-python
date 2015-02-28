@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-import pycurl
-from io import StringIO    # for handling unicode strings
-
-from .response import *
+import httplib
+from urlparse import urlparse
+from .response import Response
 from .ajax_exception import AjaxException
-
 
 class Ajax:
     def __init__(self, request):
@@ -14,31 +9,29 @@ class Ajax:
         self.__response = None
 
     def send(self):
-        buf = StringIO()
-        h_buf = StringIO()
-        c = pycurl.Curl()
-        c.setopt(pycurl.URL, self.__request.get_url_with_query_string())
-        c.setopt(pycurl.HTTPHEADER, self.__request.get_headers_array())
-        if self.__request.is_put() or self.__request.is_post():
-            c.setopt(pycurl.POST, True)
-            c.setopt(pycurl.POSTFIELDS, self.__request.get_encoded_body())
-        c.setopt(pycurl.WRITEFUNCTION, buf.write)
-        c.setopt(pycurl.HEADERFUNCTION, h_buf.write)
-        try:
-            c.perform()
-            code = c.getinfo(pycurl.HTTP_CODE)
-            content = buf.getvalue()
-            h_content = h_buf.getvalue()
-            raw = (h_content + BODY_SEPARATOR if h_content else '') + content
-            self.__response = Response(code, raw)
 
+        url = urlparse(self.__request.get_url())
+        if url.scheme == "https":
+            conn = httplib.HTTPSConnection(url.hostname, url.port)
+        else:
+            conn = httplib.HTTPConnection(url.hostname, url.port)
+        try:
+            conn.request(self.__request.get_method(),
+                         self.__request.get_url(),
+                         body=self.__request.get_encoded_body(),
+                         headers=self.__request.get_headers())
+
+            response = conn.getresponse()
+            body = response.read()
+            status_code = response.status
+            headers = dict(response.getheaders())
+
+            self.__response = Response(status_code, body, dict(headers))
             if not self.__response.check_status():
                 raise AjaxException(self)
 
-        except Exception as e:
-            raise AjaxException(self, e)
         finally:
-            c.close()
+            conn.close()
 
     def is_loaded(self):
         return True if self.__response else False
