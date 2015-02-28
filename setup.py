@@ -4,7 +4,14 @@ VERSION = __import__("rcsdk").VERSION
 
 setup(
     name='rcsdk',
-    packages=['rcsdk'],
+    packages=[
+        'rcsdk',
+        'rcsdk.core',
+        'rcsdk.core.ajax',
+        'rcsdk.core.cache',
+        'rcsdk.core.platform',
+        'rcsdk.core.subscription'
+    ],
     version=VERSION,
     description='RingPlatform Python SDK',
     author="RingCentral, Inc.",
