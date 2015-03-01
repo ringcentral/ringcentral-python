@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import sys
 import os
 import ConfigParser
 from threading import Thread
 from time import sleep
-
-sys.path.insert(0, 'rcsdk/')
 
 from rcsdk import RCSDK
 from rcsdk.core.ajax.request import Request
