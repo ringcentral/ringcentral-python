@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import sys
 import os
 import ConfigParser
 from threading import Thread
 from time import sleep
 
-sys.path.insert(0, 'rcsdk/')
-
 from rcsdk import RCSDK
-from core.ajax.request import Request
-from core.cache.filecache import FileCache
-from core.cache.memorycache import MemoryCache
-from core.subscription.subscription import EVENTS
+from rcsdk.core.ajax.request import Request
+from rcsdk.core.cache.filecache import FileCache
+from rcsdk.core.cache.memorycache import MemoryCache
+from rcsdk.core.subscription.subscription import EVENTS
 
 config = ConfigParser.ConfigParser()
 config.read('credentials.ini')
