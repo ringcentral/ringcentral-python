@@ -16,12 +16,11 @@ API_VERSION = 'v1.0'
 ACCESS_TOKEN_TTL = 600  # 10 minutes
 REFRESH_TOKEN_TTL = 36000  # 10 hours
 REFRESH_TOKEN_TTL_REMEMBER = 604800  # 1 week
-SERVER = 'https://platform.ringcentral.com'
 
 
 class Platform:
-    def __init__(self, cache, key, secret, server=None):
-        self.__server = server if server else SERVER
+    def __init__(self, cache, key, secret, server):
+        self.__server = server
         self.appKey = key
         self.appSecret = secret
         self.__auth = Auth(cache)
