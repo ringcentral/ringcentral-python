@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-VERSION = '0.2.2'
+VERSION = '0.2.3'
 
 
 from core.platform.platform import Platform
