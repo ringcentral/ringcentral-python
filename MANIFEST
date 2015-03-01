@@ -2,7 +2,6 @@
 setup.cfg
 setup.py
 rcsdk/__init__.py
-rcsdk/rcsdk.py
 rcsdk/core/__init__.py
 rcsdk/core/ajax/__init__.py
 rcsdk/core/ajax/ajax.py
