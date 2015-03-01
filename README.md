@@ -31,6 +31,7 @@ For more info take a look on the `test.py` in this repository.
 ```py
 from rcsdk import RCSDK
 from rcsdk.core.ajax.request import Request
+from rcsdk.core.cache.memorycache import MemoryCache
 
 sdk = RCSDK(MemoryCache(), 'APP_KEY', 'APP_SECRET')
 platform = memory_sdk.get_platform()
