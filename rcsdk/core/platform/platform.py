@@ -5,8 +5,8 @@ import base64
 import time
 
 from .auth import Auth
-from core.ajax.request import *
-from core.ajax.ajax import Ajax
+from rcsdk.core.ajax.request import *
+from RCSDK.core.ajax.ajax import Ajax
 
 ACCOUNT_ID = '~'
 ACCOUNT_PREFIX = '/account/'

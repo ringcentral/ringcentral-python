@@ -3,7 +3,7 @@
 import base64
 from threading import Timer
 
-from core.ajax.request import *
+from rcsdk.core.ajax.request import *
 
 
 EVENTS = {
