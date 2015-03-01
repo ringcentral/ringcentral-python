@@ -20,11 +20,12 @@ EXTENSION = config.get('Credentials', 'EXTENSION')
 PASSWORD = config.get('Credentials', 'PASSWORD')
 APP_KEY = config.get('Credentials', 'APP_KEY')
 APP_SECRET = config.get('Credentials', 'APP_SECRET')
+SERVER = config.get('Credentials', 'SERVER')
 
 
 def main():
     print('Test with memory cache')
-    memory_sdk = RCSDK(MemoryCache(), APP_KEY, APP_SECRET)
+    memory_sdk = RCSDK(MemoryCache(), APP_KEY, APP_SECRET, SERVER)
     memory_platform = memory_sdk.get_platform()
     memory_platform.authorize(USERNAME, EXTENSION, PASSWORD)
     print('Memory Authorized')
@@ -38,7 +39,7 @@ def main():
     #
     print('Test with file cache')
     cache_dir = os.path.join(os.getcwd(), '_cache')
-    file_platform = RCSDK(FileCache(cache_dir), APP_KEY, APP_SECRET).get_platform()
+    file_platform = RCSDK(FileCache(cache_dir), APP_KEY, APP_SECRET, SERVER).get_platform()
     try:
         file_platform.is_authorized()
         print('File is authorized already')
