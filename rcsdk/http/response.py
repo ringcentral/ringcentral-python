@@ -3,7 +3,7 @@
 import json
 from email.feedparser import FeedParser
 
-from rcsdk.http.headers import *
+from .headers import *
 
 
 BOUNDARY_SEPARATOR = '--'

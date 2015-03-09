@@ -3,7 +3,7 @@
 import base64
 from threading import Timer
 
-from rcsdk.http.request import *
+from ..http.request import *
 
 
 EVENTS = {

@@ -5,9 +5,9 @@ import urllib
 import httplib
 from urlparse import urlparse
 
-from rcsdk.http.response import Response
 from .http_exception import HttpException
 from .headers import *
+from .response import Response
 
 
 POST = 'POST'

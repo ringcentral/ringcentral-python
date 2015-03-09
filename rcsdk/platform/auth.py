@@ -101,6 +101,24 @@ class Auth:
             'owner_id': self.__owner_id
         }
 
+    def reset(self):
+        self.__paused_time = 0
+
+        self.__remember = False
+
+        self.__token_type = ''
+
+        self.__access_token = ''
+        self.__expires_in = 0
+        self.__expire_time = 0
+
+        self.__refresh_token = ''
+        self.__refresh_token_expires_in = 0
+        self.__refresh_token_expire_time = 0
+
+        self.__scope = ''
+        self.__owner_id = ''
+
     def get_access_token(self):
         return self.__access_token
 

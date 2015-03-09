@@ -79,6 +79,13 @@ class Platform:
                 time.sleep(1)
             self.is_authorized(False)
 
+    def logout(self):
+        response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+            'token': self.__auth.get_access_token
+        }))
+        self.__auth.reset()
+        return response
+
     def api_call(self, request):
         self.is_authorized()
         request.set_header(AUTHORIZATION, self.__get_auth_header())
