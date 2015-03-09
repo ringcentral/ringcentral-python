@@ -4,6 +4,12 @@
 import os
 import json
 import ConfigParser
+from threading import Thread
+from multiprocessing import Process
+from time import sleep
+from rcsdk.subscription import EVENTS
+import Pubnub
+
 
 from rcsdk import RCSDK
 from rcsdk.http.request import Request
@@ -49,7 +55,7 @@ def main():
     platform = sdk.get_platform()
 
     # Set cached authentication data
-    platform.set_auth_data(cache)
+    # platform.set_auth_data(cache)
 
     # Check authentication
     try:
@@ -66,30 +72,30 @@ def main():
     user = platform.api_call(Request('GET', '/account/~/extension/~'))
     print('User loaded ' + user.get_data()['name'])
 
-    #multipart_response = platform.api_call(Request('GET', '/account/~/extension/~/message-store/' + str(user.get_data()['id']) + ',' + str(user.get_data()['id'])))
-    #print 'Memory messages loaded ' + " ".join([str(r.get_data()['id']) for r in multipart_response.get_responses()])
+    # multipart_response = platform.api_call(Request('GET', '/account/~/extension/~/message-store/' + str(user.get_data()['id']) + ',' + str(user.get_data()['id'])))
+    # print 'Memory messages loaded ' + " ".join([str(r.get_data()['id']) for r in multipart_response.get_responses()])
 
     # Pubnub notifications example
-    # def on_message(msg):
-    #     print(msg)
-    #
-    # def pubnub():
-    #     s = sdk.get_subscription()
-    #     s.add_events(['/account/~/extension/~/message-store'])
-    #     s.on(EVENTS['notification'], on_message)
-    #     s.register()
-    #     while True:
-    #         sleep(0.1)
-    #
-    # try:
-    #     try:
-    #         import Pubnub
-    #         t = Thread(target=pubnub)
-    #         t.start()
-    #     except ImportError as e:
-    #         print("No Pubnub SDK, skipping Pubnub test")
-    # except KeyboardInterrupt:
-    #     raise Exception('Stopped by user')
+    def on_message(msg):
+        print(msg)
+
+    def pubnub():
+        try:
+            s = sdk.get_subscription()
+            s.add_events(['/account/~/extension/~/message-store'])
+            s.on(EVENTS['notification'], on_message)
+            s.register()
+            while True:
+                sleep(0.1)
+        except KeyboardInterrupt:
+            print("Pubnub listener stopped...")
+
+    try:
+        p = Process(target=pubnub)
+        p.start()
+    except KeyboardInterrupt:
+        p.terminate()
+        print("Stopped by User")
 
     set_file_cache(platform.get_auth_data())
     print("Authentication data has been cached")
