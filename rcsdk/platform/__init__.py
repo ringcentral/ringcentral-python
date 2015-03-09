@@ -80,7 +80,7 @@ class Platform:
             self.is_authorized(False)
 
     def logout(self):
-        response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+        response = self.auth_call(Request(POST, TOKEN_ENDPOINT + '/revoke', body={
             'token': self.__auth.get_access_token
         }))
         self.__auth.reset()
