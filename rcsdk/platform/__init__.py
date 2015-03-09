@@ -53,31 +53,19 @@ class Platform:
         self.__auth.set_remember(remember)
 
     def refresh(self):
-        if not self.__auth.is_paused():
+        if not self.__auth.is_refresh_token_valid():
+            raise Exception('Refresh token has expired')
 
-            print("Refresh will be performed\n")
-            self.__auth.pause()
+        response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+            'grant_type': 'refresh_token',
+            'refresh_token': self.__auth.get_refresh_token(),
+            'access_token_ttl': ACCESS_TOKEN_TTL,
+            'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if self.__auth.is_remember() else REFRESH_TOKEN_TTL
+        }))
 
-            if not self.__auth.is_refresh_token_valid():
-                raise Exception('Refresh token has expired')
+        self.__auth.set_data(response.get_data())
 
-            response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
-                'grant_type': 'refresh_token',
-                'refresh_token': self.__auth.get_refresh_token(),
-                'access_token_ttl': ACCESS_TOKEN_TTL,
-                'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if self.__auth.is_remember() else REFRESH_TOKEN_TTL
-            }))
-
-            self.__auth.set_data(response.get_data())
-
-            self.__auth.resume()
-
-        else:
-
-            while self.__auth.is_paused():
-                print("Waiting for refresh\n")
-                time.sleep(1)
-            self.is_authorized(False)
+        return response
 
     def logout(self):
         response = self.auth_call(Request(POST, TOKEN_ENDPOINT + '/revoke', body={

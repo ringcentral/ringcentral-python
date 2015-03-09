@@ -4,24 +4,10 @@
 from time import time
 
 RELEASE_TIMEOUT = 10
-CACHE_KEY = 'platform'
-
-DEFAULT_AUTH_DATA = {
-    'paused_time': 0,
-    'token_type': '',
-    'access_token': '',
-    'expires_in': 0,
-    'expire_time': 0,
-    'refresh_token': '',
-    'refresh_token_expires_in': 0
-}
 
 
 class Auth:
     def __init__(self):
-
-        self.__paused_time = 0
-
         self.__remember = False
 
         self.__token_type = ''
@@ -102,8 +88,6 @@ class Auth:
         }
 
     def reset(self):
-        self.__paused_time = 0
-
         self.__remember = False
 
         self.__token_type = ''
@@ -133,16 +117,6 @@ class Auth:
 
     def is_refresh_token_valid(self):
         return self.__is_token_date_valid(self.get_data().get('refresh_token_expire_time'))
-
-    def is_paused(self):
-        pt = self.get_data().get('paused_time')
-        return pt > 0 and (time() - pt) < RELEASE_TIMEOUT
-
-    def pause(self):
-        self.set_data({'paused_time': time()})
-
-    def resume(self):
-        self.set_data({'paused_time': 0})
 
     def set_remember(self, val):
         self.set_data({'remember': True if val else False})
