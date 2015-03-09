@@ -1,9 +1,9 @@
 # !/usr/bin/env python
 # encoding: utf-8
 import json
-
-from .headers import *
 from email.feedparser import FeedParser
+
+from rcsdk.http.headers import *
 
 
 BOUNDARY_SEPARATOR = '--'

@@ -5,8 +5,9 @@ import base64
 import time
 
 from .auth import Auth
-from rcsdk.core.ajax.request import *
-from rcsdk.core.ajax.ajax import Ajax
+from ..http.request import *
+from ..http.response import *
+
 
 ACCOUNT_ID = '~'
 ACCOUNT_PREFIX = '/account/'
@@ -19,12 +20,19 @@ REFRESH_TOKEN_TTL_REMEMBER = 604800  # 1 week
 
 
 class Platform:
-    def __init__(self, cache, key, secret, server):
+    def __init__(self, key, secret, server):
         self.__server = server
         self.appKey = key
         self.appSecret = secret
-        self.__auth = Auth(cache)
+        self.__auth = Auth()
         self.__account = ACCOUNT_ID
+
+    def set_auth_data(self, auth_data=None):
+        self.__auth.set_data(auth_data)
+        return self
+
+    def get_auth_data(self):
+        return self.__auth.get_data()
 
     def is_authorized(self, refresh=True):
         if not self.__auth.is_access_token_valid() and refresh:
@@ -33,7 +41,7 @@ class Platform:
             raise Exception('Access token is not valid after refresh timeout')
 
     def authorize(self, user_name, extension, password, remember=False):
-        ajax = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+        response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
             'grant_type': 'password',
             'username': user_name,
             'extension': extension,
@@ -41,7 +49,7 @@ class Platform:
             'access_toket_ttl': ACCESS_TOKEN_TTL,
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if remember else REFRESH_TOKEN_TTL
         }))
-        self.__auth.set_data(ajax.get_response().get_data())
+        self.__auth.set_data(response.get_data())
         self.__auth.set_remember(remember)
 
     def refresh(self):
@@ -53,14 +61,14 @@ class Platform:
             if not self.__auth.is_refresh_token_valid():
                 raise Exception('Refresh token has expired')
 
-            ajax = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+            response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
                 'grant_type': 'refresh_token',
                 'refresh_token': self.__auth.get_refresh_token(),
                 'access_token_ttl': ACCESS_TOKEN_TTL,
                 'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if self.__auth.is_remember() else REFRESH_TOKEN_TTL
             }))
 
-            self.__auth.set_data(ajax.get_response().get_data())
+            self.__auth.set_data(response.get_data())
 
             self.__auth.resume()
 
@@ -75,18 +83,14 @@ class Platform:
         self.is_authorized()
         request.set_header(AUTHORIZATION, self.__get_auth_header())
         request.set_url(self.api_url(request.get_url(), {'addServer': True}))
-        ajax = Ajax(request)
-        ajax.send()
-        return ajax
+        return request.send()
 
     def auth_call(self, request):
         request.set_header(AUTHORIZATION, 'Basic ' + self.__get_api_key())
         request.set_header(CONTENT_TYPE, URL_ENCODED_CONTENT_TYPE)
         request.set_url(self.api_url(request.get_url(), {'addServer': True}))
         request.set_method(POST)
-        ajax = Ajax(request)
-        ajax.send()
-        return ajax
+        return request.send()
 
     def __get_api_key(self):
         return base64.b64encode(self.appKey + ':' + self.appSecret)

@@ -4,12 +4,13 @@
 VERSION = '0.2.4'
 
 
-from core.platform.platform import Platform
-from core.subscription.subscription import Subscription
+from .platform import Platform
+from .subscription import Subscription
+
 
 class RCSDK:
-    def __init__(self, cache, key, secret, server):
-        self.__platform = Platform(cache, key, secret, server)
+    def __init__(self, key, secret, server):
+        self.__platform = Platform(key, secret, server)
 
     def get_platform(self):
         return self.__platform

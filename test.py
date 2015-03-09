@@ -2,15 +2,12 @@
 # encoding: utf-8
 
 import os
+import json
 import ConfigParser
-from threading import Thread
-from time import sleep
 
 from rcsdk import RCSDK
-from rcsdk.core.ajax.request import Request
-from rcsdk.core.cache.filecache import FileCache
-from rcsdk.core.cache.memorycache import MemoryCache
-from rcsdk.core.subscription.subscription import EVENTS
+from rcsdk.http.request import Request
+
 
 config = ConfigParser.ConfigParser()
 config.read('credentials.ini')
@@ -22,54 +19,80 @@ APP_KEY = config.get('Credentials', 'APP_KEY')
 APP_SECRET = config.get('Credentials', 'APP_SECRET')
 SERVER = config.get('Credentials', 'SERVER')
 
+cache_dir = os.path.join(os.getcwd(), '_cache')
+file_path = os.path.join(cache_dir, 'platform.json')
+
+
+def get_file_cache():
+    try:
+        f = open(file_path, 'r')
+        data = json.load(f)
+        f.close()
+        return data if data else {}
+    except IOError:
+        return {}
+
+
+def set_file_cache(cache):
+    if not os.path.isdir(cache_dir):
+        os.mkdir(cache_dir)
+    f = open(file_path, 'w')
+    json.dump(cache, f, indent=4)
+    f.close()
+
 
 def main():
-    print('Test with memory cache')
-    memory_sdk = RCSDK(MemoryCache(), APP_KEY, APP_SECRET, SERVER)
-    memory_platform = memory_sdk.get_platform()
-    memory_platform.authorize(USERNAME, EXTENSION, PASSWORD)
-    print('Memory Authorized')
-    memory_platform.refresh()
-    print('Memory Refreshed')
-    call = memory_platform.api_call(Request('GET', '/account/~/extension/~'))
-    print('Memory User loaded ' + call.get_response().get_data()['name'])
+    cache = get_file_cache()
 
-    # call = memory_platform.api_call(Request('GET', '/account/~/extension/~/message-store/527975372020,527966621020,527965464020'))
-    # print 'Memory messages loaded ' + " ".join([str(r.get_data()["uri"]) for r in call.get_response().get_responses()])
-    #
-    print('Test with file cache')
-    cache_dir = os.path.join(os.getcwd(), '_cache')
-    file_platform = RCSDK(FileCache(cache_dir), APP_KEY, APP_SECRET, SERVER).get_platform()
+    # Create SDK instance
+    sdk = RCSDK(APP_KEY, APP_SECRET, SERVER)
+    platform = sdk.get_platform()
+
+    # Set cached authentication data
+    platform.set_auth_data(cache)
+
+    # Check authentication
     try:
-        file_platform.is_authorized()
-        print('File is authorized already')
+        platform.is_authorized()
+        print('Authorized already by cached data')
     except Exception as e:
-        file_platform.authorize(USERNAME, EXTENSION, PASSWORD)
-        print('File Authorized')
+        platform.authorize(USERNAME, EXTENSION, PASSWORD)
+        print('Authorized by credentials')
 
-    call = file_platform.api_call(Request('GET', '/account/~/extension/~'))
-    print('File User loaded ' + call.get_response().get_data()['name'])
+    # Perform refresh by force
+    platform.refresh()
+    print('Refreshed')
 
-    def on_message(msg):
-        print(msg)
+    user = platform.api_call(Request('GET', '/account/~/extension/~'))
+    print('User loaded ' + user.get_data()['name'])
 
-    def pubnub():
-        s = memory_sdk.get_subscription()
-        s.add_events(['/account/~/extension/~/message-store'])
-        s.on(EVENTS['notification'], on_message)
-        s.register()
-        while True:
-            sleep(0.1)
+    #multipart_response = platform.api_call(Request('GET', '/account/~/extension/~/message-store/' + str(user.get_data()['id']) + ',' + str(user.get_data()['id'])))
+    #print 'Memory messages loaded ' + " ".join([str(r.get_data()['id']) for r in multipart_response.get_responses()])
 
-    try:
-        try:
-            import Pubnub
-            t = Thread(target=pubnub)
-            t.start()
-        except ImportError as e:
-            print("No Pubnub SDK, skipping Pubnub test")
-    except KeyboardInterrupt:
-        pass
+    # Pubnub notifications example
+    # def on_message(msg):
+    #     print(msg)
+    #
+    # def pubnub():
+    #     s = sdk.get_subscription()
+    #     s.add_events(['/account/~/extension/~/message-store'])
+    #     s.on(EVENTS['notification'], on_message)
+    #     s.register()
+    #     while True:
+    #         sleep(0.1)
+    #
+    # try:
+    #     try:
+    #         import Pubnub
+    #         t = Thread(target=pubnub)
+    #         t.start()
+    #     except ImportError as e:
+    #         print("No Pubnub SDK, skipping Pubnub test")
+    # except KeyboardInterrupt:
+    #     raise Exception('Stopped by user')
+
+    set_file_cache(platform.get_auth_data())
+    print("Authentication data has been cached")
 
     print("Wait for notification...")
 

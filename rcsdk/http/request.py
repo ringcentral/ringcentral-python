@@ -2,7 +2,11 @@
 # encoding: utf-8
 import json
 import urllib
+import httplib
+from urlparse import urlparse
 
+from rcsdk.http.response import Response
+from .http_exception import HttpException
 from .headers import *
 
 
@@ -21,6 +25,8 @@ class Request(Headers):
         if method not in ALLOWED_METHODS:
             raise Exception('Unknown method')
 
+        self.__response = None
+
         self.__method = method
         self.__url = url
         self.__query_params = query_params if query_params else {}
@@ -36,6 +42,33 @@ class Request(Headers):
 
     def get_url(self):
         return self.__url
+
+    def send(self):
+
+        url = urlparse(self.get_url())
+        if url.scheme == "https":
+            conn = httplib.HTTPSConnection(url.hostname, url.port)
+        else:
+            conn = httplib.HTTPConnection(url.hostname, url.port)
+        try:
+            conn.request(self.get_method(),
+                         self.get_url(),
+                         body=self.get_encoded_body(),
+                         headers=self.get_headers())
+
+            response = conn.getresponse()
+            body = response.read()
+            status_code = response.status
+            headers = dict(response.getheaders())
+
+            self.__response = Response(status_code, body, dict(headers))
+            if not self.__response.check_status():
+                raise HttpException(self)
+
+            return self.__response
+
+        finally:
+            conn.close()
 
     def get_url_with_query_string(self):
         url = self.__url
@@ -81,3 +114,10 @@ class Request(Headers):
 
     def get_query_params(self):
         return self.__query_params
+
+    def get_response(self):
+        return self.__response
+
+    # FIXME
+    def is_loaded(self):
+        return False

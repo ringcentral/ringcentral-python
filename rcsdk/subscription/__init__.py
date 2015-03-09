@@ -3,7 +3,7 @@
 import base64
 from threading import Timer
 
-from rcsdk.core.ajax.request import *
+from rcsdk.http.request import *
 
 
 EVENTS = {
@@ -80,8 +80,8 @@ class Subscription:
                 }
             }
             req = Request(POST, '/restapi/v1.0/subscription', body=body)
-            ajax = self.__platform.api_call(req)
-            data = ajax.get_response().get_data()
+            response = self.__platform.api_call(req)
+            data = response.get_data()
             self.__update_subscription(data)
             self.__subscribe_at_pubnub()
             self.__emit(EVENTS['subscribeSuccess'], data)
@@ -103,8 +103,8 @@ class Subscription:
                 'eventFilters': self.__get_full_events_filter()
             }
             req = Request(PUT, '/restapi/v1.0/subscription' + self.__subscription['id'], body=body)
-            ajax = self.__platform.api_call(req)
-            data = ajax.get_response().get_data()
+            response = self.__platform.api_call(req)
+            data = response.get_data()
             self.__update_subscription(data)
             self.__emit(EVENTS['subscribeSuccess'], data)
         except Exception as e:
