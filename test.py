@@ -72,19 +72,19 @@ def main():
     print('Refreshed')
 
     # Simple GET
-    user = client.get('/account/~/extension/~')
-    user_id = str(user.get_json().id)
-    print('User loaded ' + user.get_json().name + ' (' + str(user.get_json().id) + ')')
+    user = client.get('/account/~/extension/~').get_json(True)
+    user_id = str(user.id)
+    print('User loaded ' + user.name + ' (' + user_id + ')')
 
     # Multipart response
     try:
-        multipart_response = client.get('/account/~/extension/' + user_id + ',' + user_id + '/')
-        print 'Multipart 1\n' + str(multipart_response.get_responses()[0].get_data())
-        print 'Multipart 2\n' + str(multipart_response.get_responses()[1].get_data())
+        multipart_response = client.get('/account/~/extension/' + user_id + ',' + user_id + '/').get_responses()
+        print 'Multipart 1\n' + str(multipart_response[0].get_json())
+        print 'Multipart 2\n' + str(multipart_response[1].get_json())
     except HttpException as e:
         print 'Cannot load multipart'
         print 'URL ' + e.get_request().get_url()
-        print 'Response' + str(e.get_request().get_response().get_data())
+        print 'Response' + str(e.get_request().get_response().get_json())
 
     # Pubnub notifications example
     def on_message(msg):
