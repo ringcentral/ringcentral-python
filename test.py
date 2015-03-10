@@ -9,6 +9,7 @@ from multiprocessing import Process
 from time import sleep
 from rcsdk.subscription import EVENTS
 import Pubnub
+from rcsdk.http.http_exception import HttpException
 
 
 from rcsdk import RCSDK
@@ -53,6 +54,7 @@ def main():
     # Create SDK instance
     sdk = RCSDK(APP_KEY, APP_SECRET, SERVER)
     platform = sdk.get_platform()
+    client = sdk.get_client()
 
     # Set cached authentication data
     # platform.set_auth_data(cache)
@@ -69,11 +71,20 @@ def main():
     platform.refresh()
     print('Refreshed')
 
-    user = platform.api_call(Request('GET', '/account/~/extension/~'))
-    print('User loaded ' + user.get_data()['name'])
+    # Simple GET
+    user = client.get('/account/~/extension/~')
+    user_id = str(user.get_json().id)
+    print('User loaded ' + user.get_json().name + ' (' + str(user.get_json().id) + ')')
 
-    # multipart_response = platform.api_call(Request('GET', '/account/~/extension/~/message-store/' + str(user.get_data()['id']) + ',' + str(user.get_data()['id'])))
-    # print 'Memory messages loaded ' + " ".join([str(r.get_data()['id']) for r in multipart_response.get_responses()])
+    # Multipart response
+    try:
+        multipart_response = client.get('/account/~/extension/' + user_id + ',' + user_id + '/')
+        print 'Multipart 1\n' + str(multipart_response.get_responses()[0].get_data())
+        print 'Multipart 2\n' + str(multipart_response.get_responses()[1].get_data())
+    except HttpException as e:
+        print 'Cannot load multipart'
+        print 'URL ' + e.get_request().get_url()
+        print 'Response' + str(e.get_request().get_response().get_data())
 
     # Pubnub notifications example
     def on_message(msg):
@@ -90,8 +101,8 @@ def main():
         except KeyboardInterrupt:
             print("Pubnub listener stopped...")
 
+    p = Process(target=pubnub)
     try:
-        p = Process(target=pubnub)
         p.start()
     except KeyboardInterrupt:
         p.terminate()

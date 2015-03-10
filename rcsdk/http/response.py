@@ -27,6 +27,7 @@ class Response(Headers):
         self.__raw = raw.replace('\r', '')
         self.__raw_headers = ''
         self.__data = None
+        self.__json = None
         self.__status = status
         self.__responses = []
 
@@ -68,6 +69,9 @@ class Response(Headers):
          - or body for anything else
         """
         return self.__data
+
+    def get_json(self):
+        return self.__json
 
     def get_raw(self):
         """
@@ -111,6 +115,7 @@ class Response(Headers):
         parts = msg.get_payload()
         return parts
 
+    # TODO Make it lazy
     def __parse_body(self):
         """
         Parses body (facepalm)
@@ -120,8 +125,8 @@ class Response(Headers):
             if len(parts) < 1:
                 # sic! not specific extension
                 raise Exception("Malformed Batch Response (not enough parts)")
-            # todo: defensive checking for part[0] content type
-            # todo: JSON parsing errors handling
+            # TODO Defensive checking for part[0] content type
+            # TODO JSON parsing errors handling
             statuses = json.loads(parts[0].get_payload())
             if len(statuses["response"]) != len(parts) - 1:
                 raise Exception("Malformed Batch Response (not-consistent number of parts)")
@@ -131,5 +136,37 @@ class Response(Headers):
 
         elif self.is_json():
             self.__data = json.loads(self.__body)
+            self.__json = unfold(self.__data)
         else:
             self.__data = self.__body
+
+
+PYTHON_KEYWORDS = (
+    "and", "del", "from", "not", "while", "as", "elif", "global", "or", "with", "assert", "else", "if", "pass", "yield",
+    "break", "except", "import", "rint", "class", "exec", "in", "raise", "continue", "finally", "is", "return", "def",
+    "for", "lambda", "try",)
+
+
+class JsonObject:
+    def __init__(self):
+        pass
+
+
+def safe_name(n):
+    if n in PYTHON_KEYWORDS:
+        return n + "_"
+    else:
+        return n
+
+
+def unfold(d):
+    if isinstance(d, dict):
+        o = JsonObject()
+        for k, v in d.iteritems():
+            o.__dict__[safe_name(k)] = unfold(v)
+        return o
+    elif isinstance(d, list):
+        o = [unfold(x) for x in d]
+        return o
+    else:
+        return d
