@@ -33,9 +33,9 @@ from rcsdk import RCSDK
 from rcsdk.core.ajax.request import Request
 from rcsdk.core.cache.memorycache import MemoryCache
 
-sdk = RCSDK(MemoryCache(), 'APP_KEY', 'APP_SECRET', 'https://platform.devtest.ringcentral.com')
-platform = memory_sdk.get_platform()
-platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
+memory_sdk = RCSDK(MemoryCache(), 'APP_KEY', 'APP_SECRET', 'https://platform.devtest.ringcentral.com')
+memory_platform = memory_sdk.get_platform()
+memory_platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
 
 call = memory_platform.api_call(Request('GET', '/account/~/extension/~'))
 print('Memory User loaded ' + call.get_response().get_data()['name'])
