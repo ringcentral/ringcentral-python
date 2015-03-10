@@ -72,13 +72,15 @@ def main():
     print('Refreshed')
 
     # Simple GET
-    user = client.get('/account/~/extension/~').get_json(True)
+    response = client.get('/account/~/extension/~')
+    user = response.get_json(True)
     user_id = str(user.id)
     print('User loaded ' + user.name + ' (' + user_id + ')')
+    print('Headers ' + str(response.get_headers()))
 
     # Multipart response
     try:
-        multipart_response = client.get('/account/~/extension/' + user_id + ',' + user_id + '/').get_responses()
+        multipart_response = client.get('/account/~/extension/' + user_id + ',' + user_id + '/presence').get_responses()
         print 'Multipart 1\n' + str(multipart_response[0].get_json())
         print 'Multipart 2\n' + str(multipart_response[1].get_json())
     except HttpException as e:

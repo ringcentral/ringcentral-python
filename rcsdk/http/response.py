@@ -6,13 +6,11 @@ from email.feedparser import FeedParser
 from .headers import *
 
 
-BOUNDARY_SEPARATOR = '--'
-BODY_SEPARATOR = "\n\n"
 UNAUTHORIZED_STATUS = 401
 
 
 class Response(Headers):
-    def __init__(self, status, raw, headers=None):
+    def __init__(self, status, body, headers=None):
         """
          Builds response by parsing raw response on-the-wire. Should be refactored out. Parsing should not happen here.
          It's not the place for this.
@@ -23,9 +21,7 @@ class Response(Headers):
         """
         Headers.__init__(self)
 
-        self.__body = ''
-        self.__raw = raw.replace('\r', '')
-        self.__raw_headers = ''
+        self.__body = body
         self.__status = status
 
         if status is None:
@@ -33,14 +29,6 @@ class Response(Headers):
 
         if isinstance(headers, dict):
             self.set_headers(headers)
-            self.__body = raw
-            self.__parse_headers()
-
-        elif self.__raw.find(BODY_SEPARATOR) > 0:
-            self.__raw_headers, self.__body = self.__raw.split(BODY_SEPARATOR, 1)
-
-        else:
-            self.__body = self.__raw
 
     def check_status(self):
         """
@@ -115,16 +103,6 @@ class Response(Headers):
 
         else:
             raise Exception('Response is not Batch (Multipart)')
-
-    def __parse_headers(self):
-        """
-        Sic! HTTP clients do this!
-        :return:
-        """
-        headers = self.__raw_headers.split('\n')
-        for h in filter(lambda x: x.find(HEADER_SEPARATOR) >= 0, headers):
-            k, v = h.split(HEADER_SEPARATOR, 1)
-            self.set_header(k.strip(), v.strip())
 
     def __break_into_parts(self):
 
