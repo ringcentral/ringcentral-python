@@ -45,8 +45,6 @@ class Response(Headers):
         else:
             self.__body = self.__raw
 
-        self.__parse_body()
-
     def check_status(self):
         """
         Returns True if HTTP status is 200 OK
@@ -68,9 +66,28 @@ class Response(Headers):
          - JSON for application/json response,
          - or body for anything else
         """
+        if not self.__data:
+            if self.is_json():
+                self.__data = json.loads(self.__body)
+            elif self.is_multipart():
+                self.__data = None
+            else:
+                self.__data = self.__body
+
         return self.__data
 
     def get_json(self):
+        """
+        Returns:
+         - JSON for application/json response,
+         - or raises exception
+        """
+        if not self.__json:
+            if self.is_json():
+                self.__json = unfold(self.get_data())
+            else:
+                raise Exception('Response is not JSON')
+
         return self.__json
 
     def get_raw(self):
@@ -92,6 +109,25 @@ class Response(Headers):
         Returns sub-responses, if this response is multipart
         :return:
         """
+        if not len(self.__responses):
+
+            if self.is_multipart():
+                parts = self.__break_into_parts()
+                if len(parts) < 1:
+                    # sic! not specific extension
+                    raise Exception("Malformed Batch Response (not enough parts)")
+                # TODO Defensive checking for part[0] content type
+                # TODO JSON parsing errors handling
+                statuses = json.loads(parts[0].get_payload())
+                if len(statuses["response"]) != len(parts) - 1:
+                    raise Exception("Malformed Batch Response (not-consistent number of parts)")
+
+                for response, payload in zip(statuses["response"], parts[1:]):
+                    self.__responses.append(Response(response["status"], payload.get_payload(), dict(payload)))
+
+            else:
+                raise Exception('Response is not Batch (Multipart)')
+
         return self.__responses
 
     def __parse_headers(self):
@@ -114,31 +150,6 @@ class Response(Headers):
         msg = p.close()
         parts = msg.get_payload()
         return parts
-
-    # TODO Make it lazy
-    def __parse_body(self):
-        """
-        Parses body (facepalm)
-        """
-        if self.is_multipart():
-            parts = self.__break_into_parts()
-            if len(parts) < 1:
-                # sic! not specific extension
-                raise Exception("Malformed Batch Response (not enough parts)")
-            # TODO Defensive checking for part[0] content type
-            # TODO JSON parsing errors handling
-            statuses = json.loads(parts[0].get_payload())
-            if len(statuses["response"]) != len(parts) - 1:
-                raise Exception("Malformed Batch Response (not-consistent number of parts)")
-
-            for response, payload in zip(statuses["response"], parts[1:]):
-                self.__responses.append(Response(response["status"], payload.get_payload(), dict(payload)))
-
-        elif self.is_json():
-            self.__data = json.loads(self.__body)
-            self.__json = unfold(self.__data)
-        else:
-            self.__data = self.__body
 
 
 PYTHON_KEYWORDS = (
