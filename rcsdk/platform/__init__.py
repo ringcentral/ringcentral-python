@@ -2,8 +2,6 @@
 # encoding: utf-8
 
 import base64
-import time
-
 from .auth import Auth
 from ..http.request import *
 from ..http.response import *
@@ -14,7 +12,7 @@ ACCOUNT_PREFIX = '/account/'
 URL_PREFIX = '/restapi'
 TOKEN_ENDPOINT = '/restapi/oauth/token'
 API_VERSION = 'v1.0'
-ACCESS_TOKEN_TTL = 600  # 10 minutes
+ACCESS_TOKEN_TTL = 3600  # 60 minutes
 REFRESH_TOKEN_TTL = 36000  # 10 hours
 REFRESH_TOKEN_TTL_REMEMBER = 604800  # 1 week
 
@@ -49,7 +47,7 @@ class Platform:
             'access_toket_ttl': ACCESS_TOKEN_TTL,
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if remember else REFRESH_TOKEN_TTL
         }))
-        self.__auth.set_data(response.get_data())
+        self.__auth.set_data(response.get_json(False))
         self.__auth.set_remember(remember)
 
     def refresh(self):
@@ -63,7 +61,7 @@ class Platform:
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if self.__auth.is_remember() else REFRESH_TOKEN_TTL
         }))
 
-        self.__auth.set_data(response.get_data())
+        self.__auth.set_data(response.get_json(False))
 
         return response
 

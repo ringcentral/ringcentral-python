@@ -85,7 +85,7 @@ def main():
     except HttpException as e:
         print 'Cannot load multipart'
         print 'URL ' + e.get_request().get_url()
-        print 'Response' + str(e.get_request().get_response().get_json())
+        print 'Response' + str(e.get_response().get_json())
 
     # Pubnub notifications example
     def on_message(msg):

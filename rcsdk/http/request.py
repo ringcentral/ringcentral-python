@@ -25,8 +25,6 @@ class Request(Headers):
         if method not in ALLOWED_METHODS:
             raise Exception('Unknown method')
 
-        self.__response = None
-
         self.__method = method
         self.__url = url
         self.__query_params = query_params if query_params else {}
@@ -61,11 +59,11 @@ class Request(Headers):
             status_code = response.status
             headers = dict(response.getheaders())
 
-            self.__response = Response(status_code, body, dict(headers))
-            if not self.__response.check_status():
-                raise HttpException(self)
+            response = Response(status_code, body, dict(headers))
+            if not response.check_status():
+                raise HttpException(self, response)
 
-            return self.__response
+            return response
 
         finally:
             conn.close()

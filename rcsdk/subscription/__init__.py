@@ -81,7 +81,7 @@ class Subscription:
             }
             req = Request(POST, '/restapi/v1.0/subscription', body=body)
             response = self.__platform.api_call(req)
-            data = response.get_data()
+            data = response.get_json(False)
             self.__update_subscription(data)
             self.__subscribe_at_pubnub()
             self.__emit(EVENTS['subscribeSuccess'], data)
@@ -104,7 +104,7 @@ class Subscription:
             }
             req = Request(PUT, '/restapi/v1.0/subscription' + self.__subscription['id'], body=body)
             response = self.__platform.api_call(req)
-            data = response.get_data()
+            data = response.get_data(False)
             self.__update_subscription(data)
             self.__emit(EVENTS['subscribeSuccess'], data)
         except Exception as e:
