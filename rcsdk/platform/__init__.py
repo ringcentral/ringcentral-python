@@ -116,5 +116,16 @@ class Platform:
 
         return built_url
 
+    def get(self, url, query_params=None, headers=None):
+        return self.api_call(Request(GET, url, query_params, None, headers))
+
+    def post(self, url, query_params=None, body=None, headers=None):
+        return self.api_call(Request(POST, url, query_params, body, headers))
+
+    def put(self, url, query_params=None, body=None, headers=None):
+        return self.api_call(Request(PUT, url, query_params, body, headers))
+
+    def delete(self, url, query_params=None, body=None, headers=None):
+        return self.api_call(Request(DELETE, url, query_params, body, headers))
 
 

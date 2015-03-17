@@ -10,7 +10,7 @@ UNAUTHORIZED_STATUS = 401
 
 
 class Response(Headers):
-    def __init__(self, status, body, headers=None):
+    def __init__(self, status, body, headers=None):  # TODO Add statusText
         """
          Builds response by parsing raw response on-the-wire. Should be refactored out. Parsing should not happen here.
          It's not the place for this.
@@ -64,13 +64,6 @@ class Response(Headers):
         else:
             raise Exception('Response is not JSON')
 
-    def get_raw(self):
-        """
-        Raw response with headers and body. As seen on the wire. (WTF?!)
-        :return:
-        """
-        return self.__raw
-
     def get_status(self):
         """
         Returns HTTP status code
@@ -103,6 +96,19 @@ class Response(Headers):
 
         else:
             raise Exception('Response is not Batch (Multipart)')
+
+    def get_error(self):
+        message = self.__status + ' Unknown error'  # TODO Use statusText
+        data = self.get_data()
+
+        if 'message' in data:
+            message = data['message']
+        elif 'error_description' in data:
+            message = data['error_description']
+        elif 'description' in data:
+            message = data['description']
+
+        return message
 
     def __break_into_parts(self):
 

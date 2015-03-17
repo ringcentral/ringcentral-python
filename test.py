@@ -54,7 +54,6 @@ def main():
     # Create SDK instance
     sdk = RCSDK(APP_KEY, APP_SECRET, SERVER)
     platform = sdk.get_platform()
-    client = sdk.get_client()
 
     # Set cached authentication data
     # platform.set_auth_data(cache)
@@ -72,7 +71,7 @@ def main():
     print('Refreshed')
 
     # Simple GET
-    response = client.get('/account/~/extension/~')
+    response = platform.get('/account/~/extension/~')
     user = response.get_json(True)
     user_id = str(user.id)
     print('User loaded ' + user.name + ' (' + user_id + ')')
@@ -80,7 +79,7 @@ def main():
 
     # Multipart response
     try:
-        multipart_response = client.get('/account/~/extension/' + user_id + ',' + user_id + '/presence').get_responses()
+        multipart_response = platform.get('/account/~/extension/' + user_id + ',' + user_id + '/presence').get_responses()
         print 'Multipart 1\n' + str(multipart_response[0].get_json())
         print 'Multipart 2\n' + str(multipart_response[1].get_json())
     except HttpException as e:
