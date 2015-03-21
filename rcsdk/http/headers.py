@@ -24,6 +24,9 @@ class Headers:
     def get_header(self, key):
         return self.headers.get(key.lower())
 
+    def has_header(self, key):
+        return key.lower() in self.headers
+
     def get_headers(self):
         return self.headers
 
