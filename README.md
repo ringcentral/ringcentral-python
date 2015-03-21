@@ -33,11 +33,11 @@ from rcsdk import RCSDK
 from rcsdk.core.ajax.request import Request
 from rcsdk.core.cache.memorycache import MemoryCache
 
-sdk = RCSDK(MemoryCache(), 'APP_KEY', 'APP_SECRET', 'SERVER')
-platform = memory_sdk.get_platform()
+sdk = RCSDK('APP_KEY', 'APP_SECRET', 'SERVER')
+platform = sdk.get_platform()
 platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
 
-call = memory_platform.api_call(Request('GET', '/account/~/extension/~'))
+call = platform.api_call(Request('GET', '/account/~/extension/~'))
 print('Memory User loaded ' + call.get_response().get_data()['name'])
 ```
 

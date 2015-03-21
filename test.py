@@ -4,16 +4,11 @@
 import os
 import json
 import ConfigParser
-from threading import Thread
 from multiprocessing import Process
 from time import sleep
 from rcsdk.subscription import EVENTS
-import Pubnub
 from rcsdk.http.http_exception import HttpException
-
-
 from rcsdk import RCSDK
-from rcsdk.http.request import Request
 
 
 config = ConfigParser.ConfigParser()

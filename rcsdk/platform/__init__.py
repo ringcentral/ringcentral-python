@@ -39,14 +39,14 @@ class Platform:
             raise Exception('Access token is not valid after refresh timeout')
 
     def authorize(self, user_name, extension, password, remember=False):
-        response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+        response = self.auth_call(POST, TOKEN_ENDPOINT, body={
             'grant_type': 'password',
             'username': user_name,
             'extension': extension,
             'password': password,
             'access_toket_ttl': ACCESS_TOKEN_TTL,
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if remember else REFRESH_TOKEN_TTL
-        }))
+        })
         self.__auth.set_data(response.get_json(False))
         self.__auth.set_remember(remember)
 
@@ -54,31 +54,33 @@ class Platform:
         if not self.__auth.is_refresh_token_valid():
             raise Exception('Refresh token has expired')
 
-        response = self.auth_call(Request(POST, TOKEN_ENDPOINT, body={
+        response = self.auth_call(POST, TOKEN_ENDPOINT, body={
             'grant_type': 'refresh_token',
             'refresh_token': self.__auth.get_refresh_token(),
             'access_token_ttl': ACCESS_TOKEN_TTL,
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if self.__auth.is_remember() else REFRESH_TOKEN_TTL
-        }))
+        })
 
         self.__auth.set_data(response.get_json(False))
 
         return response
 
     def logout(self):
-        response = self.auth_call(Request(POST, TOKEN_ENDPOINT + '/revoke', body={
+        response = self.auth_call(POST, TOKEN_ENDPOINT + '/revoke', body={
             'token': self.__auth.get_access_token
-        }))
+        })
         self.__auth.reset()
         return response
 
-    def api_call(self, request):
+    def api_call(self, method, url, query_params=None, body=None, headers=None):
         self.is_authorized()
+        request = Request(method, url, query_params, body, headers)
         request.set_header(AUTHORIZATION, self.__get_auth_header())
         request.set_url(self.api_url(request.get_url(), {'addServer': True}))
         return request.send()
 
-    def auth_call(self, request):
+    def auth_call(self, method, url, query_params=None, body=None, headers=None):
+        request = Request(method, url, query_params, body, headers)
         request.set_header(AUTHORIZATION, 'Basic ' + self.__get_api_key())
         request.set_header(CONTENT_TYPE, URL_ENCODED_CONTENT_TYPE)
         request.set_url(self.api_url(request.get_url(), {'addServer': True}))
@@ -115,15 +117,15 @@ class Platform:
         return built_url
 
     def get(self, url, query_params=None, headers=None):
-        return self.api_call(Request(GET, url, query_params, None, headers))
+        return self.api_call(GET, url, query_params, None, headers)
 
     def post(self, url, query_params=None, body=None, headers=None):
-        return self.api_call(Request(POST, url, query_params, body, headers))
+        return self.api_call(POST, url, query_params, body, headers)
 
     def put(self, url, query_params=None, body=None, headers=None):
-        return self.api_call(Request(PUT, url, query_params, body, headers))
+        return self.api_call(PUT, url, query_params, body, headers)
 
     def delete(self, url, query_params=None, body=None, headers=None):
-        return self.api_call(Request(DELETE, url, query_params, body, headers))
+        return self.api_call(DELETE, url, query_params, body, headers)
 
 

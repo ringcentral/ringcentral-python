@@ -113,9 +113,6 @@ class Request(Headers):
     def get_query_params(self):
         return self.__query_params
 
-    def get_response(self):
-        return self.__response
-
     # FIXME
     def is_loaded(self):
         return False
