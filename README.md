@@ -30,15 +30,13 @@ For more info take a look on the `test.py` in this repository.
 
 ```py
 from rcsdk import RCSDK
-from rcsdk.core.ajax.request import Request
-from rcsdk.core.cache.memorycache import MemoryCache
 
 sdk = RCSDK('APP_KEY', 'APP_SECRET', 'SERVER')
 platform = sdk.get_platform()
 platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
 
-call = platform.api_call(Request('GET', '/account/~/extension/~'))
-print('Memory User loaded ' + call.get_response().get_data()['name'])
+res = platform.api_call('GET', '/account/~/extension/~')
+print('Memory User loaded ' + res.get_json().name)
 ```
 
 # Subscribing for server events
@@ -52,7 +50,7 @@ def on_message(msg):
     print(msg)
 
 def pubnub():
-    s = memory_sdk.get_subscription()
+    s = sdk.get_subscription()
     s.add_events(['/account/~/extension/~/message-store'])
     s.on(EVENTS['notification'], on_message)
     s.register()
