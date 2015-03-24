@@ -3,7 +3,7 @@
 import base64
 from threading import Timer
 
-from rcsdk.core.ajax.request import *
+from ..http.request import *
 
 
 EVENTS = {
@@ -79,9 +79,8 @@ class Subscription:
                     'transportType': 'PubNub'
                 }
             }
-            req = Request(POST, '/restapi/v1.0/subscription', body=body)
-            ajax = self.__platform.api_call(req)
-            data = ajax.get_response().get_data()
+            response = self.__platform.api_call(POST, '/restapi/v1.0/subscription', body=body)
+            data = response.get_json(False)
             self.__update_subscription(data)
             self.__subscribe_at_pubnub()
             self.__emit(EVENTS['subscribeSuccess'], data)
@@ -102,9 +101,8 @@ class Subscription:
             body = {
                 'eventFilters': self.__get_full_events_filter()
             }
-            req = Request(PUT, '/restapi/v1.0/subscription' + self.__subscription['id'], body=body)
-            ajax = self.__platform.api_call(req)
-            data = ajax.get_response().get_data()
+            response = self.__platform.api_call(PUT, '/restapi/v1.0/subscription' + self.__subscription['id'], body=body)
+            data = response.get_data(False)
             self.__update_subscription(data)
             self.__emit(EVENTS['subscribeSuccess'], data)
         except Exception as e:
@@ -115,8 +113,7 @@ class Subscription:
         try:
             if not self.__subscription or ('id' not in self.__subscription) or not self.__subscription['id']:
                 raise Exception('Subscription ID is required')
-            req = Request(DELETE, '/restapi/v1.0/subscription' + self.__subscription['id'])
-            self.__platform.api_call(req)
+            self.__platform.api_call(DELETE, '/restapi/v1.0/subscription' + self.__subscription['id'])
             self.un_subscribe()
             self.__emit(EVENTS['removeSuccess'])
         except Exception as e:

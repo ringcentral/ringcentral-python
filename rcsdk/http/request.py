@@ -2,8 +2,12 @@
 # encoding: utf-8
 import json
 import urllib
+import httplib
+from urlparse import urlparse
 
+from .http_exception import HttpException
 from .headers import *
+from .response import Response
 
 
 POST = 'POST'
@@ -36,6 +40,33 @@ class Request(Headers):
 
     def get_url(self):
         return self.__url
+
+    def send(self):
+
+        url = urlparse(self.get_url())
+        if url.scheme == "https":
+            conn = httplib.HTTPSConnection(url.hostname, url.port)
+        else:
+            conn = httplib.HTTPConnection(url.hostname, url.port)
+        try:
+            conn.request(self.get_method(),
+                         self.get_url(),
+                         body=self.get_encoded_body(),
+                         headers=self.get_headers())
+
+            response = conn.getresponse()
+            body = response.read()
+            status_code = response.status
+            headers = dict(response.getheaders())
+
+            response = Response(status_code, body, dict(headers))
+            if not response.check_status():
+                raise HttpException(self, response)
+
+            return response
+
+        finally:
+            conn.close()
 
     def get_url_with_query_string(self):
         url = self.__url
@@ -81,3 +112,7 @@ class Request(Headers):
 
     def get_query_params(self):
         return self.__query_params
+
+    # FIXME
+    def is_loaded(self):
+        return False
