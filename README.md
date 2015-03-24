@@ -36,7 +36,7 @@ platform = sdk.get_platform()
 platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
 
 res = platform.api_call('GET', '/account/~/extension/~')
-print('Memory User loaded ' + res.get_json().name)
+print('User loaded ' + res.get_json().name)
 ```
 
 # Subscribing for server events
