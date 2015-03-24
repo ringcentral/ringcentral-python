@@ -6,11 +6,9 @@ setup(
     name='rcsdk',
     packages=[
         'rcsdk',
-        'rcsdk.core',
-        'rcsdk.core.ajax',
-        'rcsdk.core.cache',
-        'rcsdk.core.platform',
-        'rcsdk.core.subscription'
+        'rcsdk.http',
+        'rcsdk.platform',
+        'rcsdk.subscription'
     ],
     version=VERSION,
     description='RingPlatform Python SDK',
