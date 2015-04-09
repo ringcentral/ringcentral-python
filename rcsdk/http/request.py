@@ -48,6 +48,7 @@ class Request(Headers):
             conn = httplib.HTTPSConnection(url.hostname, url.port)
         else:
             conn = httplib.HTTPConnection(url.hostname, url.port)
+
         try:
             conn.request(self.get_method(),
                          self.get_url(),
@@ -64,6 +65,9 @@ class Request(Headers):
                 raise HttpException(self, response)
 
             return response
+
+        except Exception as e:
+            raise HttpException(self, None, e)
 
         finally:
             conn.close()

@@ -27,8 +27,12 @@ class Response(Headers):
         if status is None:
             raise Exception('Empty status was received')
 
-        if isinstance(headers, dict):
-            self.set_headers(headers)
+        if not isinstance(headers, dict):
+            headers = {
+                'content-type': 'application/json'
+            }
+
+        self.set_headers(headers)
 
     def check_status(self):
         """

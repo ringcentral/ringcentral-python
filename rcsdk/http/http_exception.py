@@ -3,12 +3,12 @@
 
 
 class HttpException(Exception):
-    def __init__(self, request, response):
+    def __init__(self, request, response, previous=None):
         self.__request = request
         self.__response = response
 
         status = response.get_status() if response else 500
-        message = response.get_error()
+        message = response.get_error() if response else previous.message
 
         Exception.__init__(self, status, message)
 

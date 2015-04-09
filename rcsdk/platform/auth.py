@@ -65,7 +65,7 @@ class Auth:
 
         if 'refresh_token_expire_time' not in auth_data and 'refresh_token_expires_in' in auth_data:
             self.__refresh_token_expire_time = time() + auth_data.get('refresh_token_expires_in')
-        elif 'expire_time' in auth_data:
+        elif 'refresh_token_expire_time' in auth_data:
             self.__refresh_token_expire_time = auth_data.get('refresh_token_expire_time')
 
         return self
