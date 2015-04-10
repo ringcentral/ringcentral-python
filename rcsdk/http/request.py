@@ -76,7 +76,7 @@ class Request(Headers):
         url = self.__url
         query = urllib.urlencode(self.__query_params)
         if query:
-            url = ('&' if self.__url.find('?') > 0 else '?') + query
+            url = url + ('&' if self.__url.find('?') > 0 else '?') + query
         return url
 
     def get_encoded_body(self):
@@ -104,6 +104,7 @@ class Request(Headers):
 
     def set_method(self, method):
         self.__method = method
+        return self
 
     def set_url(self, url):
         self.__url = url
@@ -113,6 +114,11 @@ class Request(Headers):
 
     def set_body(self, body):
         self.__body = body
+        return self
+
+    def set_query_params(self, query):
+        self.__query_params = query
+        return self
 
     def get_query_params(self):
         return self.__query_params

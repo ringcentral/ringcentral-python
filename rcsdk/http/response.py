@@ -95,7 +95,7 @@ class Response(Headers):
         return responses
 
     def get_error(self):
-        message = self.__status + ' Unknown error'  # TODO Use statusText
+        message = str(self.__status) + ' Unknown error'  # TODO Use statusText
         data = self.get_json(False)
 
         if 'message' in data:
