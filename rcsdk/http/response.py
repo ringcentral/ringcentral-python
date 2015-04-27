@@ -27,8 +27,12 @@ class Response(Headers):
         if status is None:
             raise Exception('Empty status was received')
 
-        if isinstance(headers, dict):
-            self.set_headers(headers)
+        if not isinstance(headers, dict):
+            headers = {
+                'content-type': 'application/json'
+            }
+
+        self.set_headers(headers)
 
     def check_status(self):
         """
@@ -91,7 +95,7 @@ class Response(Headers):
         return responses
 
     def get_error(self):
-        message = self.__status + ' Unknown error'  # TODO Use statusText
+        message = str(self.__status) + ' Unknown error'  # TODO Use statusText
         data = self.get_json(False)
 
         if 'message' in data:

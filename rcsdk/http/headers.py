@@ -16,10 +16,12 @@ class Headers:
 
     def set_header(self, key, val):
         self.headers[key.lower()] = val
+        return self
 
     def set_headers(self, headers):
         for k in headers.keys():
             self.set_header(k, headers[k])
+        return self
 
     def get_header(self, key):
         return self.headers.get(key.lower())
@@ -34,13 +36,14 @@ class Headers:
         return [k.lower() + HEADER_SEPARATOR + str(self.headers[k]) for k in self.headers.keys()]
 
     def get_content_type(self):
-        return self.get_header(CONTENT_TYPE)
+        return self.get_header(CONTENT_TYPE) if self.has_header(CONTENT_TYPE) else ''
 
     def set_content_type(self, ct):
         self.set_header(CONTENT_TYPE, ct)
+        return self
 
     def is_content_type(self, ct):
-        return self.get_content_type().find(ct) >= 0
+        return self.get_content_type().lower().find(ct.lower()) >= 0
 
     def is_json(self):
         return self.is_content_type(JSON_CONTENT_TYPE)

@@ -2,9 +2,9 @@
 # encoding: utf-8
 import base64
 from threading import Timer
-
+import json
 from ..http.request import *
-
+from ..core.observable import Observable
 
 EVENTS = {
     'notification': 'notification',
@@ -19,8 +19,10 @@ EVENTS = {
 RENEW_HANDICAP = 60
 
 
-class Subscription:
-    def __init__(self, platform):
+class Subscription(Observable):
+    def __init__(self, context, platform):
+        Observable.__init__(self)
+        self.__context = context
         self.__platform = platform
         self.__event_filters = []
         self.__timeout = None
@@ -41,23 +43,12 @@ class Subscription:
             'uri': ''
         }
         self.__pubnub = None
-        self.__listeners = {}
 
-    def on(self, event, fn):
-        if event not in self.__listeners:
-            self.__listeners[event] = []
-        self.__listeners[event].append(fn)
-
-    def __emit(self, event, data=None):
-        if event in self.__listeners:
-            for l in self.__listeners[event]:
-                l(data)
-
-    def register(self, options=None):
+    def register(self, events=None):
         if self.is_subscribed():
-            self.renew(options)
+            return self.renew(events=events)
         else:
-            self.subscribe(options)
+            return self.subscribe(events=events)
 
     def add_events(self, events):
         self.__event_filters += events
@@ -66,62 +57,83 @@ class Subscription:
     def set_events(self, events):
         self.__event_filters = events
 
-    def subscribe(self, options=None):
-        options = options if options else {}
-        if 'events' in options:
-            self.__event_filters = options['events']
+    def subscribe(self, events=None):
+
+        if events:
+            self.set_events(events)
+
         try:
             if not self.__event_filters or len(self.__event_filters) == 0:
                 raise Exception('Events are undefined')
+
             body = {
                 'eventFilters': self.__get_full_events_filter(),
                 'deliveryMode': {
                     'transportType': 'PubNub'
                 }
             }
-            response = self.__platform.api_call(POST, '/restapi/v1.0/subscription', body=body)
+            response = self.__platform.post('/restapi/v1.0/subscription', body=body)
+
             data = response.get_json(False)
+
             self.__update_subscription(data)
             self.__subscribe_at_pubnub()
-            self.__emit(EVENTS['subscribeSuccess'], data)
+            self.emit(EVENTS['subscribeSuccess'], data)
+
+            return response
+
         except Exception as e:
             self.un_subscribe()
-            self.__emit(EVENTS['subscribeError'], e)
+            self.emit(EVENTS['subscribeError'], e)
             raise e
 
-    def renew(self, options=None):
-        options = options if options else {}
-        self.__event_filters = options['events'] if 'events' in options else []
+    def renew(self, events=None):
+
+        if events:
+            self.set_events(events)
+
         self.__clear_timeout()
+
         try:
             if not self.__subscription or ('id' not in self.__subscription) or not self.__subscription['id']:
                 raise Exception('Subscription ID is required')
+
             if not self.__event_filters or len(self.__event_filters) == 0:
                 raise Exception('Events are undefined')
-            body = {
-                'eventFilters': self.__get_full_events_filter()
-            }
-            response = self.__platform.api_call(PUT, '/restapi/v1.0/subscription' + self.__subscription['id'], body=body)
+
+            body = {'eventFilters': self.__get_full_events_filter()}
+            response = self.__platform.put('/restapi/v1.0/subscription' + self.__subscription['id'], body=body)
+
             data = response.get_data(False)
+
             self.__update_subscription(data)
-            self.__emit(EVENTS['subscribeSuccess'], data)
+            self.emit(EVENTS['subscribeSuccess'], data)
+
+            return response
+
         except Exception as e:
             self.un_subscribe()
-            self.__emit(EVENTS['renewError'], e)
+            self.emit(EVENTS['renewError'], e)
 
     def remove(self):
         try:
             if not self.__subscription or ('id' not in self.__subscription) or not self.__subscription['id']:
                 raise Exception('Subscription ID is required')
-            self.__platform.api_call(DELETE, '/restapi/v1.0/subscription' + self.__subscription['id'])
+
+            response = self.__platform.delete('/restapi/v1.0/subscription' + self.__subscription['id'])
+
             self.un_subscribe()
-            self.__emit(EVENTS['removeSuccess'])
+            self.emit(EVENTS['removeSuccess'])
+
+            return response
+
         except Exception as e:
             self.un_subscribe()
-            self.__emit(EVENTS['removeError'], e)
+            self.emit(EVENTS['removeError'], e)
 
     def destroy(self):
         self.un_subscribe()
+        self.off()
 
     def un_subscribe(self):
         self.__clear_timeout()
@@ -144,17 +156,23 @@ class Subscription:
 
         if not self.is_subscribed():
             return
+
         # TODO check this stuff
         s_key = self.__subscription['deliveryMode']['subscriberKey']
-        self.__pubnub = Pubnub(subscribe_key=s_key, ssl_on=False, publish_key='')
+        self.__pubnub = self.__context.get_pubnub(subscribe_key=s_key, ssl_on=False, publish_key='')
 
-        def callback(message, channel):
-            if self.is_subscribed() and ('encryptionKey' in self.__subscription['deliveryMode']):
+        def callback(message, channel=''):
+
+            is_subscibed = self.is_subscribed()
+            delivery_mode = self.__subscription['deliveryMode'] if is_subscibed else {}
+            is_encrypted = ('encryption' in delivery_mode) and ('encryptionKey' in delivery_mode)
+
+            if is_subscibed and is_encrypted:
                 key = base64.b64decode(self.__subscription['deliveryMode']['encryptionKey'])
                 data = base64.b64decode(message)
                 obj2 = AES.new(key)
-                decrypted = obj2.decrypt(data)
-                self.__notify(decrypted)
+                decrypted = str(obj2.decrypt(data)).replace('\x05', '')
+                self.__notify(json.loads(decrypted))
             else:
                 self.__notify(message)
 
@@ -174,7 +192,7 @@ class Subscription:
                                 connect=connect, reconnect=reconnect, disconnect=disconnect)
 
     def __notify(self, message):
-        self.__emit(EVENTS['notification'], message)
+        self.emit(EVENTS['notification'], message)
 
     def __un_subscribe_at_pubnub(self):
         if self.__pubnub and self.is_subscribed():
@@ -191,6 +209,9 @@ class Subscription:
     def __clear_timeout(self):
         if self.__timeout:
             self.__timeout.cancel()
+
+    def _get_pubnub(self):
+        return self.__pubnub
 
 
 if __name__ == '__main__':
