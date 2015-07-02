@@ -46,7 +46,7 @@ class Platform:
             'username': user_name,
             'extension': extension,
             'password': password,
-            'access_toket_ttl': ACCESS_TOKEN_TTL,
+            'access_token_ttl': ACCESS_TOKEN_TTL,
             'refresh_token_ttl': REFRESH_TOKEN_TTL_REMEMBER if remember else REFRESH_TOKEN_TTL
         })
         self.__auth.set_data(response.get_json(False))
