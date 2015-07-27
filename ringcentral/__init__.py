@@ -6,7 +6,7 @@ from .subscription import Subscription
 from .core.context import Context
 
 
-VERSION = '0.4.0'
+VERSION = '0.4.1'
 
 
 class RCSDK:
