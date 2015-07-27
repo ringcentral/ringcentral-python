@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/travis/ringcentral/ringcentral-python/master.svg)](https://travis-ci.org/ringcentral/ringcentral-python)
+
 # Installation
 
 ## Manual
