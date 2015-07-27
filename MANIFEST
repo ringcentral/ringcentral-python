@@ -2,6 +2,7 @@
 setup.cfg
 setup.py
 ringcentral/__init__.py
+ringcentral/__init__test.py
 ringcentral/core/__init__.py
 ringcentral/core/context.py
 ringcentral/core/observable.py

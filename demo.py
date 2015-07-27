@@ -8,7 +8,7 @@ from multiprocessing import Process
 from time import sleep
 from ringcentral.subscription import EVENTS
 from ringcentral.http.http_exception import HttpException
-from ringcentral import RCSDK
+from ringcentral import SDK
 
 
 config = ConfigParser.ConfigParser()
@@ -47,7 +47,7 @@ def main():
     cache = get_file_cache()
 
     # Create SDK instance
-    sdk = RCSDK(APP_KEY, APP_SECRET, SERVER)
+    sdk = SDK(APP_KEY, APP_SECRET, SERVER)
     platform = sdk.get_platform()
 
     # Set cached authentication data
