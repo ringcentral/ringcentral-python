@@ -11,7 +11,7 @@ class TestCase(unittest.TestCase):
         unittest.TestCase.__init__(self, method_name)
 
     def get_sdk(self, authorized=True):
-        sdk = RCSDK('whatever', 'whatever', 'https://whatever')
+        sdk = SDK('whatever', 'whatever', 'https://whatever')
 
         context = sdk.get_context()
 

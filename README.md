@@ -1,4 +1,6 @@
-[![Build Status](https://img.shields.io/travis/ringcentral/ringcentral-python/master.svg)](https://travis-ci.org/ringcentral/ringcentral-python)
+# RingCentral SDK for Python
+
+[![Build Status](https://img.shields.io/travis/ringcentral/ringcentral-python/master.svg)](https://travis-ci.org/ringcentral/ringcentral-python )
 
 # Installation
 
@@ -31,9 +33,9 @@ Installation instructions: [http://www.pubnub.com/docs/python/python-sdk.html](h
 For more info take a look on the `test.py` in this repository.
 
 ```py
-from rcsdk import RCSDK
+from ringcentral import SDK
 
-sdk = RCSDK('APP_KEY', 'APP_SECRET', 'SERVER')
+sdk = SDK('APP_KEY', 'APP_SECRET', 'SERVER')
 platform = sdk.get_platform()
 platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
 
@@ -46,7 +48,7 @@ print('User loaded ' + res.get_json().name)
 ```py
 from threading import Thread
 from time import sleep
-from rcsdk.core.subscription.subscription import EVENTS
+from ringcentral.core.subscription.subscription import EVENTS
 
 def on_message(msg):
     print(msg)

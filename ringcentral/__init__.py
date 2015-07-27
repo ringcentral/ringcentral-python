@@ -6,10 +6,10 @@ from .subscription import Subscription
 from .core.context import Context
 
 
-VERSION = '0.4.1'
+VERSION = '0.5.0'
 
 
-class RCSDK:
+class SDK:
     def __init__(self, key, secret, server):
         self.__context = Context()
         self.__platform = Platform(self.__context, key, secret, server)
