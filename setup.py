@@ -1,25 +1,25 @@
 from distutils.core import setup
 
-VERSION = __import__("rcsdk").VERSION
+VERSION = __import__("ringcentral").VERSION
 
 setup(
-    name='rcsdk',
+    name='ringcentral',
     packages=[
-        'rcsdk',
-        'rcsdk.core',
-        'rcsdk.http',
-        'rcsdk.http.mocks',
-        'rcsdk.platform',
-        'rcsdk.subscription',
-        'rcsdk.test'
+        'ringcentral',
+        'ringcentral.core',
+        'ringcentral.http',
+        'ringcentral.http.mocks',
+        'ringcentral.platform',
+        'ringcentral.subscription',
+        'ringcentral.test'
     ],
     version=VERSION,
     description='RingCentral Connect Platform Python SDK',
-    author="RingCentral, Inc.",
+    author="Kirill Konshin @ RingCentral, Inc.",
     author_email="devsupport@ringcentral.com",
-    url="https://github.com/ringcentral/python-sdk",
-    download_url="https://github.com/ringcentral/python-sdk/tarball/%s" % VERSION,
-    keywords=['sdk', 'ringcentral', 'connect', 'platform'],
+    url="https://github.com/ringcentral/ringcentral-python",
+    download_url="https://github.com/ringcentral/ringcentral-python/tarball/%s" % VERSION,
+    keywords=['sdk', 'ringcentral', 'connect', 'platform', 'api', 'python'],
     install_requires=[
         'pubnub>=3.7.0'
     ],

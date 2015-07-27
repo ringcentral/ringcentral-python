@@ -6,9 +6,9 @@ import json
 import ConfigParser
 from multiprocessing import Process
 from time import sleep
-from rcsdk.subscription import EVENTS
-from rcsdk.http.http_exception import HttpException
-from rcsdk import RCSDK
+from ringcentral.subscription import EVENTS
+from ringcentral.http.http_exception import HttpException
+from ringcentral import RCSDK
 
 
 config = ConfigParser.ConfigParser()
