@@ -11,7 +11,7 @@ coverage:
 	coverage run -m unittest discover --pattern '*test.py'
 
 .PHONY: coverage-report
-coverage:
+coverage-report:
 	coverage report -m
 
 .PHONY: publish
