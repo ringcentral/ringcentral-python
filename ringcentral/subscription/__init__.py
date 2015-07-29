@@ -85,7 +85,7 @@ class Subscription(Observable):
         except Exception as e:
             self.un_subscribe()
             self.emit(EVENTS['subscribeError'], e)
-            raise e
+            raise   # this will re-raise existing e
 
     def renew(self, events=None):
 
@@ -152,7 +152,7 @@ class Subscription(Observable):
         self.__set_timeout()
 
     def __subscribe_at_pubnub(self):
-        from Pubnub import Pubnub, AES
+        from pubnub import AES
 
         if not self.is_subscribed():
             return

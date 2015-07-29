@@ -5,6 +5,8 @@ from ..http.mocks.mocks import Mocks
 from ..http.request import Request
 from ..subscription.pubnub_mock import PubnubMock
 from ..http.request_mock import RequestMock
+from pubnub import Pubnub
+
 
 class Context:
     def __init__(self):
@@ -16,7 +18,6 @@ class Context:
         if self.__usePubnubMock:
             return PubnubMock()
         else:
-            from Pubnub import Pubnub
             return Pubnub(subscribe_key=subscribe_key, ssl_on=ssl_on, publish_key=publish_key)
 
     def get_request(self, method, url, query_params=None, body=None, headers=None):
