@@ -4,5 +4,6 @@ python:
   - "2.7"
 install:
   - make install
+  - pip install discover
 script:
   - make test
