@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from ..core.observable import Observable
+from ..core import Observable
 
 
 class PubnubMock(Observable):

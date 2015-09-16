@@ -1,24 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from .platform import Platform
-from .subscription import Subscription
-from .core.context import Context
+from .sdk import SDK
 
-
-VERSION = '0.5.0'
-
-
-class SDK:
-    def __init__(self, key, secret, server):
-        self.__context = Context()
-        self.__platform = Platform(self.__context, key, secret, server)
-
-    def get_platform(self):
-        return self.__platform
-
-    def get_subscription(self):
-        return Subscription(self.__context, self.__platform)
-
-    def get_context(self):
-        return self.__context
+VERSION = '0.6.0'
