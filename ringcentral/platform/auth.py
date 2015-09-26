@@ -25,7 +25,7 @@ class Auth:
 
     def set_data(self, auth_data=None):
 
-        if not auth_data:
+        if auth_data is None:
             return self
 
         # Misc
@@ -70,7 +70,7 @@ class Auth:
 
         return self
 
-    def get_data(self):
+    def data(self):
         return {
             'remember': self.__remember,
             'token_type': self.__token_type,
@@ -103,26 +103,20 @@ class Auth:
         self.__scope = ''
         self.__owner_id = ''
 
-    def get_access_token(self):
+    def access_token(self):
         return self.__access_token
 
-    def get_refresh_token(self):
+    def refresh_token(self):
         return self.__refresh_token
 
-    def get_token_type(self):
+    def token_type(self):
         return self.__token_type
 
-    def is_access_token_valid(self):
-        return self.__is_token_date_valid(self.get_data().get('expire_time'))
+    def access_token_valid(self):
+        return self.__is_token_date_valid(self.data().get('expire_time'))
 
-    def is_refresh_token_valid(self):
-        return self.__is_token_date_valid(self.get_data().get('refresh_token_expire_time'))
-
-    def set_remember(self, val):
-        self.set_data({'remember': True if val else False})
-
-    def is_remember(self):
-        return self.get_data().get('remember', False)
+    def refresh_token_valid(self):
+        return self.__is_token_date_valid(self.data().get('refresh_token_expire_time'))
 
     @staticmethod
     def __is_token_date_valid(token_date):

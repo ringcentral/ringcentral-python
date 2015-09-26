@@ -8,8 +8,9 @@ setup(
         'ringcentral',
         'ringcentral.core',
         'ringcentral.http',
-        'ringcentral.http.mocks',
+        'ringcentral.mocks',
         'ringcentral.platform',
+        'ringcentral.pubnub',
         'ringcentral.subscription',
         'ringcentral.test'
     ],
@@ -21,7 +22,8 @@ setup(
     download_url="https://github.com/ringcentral/ringcentral-python/tarball/%s" % VERSION,
     keywords=['sdk', 'ringcentral', 'connect', 'platform', 'api', 'python'],
     install_requires=[
-        'pubnub>=3.7.0'
+        'pubnub>=3.7.0',
+        'requests>=2.7.0'
     ],
     classifiers=[]
 )

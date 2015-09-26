@@ -12,21 +12,14 @@ $ git clone https://github.com/ringcentral/python-sdk.git ./ringcentral-python-s
 
 Install dependencies:
 
-- PUBNUB: Installation instructions: [http://www.pubnub.com/docs/python/python-sdk.html](http://www.pubnub.com/docs/python/python-sdk.html)
+- [Pubnub](https://www.pubnub.com/docs/python/pubnub-python-sdk) 
+- [Requests](http://docs.python-requests.org/en/latest) 
 
 ## PIP
 
 ```sh
 $ pip install rcsdk
 ```
-
-## Dependencies
-
-Python 2.6.*
-
-### PubNub:
-
-Installation instructions: [http://www.pubnub.com/docs/python/python-sdk.html](http://www.pubnub.com/docs/python/python-sdk.html)
 
 # Usage
 
@@ -36,11 +29,11 @@ For more info take a look on the `test.py` in this repository.
 from ringcentral import SDK
 
 sdk = SDK('APP_KEY', 'APP_SECRET', 'SERVER')
-platform = sdk.get_platform()
-platform.authorize('USERNAME', 'EXTENSION', 'PASSWORD')
+platform = sdk.platform()
+platform.login('USERNAME', 'EXTENSION', 'PASSWORD')
 
-res = platform.api_call('GET', '/account/~/extension/~')
-print('User loaded ' + res.get_json().name)
+res = platform.get('/account/~/extension/~')
+print('User loaded ' + res.json().name)
 ```
 
 # Subscribing for server events
@@ -48,15 +41,15 @@ print('User loaded ' + res.get_json().name)
 ```py
 from threading import Thread
 from time import sleep
-from ringcentral.core.subscription.subscription import EVENTS
+from ringcentral.subscription import Events
 
 def on_message(msg):
     print(msg)
 
 def pubnub():
-    s = sdk.get_subscription()
+    s = sdk.create_subscription()
     s.add_events(['/account/~/extension/~/message-store'])
-    s.on(EVENTS['notification'], on_message)
+    s.on(Events.notification, on_message)
     s.register()
     while True:
         sleep(0.1)
@@ -68,6 +61,7 @@ try:
         t.start()
     except ImportError as e:
         print("No Pubnub SDK, skipping Pubnub test")
+        
 except KeyboardInterrupt:
     pass
 ```
