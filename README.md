@@ -18,7 +18,7 @@ Install dependencies:
 ## PIP
 
 ```sh
-$ pip install rcsdk
+$ pip install ringcentral
 ```
 
 # Usage
