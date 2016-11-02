@@ -30,7 +30,7 @@ class Auth:
 
         # Misc
 
-        if 'remeber' in auth_data:
+        if 'remember' in auth_data:
             self.__remember = auth_data.get('remember')
 
         if 'token_type' in auth_data:
