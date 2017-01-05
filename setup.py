@@ -1,12 +1,11 @@
 from distutils.core import setup
 
-VERSION = __import__("ringcentral").VERSION
+VERSION = '0.7.3'
 
 setup(
     name='ringcentral',
     packages=[
         'ringcentral',
-        'ringcentral.core',
         'ringcentral.http',
         'ringcentral.platform',
         'ringcentral.subscription',
@@ -20,7 +19,8 @@ setup(
     download_url="https://github.com/ringcentral/ringcentral-python/tarball/%s" % VERSION,
     keywords=['sdk', 'ringcentral', 'connect', 'platform', 'api', 'python'],
     install_requires=[
-        'pubnub>=3.7.0',
+        'observable>=0.3.1',
+        'pubnub==3.*',
         'requests>=2.7.0'
     ],
     classifiers=[]

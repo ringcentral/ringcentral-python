@@ -3,7 +3,7 @@
 import json
 import base64
 from threading import Timer
-from ..core.observable import Observable
+from observable import Observable
 from .events import Events
 
 RENEW_HANDICAP = 60
@@ -67,13 +67,13 @@ class Subscription(Observable):
 
             self.set_subscription(response.json_dict())
             self._subscribe_at_pubnub()
-            self.emit(Events.subscribeSuccess, response)
+            self.trigger(Events.subscribeSuccess, response)
 
             return response
 
         except Exception as e:
             self.reset()
-            self.emit(Events.subscribeError, e)
+            self.trigger(Events.subscribeError, e)
             raise
 
     def renew(self, events=None):
@@ -95,13 +95,13 @@ class Subscription(Observable):
             })
 
             self.set_subscription(response.json_dict())
-            self.emit(Events.renewSuccess, response)
+            self.trigger(Events.renewSuccess, response)
 
             return response
 
         except Exception as e:
             self.reset()
-            self.emit(Events.renewError, e)
+            self.trigger(Events.renewError, e)
             raise
 
     def remove(self):
@@ -112,13 +112,13 @@ class Subscription(Observable):
             response = self._platform.delete('/restapi/v1.0/subscription' + self._subscription['id'])
 
             self.reset()
-            self.emit(Events.removeSuccess, response)
+            self.trigger(Events.removeSuccess, response)
 
             return response
 
         except Exception as e:
             self.reset()
-            self.emit(Events.removeError, e)
+            self.trigger(Events.removeError, e)
 
     def alive(self):
         s = self._subscription
@@ -172,7 +172,7 @@ class Subscription(Observable):
 
     def _notify(self, message):
         message = self._decrypt(message)
-        self.emit(Events.notification, message)
+        self.trigger(Events.notification, message)
 
     def _decrypt(self, message):
         if not self.alive():

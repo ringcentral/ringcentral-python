@@ -7,7 +7,7 @@ from .http import Client
 
 
 class SDK:
-    def __init__(self, key, secret, server, name='', version='', use_http_mock=False, use_pubnub_mock=False):
+    def __init__(self, key, secret, server, name='', version=''):
         self._client = Client()
         self._platform = Platform(self._client, key, secret, server, name, version)
 

@@ -72,6 +72,7 @@ class Platform:
             'refresh_token_ttl': REFRESH_TOKEN_TTL
         })
         self._auth.set_data(response.json_dict())
+        # TODO Add event trigger
         return response
 
     def refresh(self):
@@ -87,6 +88,8 @@ class Platform:
 
         self._auth.set_data(response.json_dict())
 
+        # TODO Add event trigger
+
         return response
 
     def logout(self):
@@ -94,6 +97,7 @@ class Platform:
             'token': self._auth.access_token()
         })
         self._auth.reset()
+        # TODO Add event trigger
         return response
 
     def inflate_request(self, request, skip_auth_check=False):

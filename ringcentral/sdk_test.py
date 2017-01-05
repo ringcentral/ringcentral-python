@@ -8,7 +8,7 @@ from . import SDK
 
 class TestSDK(TestCase):
     def test_instance(self):
-        sdk = SDK('whatever', 'whatever', 'mock://whatever', use_pubnub_mock=True)
+        sdk = SDK('whatever', 'whatever', 'mock://whatever')
         self.assertEqual(sdk.platform().create_url('/foo', add_server=True), 'mock://whatever/restapi/v1.0/foo')
 
 
