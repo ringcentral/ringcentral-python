@@ -10,9 +10,8 @@ RENEW_HANDICAP = 60
 
 
 class Subscription(Observable):
-    def __init__(self, platform, pubnub_factory):
+    def __init__(self, platform):
         Observable.__init__(self)
-        self._pubnub_factory = pubnub_factory
         self._platform = platform
         self._event_filters = []
         self._timeout = None
@@ -148,8 +147,10 @@ class Subscription(Observable):
         if not self.alive():
             raise Exception('Subscription is not alive')
 
+        from pubnub import Pubnub
+
         s_key = self._subscription['deliveryMode']['subscriberKey']
-        self._pubnub = self._pubnub_factory.pubnub(subscribe_key=s_key, ssl_on=False, publish_key='')
+        self._pubnub = Pubnub(subscribe_key=s_key, ssl_on=False, publish_key='')
 
         def callback(message, channel=''):
             self._notify(message)
@@ -185,7 +186,7 @@ class Subscription(Observable):
         if is_encrypted:
             key = base64.b64decode(self._subscription['deliveryMode']['encryptionKey'])
             data = base64.b64decode(message)
-            obj2 = AES.new(key)
+            obj2 = AES.new(key, AES.MODE_ECB)
             decrypted = str(obj2.decrypt(data)).replace('\x05', '')
             message = json.loads(decrypted)
 

@@ -1,12 +1,19 @@
 language: python
 python:
-  - "2.7"
+- '2.7'
 install:
-  - make install
-  - pip install discover
-  - pip install coverage
-  - pip install coveralls
+- make install
+- make install-dev
 script:
-  - make coverage
+- make coverage
 after_success:
-  - coveralls
+- coveralls
+deploy:
+  provider: pypi
+  user: kirill.konshin
+  password:
+    secure: L+GM30lUbOih41dAXh0fD4d3L0pcYtnvLVL9XRM2TnXJvGhh1o/jcxbMilTH8PxyMRvan+52spoJn1zZHVuzTMfrtsENT60VsvV+1nyvev07w0JaaS1OBlgeiOVTJIk7O7+/B6Jeu48e/tZMX22cdw28/WK5gMUwnPycZIMyKG4=
+  on:
+    tags: true
+    repo: ringcentral/ringcentral-python
+    branch: master

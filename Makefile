@@ -2,6 +2,10 @@
 install:
 	pip install -r requirements.txt
 
+.PHONY: install-dev
+install-dev:
+	pip install -r requirements-dev.txt
+
 .PHONY: test
 test:
 	python -m unittest discover . --pattern '*test.py'

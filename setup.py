@@ -8,9 +8,7 @@ setup(
         'ringcentral',
         'ringcentral.core',
         'ringcentral.http',
-        'ringcentral.mocks',
         'ringcentral.platform',
-        'ringcentral.pubnub',
         'ringcentral.subscription',
         'ringcentral.test'
     ],
