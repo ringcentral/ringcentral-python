@@ -31,6 +31,7 @@ class Client:
 
     def load_response(self, request):
 
+        # TODO Persist between requests?
         session = None
 
         try:
