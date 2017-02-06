@@ -2,7 +2,9 @@
 # encoding: utf-8
 
 import sys
+from observable import Observable
 from .auth import Auth
+from .events import Events
 from ..core import base64encode
 
 ACCOUNT_ID = '~'
@@ -15,8 +17,11 @@ ACCESS_TOKEN_TTL = 3600  # 60 minutes
 REFRESH_TOKEN_TTL = 604800  # 1 week
 
 
-class Platform:
+class Platform(Observable):
     def __init__(self, client, key='', secret='', server='', name='', version=''):
+
+        Observable.__init__(self)
+
         self._server = server
         self._key = key
         self._name = name if name else 'Unnamed'
@@ -63,42 +68,50 @@ class Platform:
             return False
 
     def login(self, username, extension, password):
-        response = self._request_token(TOKEN_ENDPOINT, body={
-            'grant_type': 'password',
-            'username': username,
-            'extension': extension,
-            'password': password,
-            'access_token_ttl': ACCESS_TOKEN_TTL,
-            'refresh_token_ttl': REFRESH_TOKEN_TTL
-        })
-        self._auth.set_data(response.json_dict())
-        # TODO Add event trigger
-        return response
+        try:
+            response = self._request_token(TOKEN_ENDPOINT, body={
+                'grant_type': 'password',
+                'username': username,
+                'extension': extension,
+                'password': password,
+                'access_token_ttl': ACCESS_TOKEN_TTL,
+                'refresh_token_ttl': REFRESH_TOKEN_TTL
+            })
+            self._auth.set_data(response.json_dict())
+            self.trigger(Events.loginSuccess, response)
+            return response
+        except Exception as e:
+            self.trigger(Events.loginError, e)
+            raise e
 
     def refresh(self):
-        if not self._auth.refresh_token_valid():
-            raise Exception('Refresh token has expired')
-
-        response = self._request_token(TOKEN_ENDPOINT, body={
-            'grant_type': 'refresh_token',
-            'refresh_token': self._auth.refresh_token(),
-            'access_token_ttl': ACCESS_TOKEN_TTL,
-            'refresh_token_ttl': REFRESH_TOKEN_TTL
-        })
-
-        self._auth.set_data(response.json_dict())
-
-        # TODO Add event trigger
-
-        return response
+        try:
+            if not self._auth.refresh_token_valid():
+                raise Exception('Refresh token has expired')
+            response = self._request_token(TOKEN_ENDPOINT, body={
+                'grant_type': 'refresh_token',
+                'refresh_token': self._auth.refresh_token(),
+                'access_token_ttl': ACCESS_TOKEN_TTL,
+                'refresh_token_ttl': REFRESH_TOKEN_TTL
+            })
+            self._auth.set_data(response.json_dict())
+            self.trigger(Events.refreshSuccess, response)
+            return response
+        except Exception as e:
+            self.trigger(Events.refreshError, e)
+            raise e
 
     def logout(self):
-        response = self._request_token(REVOKE_ENDPOINT, body={
-            'token': self._auth.access_token()
-        })
-        self._auth.reset()
-        # TODO Add event trigger
-        return response
+        try:
+            response = self._request_token(REVOKE_ENDPOINT, body={
+                'token': self._auth.access_token()
+            })
+            self._auth.reset()
+            self.trigger(Events.logoutSuccess, response)
+            return response
+        except Exception as e:
+            self.trigger(Events.logoutError, e)
+            raise e
 
     def inflate_request(self, request, skip_auth_check=False):
         if not skip_auth_check:

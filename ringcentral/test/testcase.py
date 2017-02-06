@@ -31,6 +31,14 @@ class TestCase(unittest.TestCase):
             text=''
         )
 
+        matcher = re.compile('ps\.pndsn\.com')
+
+        mock.register_uri(
+            method=requests_mock.ANY,
+            url=matcher,
+            text=''
+        )
+
         return sdk
 
     def add(self, mock, method, url, body, status=200):

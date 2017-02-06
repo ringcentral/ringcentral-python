@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-VERSION = '0.7.4'
+VERSION = '0.7.5'
 
 setup(
     name='ringcentral',
@@ -20,7 +20,8 @@ setup(
     keywords=['sdk', 'ringcentral', 'connect', 'platform', 'api', 'python'],
     install_requires=[
         'observable>=0.3.1',
-        'pubnub==3.*',
+        'pubnub==4.*',
+        'pycryptodome>=3.4.4',
         'requests>=2.7.0'
     ],
     classifiers=[]

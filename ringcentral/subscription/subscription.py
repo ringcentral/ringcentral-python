@@ -148,34 +148,37 @@ class Subscription(Observable):
         if not self.alive():
             raise Exception('Subscription is not alive')
 
-        from pubnub import Pubnub
+        from pubnub.pubnub import PubNub
+        from pubnub.pnconfiguration import PNConfiguration
+        from pubnub.callbacks import SubscribeCallback
+        from pubnub.enums import PNStatusCategory
 
-        s_key = self._subscription['deliveryMode']['subscriberKey']
-        self._pubnub = Pubnub(subscribe_key=s_key, ssl_on=False, publish_key='')
+        pnconf = PNConfiguration()
+        pnconf.subscribe_key = self._subscription['deliveryMode']['subscriberKey']
+        self._pubnub = PubNub(pnconf)
 
-        def callback(message, channel=''):
-            self._notify(message)
+        subscription = self
 
-        def error(message):
-            self.trigger(Events.connectionError, message)
+        class SubscribeCallbackImpl(SubscribeCallback):
+            def presence(self, pubnub, presence):
+                pass  # handle incoming presence data
 
-        def connect(message):
-            pass
+            def status(self, pubnub, status):
+                if status.category == PNStatusCategory.PNUnexpectedDisconnectCategory:
+                    subscription.trigger(Events.connectionError, 'Connectivity loas')
+                    pass
+                elif status.category == PNStatusCategory.PNConnectedCategory:
+                    pass
+                elif status.category == PNStatusCategory.PNReconnectedCategory:
+                    pass
+                elif status.category == PNStatusCategory.PNDecryptionErrorCategory:
+                    pass
 
-        def reconnect(message):
-            pass
+            def message(self, pubnub, pnmessage):  # instance of PNMessageResult
+                subscription._notify(pnmessage.message)
 
-        def disconnect(message):
-            pass
-
-        self._pubnub.subscribe(
-            self._subscription['deliveryMode']['address'],
-            callback=callback,
-            error=error,
-            connect=connect,
-            reconnect=reconnect,
-            disconnect=disconnect
-        )
+        self._pubnub.add_listener(SubscribeCallbackImpl())
+        self._pubnub.subscribe().channels(self._subscription['deliveryMode']['address']).execute()
 
     def _notify(self, message):
         message = self._decrypt(message)
@@ -185,7 +188,7 @@ class Subscription(Observable):
         if not self.alive():
             raise Exception('Subscription is not alive')
 
-        from pubnub import AES
+        from Crypto.Cipher import AES
 
         delivery_mode = self._subscription['deliveryMode']
         is_encrypted = ('encryption' in delivery_mode) and ('encryptionKey' in delivery_mode)
@@ -201,7 +204,7 @@ class Subscription(Observable):
 
     def _unsubscribe_at_pubnub(self):
         if self._pubnub and self.alive():
-            self._pubnub.unsubscribe(self._subscription['deliveryMode']['address'])
+            self._pubnub.unsubscribe().channels(self._subscription['deliveryMode']['address']).execute()
 
     def _get_full_events_filter(self):
         return [self._platform.create_url(e) for e in self._event_filters]
