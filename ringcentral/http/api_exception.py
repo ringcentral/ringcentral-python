@@ -6,7 +6,7 @@ class ApiException(Exception):
     def __init__(self, apiResponse, previous=None):
         self.__apiResponse = apiResponse
 
-        message = previous.message if previous else 'Unknown error'
+        message = previous.message if previous and hasattr(previous, 'message') else 'Unknown error'
         status = 0  # previous.status if previous else 0
 
         if apiResponse:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import base64
 import sys
 from .auth import Auth
+from ..core import base64encode
 
 ACCOUNT_ID = '~'
 ACCOUNT_PREFIX = '/account/'
@@ -139,7 +139,7 @@ class Platform:
         return self.send_request(request, skip_auth_check=True)
 
     def _api_key(self):
-        return base64.b64encode(self._key + ':' + self._secret)
+        return base64encode(self._key + ':' + self._secret)
 
     def _auth_header(self):
         return self._auth.token_type() + ' ' + self._auth.access_token()

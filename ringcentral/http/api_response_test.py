@@ -4,7 +4,8 @@
 import unittest
 
 from ..test import TestCase
-from api_response import ApiResponse
+from ..core import is_third
+from .api_response import ApiResponse
 from requests import Response
 
 multipart_headers = {'Content-Type': 'multipart/mixed; boundary=Boundary_1245_945802293_1394135045248'}
@@ -106,10 +107,15 @@ class TestApiResponse(TestCase):
             r.multipart()
 
 
+# FIXME Use create response from main file api_response
 def create_response(body, status, headers=None):
     res = Response()
     res.headers = headers
-    res._content = body
+    if is_third():
+        res._content = bytes(body, 'utf8')
+        res.encoding = 'utf8'
+    else:
+        res._content = body
     res.status_code = status
     return res
 

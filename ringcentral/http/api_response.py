@@ -4,6 +4,7 @@ import json
 import requests
 from email.feedparser import FeedParser
 from .json_object import *
+from ..core import is_third
 
 
 class ApiResponse:
@@ -39,7 +40,7 @@ class ApiResponse:
         parts = self._break_into_parts()
 
         if len(parts) < 1:
-            raise Exception("Malformed Batch Response (not enough parts)")   # sic! not specific extension
+            raise Exception("Malformed Batch Response (not enough parts)")  # sic! not specific extension
 
         statuses = json.loads(parts[0].get_payload())
 
@@ -49,10 +50,7 @@ class ApiResponse:
         responses = []
 
         for response, payload in zip(statuses["response"], parts[1:]):
-            res = requests.Response()
-            res.headers = dict(payload)
-            res._content = str(payload.get_payload())
-            res.status_code = response["status"]
+            res = create_response(payload, response['status'])
 
             responses.append(ApiResponse(response=res))
 
@@ -106,3 +104,15 @@ class ApiResponse:
         parts = msg.get_payload()
 
         return parts
+
+
+def create_response(payload, status):
+    res = requests.Response()
+    res.headers = dict(payload)
+    if is_third():
+        res._content = bytes(payload.get_payload(), 'utf8')
+        res.encoding = 'utf8'
+    else:
+        res._content = str(payload.get_payload())
+    res.status_code = status
+    return res

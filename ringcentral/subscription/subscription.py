@@ -5,6 +5,7 @@ import base64
 from threading import Timer
 from observable import Observable
 from .events import Events
+from ..core import tostr, clean_decrypted
 
 RENEW_HANDICAP = 60
 
@@ -90,7 +91,7 @@ class Subscription(Observable):
         self._clear_timeout()
 
         try:
-            response = self._platform.put('/restapi/v1.0/subscription' + self._subscription['id'], body={
+            response = self._platform.put('/restapi/v1.0/subscription/' + self._subscription['id'], body={
                 'eventFilters': self._get_full_events_filter()
             })
 
@@ -109,7 +110,7 @@ class Subscription(Observable):
             raise Exception('Subscription is not alive')
 
         try:
-            response = self._platform.delete('/restapi/v1.0/subscription' + self._subscription['id'])
+            response = self._platform.delete('/restapi/v1.0/subscription/' + self._subscription['id'])
 
             self.reset()
             self.trigger(Events.removeSuccess, response)
@@ -156,19 +157,25 @@ class Subscription(Observable):
             self._notify(message)
 
         def error(message):
-            print("ERROR : " + str(message))  # FIXME Handle this
+            self.trigger(Events.connectionError, message)
 
         def connect(message):
-            print("CONNECTED")
+            pass
 
         def reconnect(message):
-            print("RECONNECTED")
+            pass
 
         def disconnect(message):
-            print("DISCONNECTED")
+            pass
 
-        self._pubnub.subscribe(self._subscription['deliveryMode']['address'], callback=callback, error=error,
-                               connect=connect, reconnect=reconnect, disconnect=disconnect)
+        self._pubnub.subscribe(
+            self._subscription['deliveryMode']['address'],
+            callback=callback,
+            error=error,
+            connect=connect,
+            reconnect=reconnect,
+            disconnect=disconnect
+        )
 
     def _notify(self, message):
         message = self._decrypt(message)
@@ -186,8 +193,8 @@ class Subscription(Observable):
         if is_encrypted:
             key = base64.b64decode(self._subscription['deliveryMode']['encryptionKey'])
             data = base64.b64decode(message)
-            obj2 = AES.new(key, AES.MODE_ECB)
-            decrypted = str(obj2.decrypt(data)).replace('\x05', '')
+            cipher = AES.new(key, AES.MODE_ECB)
+            decrypted = clean_decrypted(tostr(cipher.decrypt(data)))
             message = json.loads(decrypted)
 
         return message

@@ -35,7 +35,7 @@ class TestPlatform(TestCase):
             sdk.platform().refresh()
         except Exception as e:
             caught = True
-            self.assertEqual('Refresh token has expired', e.message)
+            self.assertEqual('Refresh token has expired', str(e))
 
         self.assertTrue(caught)
 

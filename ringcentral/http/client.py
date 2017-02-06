@@ -6,6 +6,7 @@ import requests
 
 from .api_response import ApiResponse
 from .api_exception import ApiException
+from ..core import urlencode, iterator
 
 
 class Client:
@@ -30,7 +31,6 @@ class Client:
             raise ApiException(response, e)
 
     def load_response(self, request):
-
         # TODO Persist between requests?
         session = None
 
@@ -57,7 +57,7 @@ class Client:
         """
 
         if query_params:
-            query = urllib.urlencode(query_params)
+            query = urlencode(query_params)
             if query:
                 url = url + ('&' if url.find('?') > 0 else '?') + query
 
@@ -67,7 +67,9 @@ class Client:
         if headers is None:
             headers = {}
 
-        for key, value in headers.iteritems():
+        it = iterator(headers)
+
+        for key, value in it:
             if key.lower().find('content-type') >= 0:
                 content_type = value
             if key.lower().find('accept') >= 0:
@@ -82,8 +84,8 @@ class Client:
             headers['Accept'] = accept
 
         if content_type.lower().find('application/json') >= 0:
-            body = json.dumps(body)
+            body = json.dumps(body) if body else None
         elif content_type.lower().find('application/x-www-form-urlencoded') >= 0:
-            body = urllib.urlencode(body)
+            body = urlencode(body) if body else None
 
         return requests.Request(method, url, headers=headers, data=body)

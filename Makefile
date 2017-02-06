@@ -33,3 +33,14 @@ register:
 .PHONY: register-test
 register-test:
 	python setup.py register -r pypitest
+
+.PHONY: install-ve
+install-ve:
+	virtualenv --python `which python3` .ve
+	.ve/bin/pip install -r requirements.txt
+	.ve/bin/pip install -r requirements-dev.txt
+	.ve/bin/pip install configparser
+
+.PHONY: test-ve
+test-ve:
+	.ve/bin/python -m unittest discover . --pattern '*test.py'

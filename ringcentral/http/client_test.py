@@ -16,19 +16,19 @@ class TestClient(TestCase):
 
     def test_create_request_encode_body_url(self):
         r = Client().create_request(body=body, headers={'Content-Type': 'application/x-www-form-urlencoded'})
-        self.assertEquals('foo=bar&baz=qux', r.data)
+        self.assertEqual('foo=bar&baz=qux', r.data)
 
     def test_create_request_encode_body_json(self):
         r = Client().create_request(body=body, headers={'Content-Type': 'application/json'})
-        self.assertEquals('{"foo": "bar", "baz": "qux"}', r.data)
+        self.assertEqual('{"foo": "bar", "baz": "qux"}', r.data)
 
     def test_create_request_encode_body_json_default(self):
         r = Client().create_request(body=body)  # JSON by default
-        self.assertEquals('{"foo": "bar", "baz": "qux"}', r.data)
+        self.assertEqual('{"foo": "bar", "baz": "qux"}', r.data)
 
     def test_create_request_encode_body_alternative(self):
         r = Client().create_request(body='foo-encoded-text', headers={'content-type': 'foo'})
-        self.assertEquals('foo-encoded-text', r.data)
+        self.assertEqual('foo-encoded-text', r.data)
 
 
 if __name__ == '__main__':
