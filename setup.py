@@ -9,7 +9,8 @@ setup(
         'ringcentral.http',
         'ringcentral.platform',
         'ringcentral.subscription',
-        'ringcentral.test'
+        'ringcentral.test',
+        'ringcentral.core'
     ],
     version=VERSION,
     description='RingCentral Connect Platform Python SDK',
