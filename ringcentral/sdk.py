@@ -3,7 +3,7 @@
 
 from .platform import Platform
 from .subscription import Subscription
-from .http import Client
+from .http import Client, MultipartBuilder
 
 
 class SDK:
@@ -16,3 +16,6 @@ class SDK:
 
     def create_subscription(self):
         return Subscription(self._platform)
+
+    def create_multipart_builder(self):
+        return MultipartBuilder()
