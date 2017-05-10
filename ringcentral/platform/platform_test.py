@@ -39,6 +39,11 @@ class TestPlatform(TestCase):
 
         self.assertTrue(caught)
 
+    def test_logged_in(self, mock):
+        sdk = self.get_sdk(mock)
+
+        self.assertTrue(sdk.platform().logged_in())
+
     def test_manual_refresh(self, mock):
         sdk = self.get_sdk(mock)
 
@@ -78,6 +83,7 @@ class TestPlatform(TestCase):
 
         self.assertEqual('', sdk.platform().auth().data()['access_token'])
         self.assertEqual('', sdk.platform().auth().data()['refresh_token'])
+        self.assertFalse(sdk.platform().logged_in())
 
     def test_api_url(self, mock):
         sdk = self.get_sdk(mock)

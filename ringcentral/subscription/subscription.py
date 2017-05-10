@@ -120,10 +120,12 @@ class Subscription(Observable):
         except Exception as e:
             self.reset()
             self.trigger(Events.removeError, e)
+            raise
 
     def alive(self):
         s = self._subscription
-        return ('deliveryMode' in s and s['deliveryMode']) and \
+        return s and \
+               ('deliveryMode' in s and s['deliveryMode']) and \
                ('subscriberKey' in s['deliveryMode'] and s['deliveryMode']['subscriberKey']) and \
                ('address' in s['deliveryMode'] and s['deliveryMode']['address'])
 
@@ -165,13 +167,7 @@ class Subscription(Observable):
 
             def status(self, pubnub, status):
                 if status.category == PNStatusCategory.PNUnexpectedDisconnectCategory:
-                    subscription.trigger(Events.connectionError, 'Connectivity loas')
-                    pass
-                elif status.category == PNStatusCategory.PNConnectedCategory:
-                    pass
-                elif status.category == PNStatusCategory.PNReconnectedCategory:
-                    pass
-                elif status.category == PNStatusCategory.PNDecryptionErrorCategory:
+                    subscription.trigger(Events.connectionError, 'Connectivity loss')
                     pass
 
             def message(self, pubnub, pnmessage):  # instance of PNMessageResult

@@ -107,11 +107,11 @@ class TestCase(unittest.TestCase):
 
         return self.add(mock, 'POST', '/restapi/oauth/token', body, status)
 
-    def subscription_mock(self, mock, expires_in=54000, filters=None):
+    def subscription_mock(self, mock, expires_in=54000, filters=None, id=None):
         if filters is None:
             filters = ['/restapi/v1.0/account/~/extension/1/presence']
 
-        return self.add(mock, 'POST', '/restapi/v1.0/subscription', {
+        return self.add(mock, 'POST' if not id else 'PUT', '/restapi/v1.0/subscription' + ('/' + id if id else ''), {
             'eventFilters': filters,
             'expirationTime': date.fromtimestamp(time() + expires_in).isoformat(),
             'expiresIn': expires_in,
@@ -122,7 +122,7 @@ class TestCase(unittest.TestCase):
                 'subscriberKey': 'sub-c-foo',
                 'secretKey': 'sec-c-bar'
             },
-            'id': 'foo-bar-baz',
+            'id': id if id else 'foo-bar-baz',
             'creationTime': date.today().isoformat(),
             'status': 'Active',
             'uri': 'https://platform.ringcentral.com/restapi/v1.0/subscription/foo-bar-baz'

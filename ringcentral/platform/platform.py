@@ -63,7 +63,7 @@ class Platform(Observable):
 
     def logged_in(self):
         try:
-            return True if self._auth.access_token_valid() or self.refresh() else False
+            return self._auth.access_token_valid() or self.refresh()
         except:
             return False
 

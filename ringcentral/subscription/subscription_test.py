@@ -41,8 +41,6 @@ class TestSubscription(TestCase):
 
             self.assertEqual(expected, s._decrypt(aes_message))
 
-        except Exception:
-            raise
         finally:
             s.destroy()
 
@@ -72,23 +70,93 @@ class TestSubscription(TestCase):
             s._notify(expected)
 
             self.assertEqual(expected, spy.args[0])
-        except Exception:
-            raise
+            self.assertNotEqual(s.pubnub(), None)
+
         finally:
             s.destroy()
 
-    def test_subscribe_with_events(self, mock):
+    def test_subscribe_error(self, mock):
         sdk = self.get_sdk(mock)
 
-        self.subscription_mock(mock)
+        s = sdk.create_subscription()
+
+        self.add(mock, 'POST', '/restapi/v1.0/subscription', {'error_description': 'expected'}, 400)
+
+        try:
+            s.add_events(['/restapi/v1.0/account/~/extension/1/presence'])
+            s.register()
+            raise Exception('This should not be reached')
+
+        except Exception as e:
+            self.assertEqual(str(e), 'expected')
+        finally:
+            s.destroy()
+
+    def test_subscribe_with_events_and_renew(self, mock):
+        sdk = self.get_sdk(mock)
 
         s = sdk.create_subscription()
 
         try:
+            self.subscription_mock(mock)
             res = s.register(events=['/restapi/v1.0/account/~/extension/1/presence'])
             self.assertEqual('/restapi/v1.0/account/~/extension/1/presence', res.json().eventFilters[0])
-        except Exception:
-            raise
+
+            self.subscription_mock(mock, id='foo-bar-baz', filters=['/restapi/v1.0/account/~/extension/1/foo'])
+            res = s.renew()
+            self.assertEqual('/restapi/v1.0/account/~/extension/1/foo', res.json().eventFilters[0])
+
+        finally:
+            s.destroy()
+
+    def test_subscribe_with_no_events(self, mock):
+        sdk = self.get_sdk(mock)
+
+        s = sdk.create_subscription()
+
+        try:
+            self.subscription_mock(mock)
+            s.register()
+            raise Exception('This should not be reached')
+
+        except Exception as e:
+            self.assertEqual(str(e), 'Events are undefined')
+
+        finally:
+            s.destroy()
+
+    def test_subscribe_remove(self, mock):
+        sdk = self.get_sdk(mock)
+
+        s = sdk.create_subscription()
+
+        try:
+            self.subscription_mock(mock)
+            s.register(events=['/restapi/v1.0/account/~/extension/1/presence'])
+
+            self.add(mock, 'DELETE', '/restapi/v1.0/subscription/foo-bar-baz', {}, 204)
+            s.remove()
+
+        finally:
+            s.destroy()
+
+    def test_subscribe_remove_error(self, mock):
+        sdk = self.get_sdk(mock)
+
+        s = sdk.create_subscription()
+
+        try:
+            self.subscription_mock(mock)
+            s.register(events=['/restapi/v1.0/account/~/extension/1/presence'])
+
+            self.add(mock, 'DELETE', '/restapi/v1.0/subscription/foo-bar-baz', {'error_description': 'expected'}, 400)
+            s.remove()
+
+            raise Exception('This should not be reached')
+
+        except Exception as e:
+            self.assertEqual(str(e), 'expected')
+
         finally:
             s.destroy()
 
