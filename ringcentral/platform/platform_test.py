@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import sys
 import unittest
 import requests_mock
 
@@ -16,6 +17,30 @@ class TestPlatform(TestCase):
     def test_login(self, mock):
         sdk = self.get_sdk(mock)
         self.assertTrue(sdk.platform().auth().data()['access_token'])
+
+    def test_login_code(self, mock):
+        sdk = self.get_sdk(mock)
+        self.logout_mock(mock)
+        sdk.platform().logout()
+        self.authentication_mock(mock)
+        sdk.platform().login(code='foo')
+        text = str(mock.request_history[-1].text)
+        if sys.version_info[0] == 3:
+            self.assertEqual(text, 'grant_type=authorization_code&redirect_uri=mock%3A%2F%2Fwhatever-redirect&code=foo')
+        else:
+            self.assertEqual(text, 'code=foo&grant_type=authorization_code&redirect_uri=mock%3A%2F%2Fwhatever-redirect')
+
+    def test_login_code_redirect(self, mock):
+        sdk = self.get_sdk(mock)
+        self.logout_mock(mock)
+        sdk.platform().logout()
+        self.authentication_mock(mock)
+        sdk.platform().login(code='foo', redirect_uri='bar')
+        text = str(mock.request_history[-1].text)
+        if sys.version_info[0] == 3:
+            self.assertEqual(text, 'grant_type=authorization_code&redirect_uri=bar&code=foo')
+        else:
+            self.assertEqual(text, 'code=foo&grant_type=authorization_code&redirect_uri=bar')
 
     def test_refresh_with_outdated_token(self, mock):
         sdk = self.get_sdk(mock)
@@ -96,6 +121,13 @@ class TestPlatform(TestCase):
         url2 = 'https://foo/account/~/extension/~'
         act2 = sdk.platform().create_url(url2, add_server=True, add_method='POST', add_token=True)
         self.assertEqual(exp2, act2)
+
+    def test_api_url_custom_prefixes(self, mock):
+        sdk = self.get_sdk(mock)
+        exp = 'mock://whatever/scim/v2/foo'
+        url = '/scim/v2/foo'
+        act = sdk.platform().create_url(url, add_server=True)
+        self.assertEqual(exp, act)
 
 
 if __name__ == '__main__':

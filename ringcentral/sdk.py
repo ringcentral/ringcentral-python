@@ -7,9 +7,9 @@ from .http import Client, MultipartBuilder
 
 
 class SDK:
-    def __init__(self, key, secret, server, name='', version=''):
+    def __init__(self, key, secret, server, name='', version='', redirect_uri=None, known_prefixes=None):
         self._client = Client()
-        self._platform = Platform(self._client, key, secret, server, name, version)
+        self._platform = Platform(self._client, key, secret, server, name, version, redirect_uri, known_prefixes)
 
     def platform(self):
         return self._platform

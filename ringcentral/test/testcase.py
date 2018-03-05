@@ -18,7 +18,7 @@ class TestCase(unittest.TestCase):
 
     def get_sdk(self, mock):
 
-        sdk = SDK('whatever', 'whatever', 'mock://whatever')
+        sdk = SDK('whatever', 'whatever', 'mock://whatever', redirect_uri='mock://whatever-redirect')
 
         self.authentication_mock(mock)
         sdk.platform().login('18881112233', None, 'password')
