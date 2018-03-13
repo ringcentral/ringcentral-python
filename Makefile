@@ -1,9 +1,6 @@
 .PHONY: install
 install:
 	pip install -r requirements.txt
-
-.PHONY: install-dev
-install-dev:
 	pip install -r requirements-dev.txt
 
 .PHONY: test
@@ -24,7 +21,7 @@ publish:
 
 .PHONY: publish-test
 publish-test:
-	python setup.py sdist upload -r https://testpypi.python.org/pypi
+	python setup.py sdist upload -r pypitest
 
 .PHONY: register
 register:
