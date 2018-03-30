@@ -144,8 +144,8 @@ class Platform(Observable):
 
         return request
 
-    def send_request(self, request, skip_auth_check=False):
-        return self._client.send(self.inflate_request(request, skip_auth_check=skip_auth_check))
+    def send_request(self, request, skip_auth_check=False, multipart_mixed=False):
+        return self._client.send(self.inflate_request(request, skip_auth_check=skip_auth_check), multipart_mixed)
 
     def get(self, url, query_params=None, headers=None, skip_auth_check=False):
         request = self._client.create_request('GET', url, query_params=query_params, headers=headers)

@@ -13,11 +13,14 @@ class Client:
     def __init__(self):
         pass
 
-    def send(self, request):
+    def send(self, request, multipart_mixed=False):
         response = None
 
         try:
-            response = self.load_response(request.prepare())
+            prepared = request.prepare()
+            if multipart_mixed:
+                prepared.headers['Content-Type'] = prepared.headers['Content-Type'].replace('multipart/form-data;', 'multipart/mixed;')
+            response = self.load_response(prepared)
 
             if response.ok():
                 return response
