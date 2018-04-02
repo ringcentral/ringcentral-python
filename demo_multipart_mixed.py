@@ -30,8 +30,9 @@ def main():
         'answeringRule': { 'id': last_answer_rule_id }
     })
     builder.add(binary)
+    builder.set_multipart_mixed(True)
     request = builder.request('/account/~/extension/~/greeting')
-    response = platform.send_request(request, multipart_mixed = True)
+    response = platform.send_request(request)
     print 'Updated greeting audio: ' + response.json().uri
 
 
