@@ -9,7 +9,7 @@ from .multipart_builder import MultipartBuilder
 
 class TestMultipartBuilder(TestCase):
     def test_add(self):
-        mb = MultipartBuilder()
+        mb = MultipartBuilder(None)
 
         mb.set_body({'foo': 'bar'})
         mb.add(('report.csv', 'some,data,to,send'))
