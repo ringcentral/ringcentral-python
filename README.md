@@ -28,7 +28,7 @@ For more info take a look on the `test.py` in this repository.
 ```py
 from ringcentral import SDK
 
-sdk = SDK('APP_KEY', 'APP_SECRET', 'SERVER')
+sdk = SDK('CLIENT_ID', 'CLIENT_SECRET', 'SERVER')
 platform = sdk.platform()
 platform.login('USERNAME', 'EXTENSION', 'PASSWORD')
 
