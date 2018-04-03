@@ -17,10 +17,9 @@ class Client:
         response = None
 
         try:
-            prepared = request.prepare()
-            # Ref: https://github.com/requests/requests/issues/1736#issuecomment-28470217
-            if hasattr(request, 'multipart_mixed') and request.multipart_mixed:
-                prepared.headers['Content-Type'] = prepared.headers['Content-Type'].replace('multipart/form-data;', 'multipart/mixed;')
+            prepared = request
+            if isinstance(prepared, requests.models.Request): # not a prepared request
+                prepared = request.prepare()
             response = self.load_response(prepared)
 
             if response.ok():

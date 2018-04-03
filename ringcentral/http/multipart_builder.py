@@ -3,11 +3,12 @@ import requests
 
 
 class MultipartBuilder:
-    def __init__(self):
+    def __init__(self, platform):
         self._body = None
         self._contents = []
         self._boundary = ''
         self._multipart_mixed = False
+        self._platform = platform
 
     def set_multipart_mixed(self, multipart_mixed):
         self._multipart_mixed = multipart_mixed
@@ -41,6 +42,8 @@ class MultipartBuilder:
     def request(self, url, method='POST'):
         files = [('json', ('request.json', json.dumps(self._body), 'application/json'))] + self._contents
         request = requests.Request(method, url, files=files)
-        if self._multipart_mixed:
-            request.multipart_mixed = True
+        if self._multipart_mixed: # Ref: https://github.com/requests/requests/issues/1736#issuecomment-28470217
+            request.url = self._platform.create_url(request.url, add_server=True) # prepare requires full url
+            request = request.prepare()
+            request.headers['Content-Type'] = request.headers['Content-Type'].replace('multipart/form-data;', 'multipart/mixed;')
         return request

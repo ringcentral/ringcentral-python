@@ -18,4 +18,4 @@ class SDK:
         return Subscription(self._platform)
 
     def create_multipart_builder(self):
-        return MultipartBuilder()
+        return MultipartBuilder(self._platform)
