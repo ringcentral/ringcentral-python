@@ -17,7 +17,10 @@ class Client:
         response = None
 
         try:
-            response = self.load_response(request.prepare())
+            prepared = request
+            if isinstance(prepared, requests.models.Request): # not a prepared request
+                prepared = request.prepare()
+            response = self.load_response(prepared)
 
             if response.ok():
                 return response
