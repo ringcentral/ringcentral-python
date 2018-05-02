@@ -85,11 +85,12 @@ class Platform(Observable):
                 body = {
                     'grant_type': 'password',
                     'username': username,
-                    'extension': extension,
                     'password': password,
                     'access_token_ttl': ACCESS_TOKEN_TTL,
                     'refresh_token_ttl': REFRESH_TOKEN_TTL
                 }
+                if extension:
+                    body['extension'] = extension
             else:
                 body = {
                     'grant_type': 'authorization_code',
