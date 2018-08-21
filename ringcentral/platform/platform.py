@@ -140,7 +140,7 @@ class Platform(Observable):
             request.headers['Authorization'] = self._auth_header()
 
         request.headers['User-Agent'] = self._userAgent
-        request.headers['RC-User-Agent'] = self._userAgent
+        request.headers['X-User-Agent'] = self._userAgent
         request.url = self.create_url(request.url, add_server=True)
 
         return request
