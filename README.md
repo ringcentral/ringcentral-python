@@ -73,3 +73,40 @@ try:
 except KeyboardInterrupt:
     pass
 ```
+
+# Send sms
+```py
+from ringcentral import SDK
+
+database = []
+database.append({"Customer":"Tyler","Payment":"Due","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Chen","Payment":"Paid","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Anne","Payment":"Paid","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Brown","Payment":"Due","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Peter","Payment":"Due","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"White","Payment":"Paid","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Lisa","Payment":"Paid","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Dan","Payment":"Paid","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Stephanie","Payment":"Due","PhoneNumber":"xxxxxxxxxxx"})
+database.append({"Customer":"Lukas","Payment":"Due","PhoneNumber":"xxxxxxxxxxx"})
+
+sdk = SDK('CLIENT_ID', 'CLIENT_SECRET', 'SERVER')
+platform = sdk.platform()
+platform.login('USERNAME', 'EXTENSION', 'PASSWORD')
+
+def sendSMS(message, number):  
+    params = {'from': {'phoneNumber': 'USERNAME'},'to': [{'phoneNumber': number}],'text': message}
+    response = platform.post('/restapi/v1.0/account/~/extension/~/sms', params)
+    print('Sent payment reminder to ' + number)
+
+def main():
+    for i in range(len(database)):
+        customer = database[i]
+        if customer['Payment'] is "Due":
+            sendSMS("Hi " + customer['Customer'] + ". Your payment is due.", customer['PhoneNumber'])
+        time.sleep(5)
+    print("Send payment reminder done.")
+
+if __name__ == '__main__':
+    main()
+```
