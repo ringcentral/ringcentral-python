@@ -194,6 +194,7 @@ class Subscription(Observable):
             data = base64.b64decode(message)
             cipher = AES.new(key, AES.MODE_ECB)
             decrypted = clean_decrypted(tostr(cipher.decrypt(data)))
+            message = decrypted.strip('\x07\x08')
             message = json.loads(decrypted)
 
         return message
