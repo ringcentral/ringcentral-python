@@ -8,7 +8,7 @@ from .events import Events
 from ..core import tostr, clean_decrypted
 
 RENEW_HANDICAP = 60
-
+stripped = lambda s: ''.join([c for c in s if ord(c) > 31 or ord(c) == 9])
 
 class Subscription(Observable):
     def __init__(self, platform):
@@ -194,7 +194,7 @@ class Subscription(Observable):
             data = base64.b64decode(message)
             cipher = AES.new(key, AES.MODE_ECB)
             decrypted = clean_decrypted(tostr(cipher.decrypt(data)))
-            message = decrypted.strip('\x07\x08')
+            message = stripped(decrypted)
             message = json.loads(decrypted)
 
         return message
