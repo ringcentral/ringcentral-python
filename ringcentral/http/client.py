@@ -60,7 +60,13 @@ class Client:
         """
 
         if query_params:
-            query = urlencode(query_params)
+            query = ""
+            for name, value in query_params.iteritems():
+                if type(value) is list:
+                    for item in value:
+                        query += name + "=" + urllib.quote_plus(item) + "&"
+                else:
+                    query += name + "=" + urllib.quote_plus(value) + "&"
             if query:
                 url = url + ('&' if url.find('?') > 0 else '?') + query
 
