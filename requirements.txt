@@ -1,4 +1,4 @@
-observable>=0.3.*
+observable==0.3.2
 pubnub==4.*
 pycryptodome>=3.4.4
 requests>=2.12.4
