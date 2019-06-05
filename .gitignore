@@ -5,3 +5,4 @@ _cache
 credentials.ini
 dist
 *.egg-info
+.DS_Store
