@@ -1,6 +1,7 @@
 *.pyc
+.idea
 .coverage
-.ve
+.ve*
 _cache
 credentials.ini
 dist
