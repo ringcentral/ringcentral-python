@@ -60,7 +60,17 @@ class Client:
         """
 
         if query_params:
-            query = urlencode(query_params)
+            if type(query_params) is dict:
+                query = ""
+                for key, value in  iter(query_params.items()):
+                    if type(value) is list:
+                        for k in value:
+                            query += ("%s=%s&" % (key, k))
+                    else:
+                        query += ("%s=%s&" % (key, value))
+                query = query[:-1]
+            else:
+                query = urlencode(query_params)
             if query:
                 url = url + ('&' if url.find('?') > 0 else '?') + query
 
