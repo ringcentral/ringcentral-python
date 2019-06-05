@@ -62,12 +62,13 @@ class Client:
         if query_params:
             if type(query_params) is dict:
                 query = ""
-                for key, value in query_params.iteritems():
+                for key, value in  iter(query_params.items()):
                     if type(value) is list:
                         for k in value:
-                            query += ("%s=%s&" % (key, urllib.quote_plus(k)))
+                            query += ("%s=%s&" % (key, k))
                     else:
-                        query += ("%s=%s&" % (key, urllib.quote_plus(value)))
+                        query += ("%s=%s&" % (key, value))
+                query = query[:-1]
             else:
                 query = urlencode(query_params)
             if query:
