@@ -11,8 +11,7 @@ after_success:
 deploy:
   provider: pypi
   user: kirill.konshin
-  password:
-    secure: gwPnpB1mQqhekIBQH8GPA+eC2woFK3yVy7/mXI6YBMXgrHiEo3vQDaC8JNdl/MgDDni1L2DcfyAL4L33qFkhqImVuzUjVp4v3zIyPhOUB5F3R/TEjKlDhZDd5oaPdZ+Rp3Mjc/R3cJ+mjX46w0bFMLhdqtcHUz8H7Qu/JLXX2qk=
+  password: $PYPI_TOKEN
   on:
     python: 2.7
     tags: true
