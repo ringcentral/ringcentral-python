@@ -37,7 +37,7 @@ register-test:
 
 .PHONY: install-ve-2
 install-ve-2:
-	virtualenv --python `which python2*` .ve2
+	virtualenv .ve2
 	.ve2/bin/pip install -r requirements.txt
 	.ve2/bin/pip install -r requirements-dev.txt
 
