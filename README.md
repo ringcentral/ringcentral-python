@@ -28,6 +28,14 @@ Install dependencies:
 ```sh
 $ pip install ringcentral
 ```
+# Setup
+
+Rename credentials-sample.ini to credentials.ini.
+
+Edit credentials.ini and update appropriate parameters.
+CLIENT\_ID is synonymous with APP\_KEY.
+CLIENT\_SECRET is synonymous with APP\_SECRET.
+In this repository, the latter convention is used that of APP\_KEY and APP\_SECRET.
 
 # Usage
 
