@@ -16,7 +16,7 @@ def main():
     params = {'from': {'phoneNumber': USERNAME},'to': [{'phoneNumber': to_number}],'text': "SMS message"}
     response = platform.post('/restapi/v1.0/account/~/extension/~/sms', params)
 
-    print 'Sent SMS: ' + response.json().uri
+    print ('Sent SMS: ' + response.json().uri)
 
 if __name__ == '__main__':
     main()
