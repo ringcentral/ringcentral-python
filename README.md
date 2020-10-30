@@ -39,7 +39,7 @@ In this repository, the latter convention is used that of APP\_KEY and APP\_SECR
 
 # Usage
 
-For more info take a look on the `test.py` in this repository.
+Take a look at a sample code.
 
 ```py
 from ringcentral import SDK
