@@ -11,6 +11,8 @@ __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https
 
 # Installation
 
+This SDK is tested against Python 3.7 so we recommend [installing using it with Python 3.7 or newer](https://www.python.org/downloads/)
+
 ## Manual
 
 ```sh
@@ -25,7 +27,7 @@ Install dependencies:
 ## PIP
 
 ```sh
-$ pip install ringcentral
+$ pip3 install ringcentral
 ```
 
 # Usage
