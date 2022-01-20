@@ -11,6 +11,8 @@ __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https
 
 # Installation
 
+This SDK is tested against Python 3.7 so we recommend [installing using it with Python 3.7 or newer](https://www.python.org/downloads/)
+
 ## Manual
 
 ```sh
@@ -25,12 +27,20 @@ Install dependencies:
 ## PIP
 
 ```sh
-$ pip install ringcentral
+$ pip3 install ringcentral
 ```
+# Setup
+
+Rename credentials-sample.ini to credentials.ini.
+
+Edit credentials.ini and update appropriate parameters.
+CLIENT\_ID is synonymous with APP\_KEY.
+CLIENT\_SECRET is synonymous with APP\_SECRET.
+In this repository, the latter convention is used that of APP\_KEY and APP\_SECRET.
 
 # Usage
 
-For more info take a look on the `test.py` in this repository.
+Take a look at a sample code.
 
 ```py
 from ringcentral import SDK

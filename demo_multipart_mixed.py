@@ -15,7 +15,7 @@ def main():
 
     answering_rules = platform.get('/account/~/extension/~/answering-rule').json().records
     last_answer_rule_id = answering_rules[-1].id
-    print 'Answering rule ID: ' + last_answer_rule_id
+    print('Answering rule ID: ' + last_answer_rule_id)
 
     # Step 2. Update greeting audio file
 
@@ -33,7 +33,7 @@ def main():
     builder.set_multipart_mixed(True)
     request = builder.request('/account/~/extension/~/greeting')
     response = platform.send_request(request)
-    print 'Updated greeting audio: ' + response.json().uri
+    print('Updated greeting audio: ' + response.json().uri)
 
 
 if __name__ == '__main__':

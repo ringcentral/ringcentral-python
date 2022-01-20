@@ -21,7 +21,7 @@ def main():
         if 'MmsSender' in phone_number.features:
             mms_number = phone_number.phoneNumber
 
-    print 'MMS Phone Number: ' + mms_number
+    print('MMS Phone Number: ' + mms_number)
 
     # Step 2. Send MMS
 
@@ -42,7 +42,7 @@ def main():
     request = builder.request('/account/~/extension/~/sms')
 
     response = platform.send_request(request)
-    print 'Sent MMS: ' + response.json().uri
+    print('Sent MMS: ' + response.json().uri)
 
 
 if __name__ == '__main__':
