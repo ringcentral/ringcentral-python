@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import sys
+import urllib.parse
 from observable import Observable
 from functools import reduce
 from .auth import Auth
@@ -13,6 +14,7 @@ ACCOUNT_PREFIX = '/account/'
 URL_PREFIX = '/restapi'
 TOKEN_ENDPOINT = '/restapi/oauth/token'
 REVOKE_ENDPOINT = '/restapi/oauth/revoke'
+AUTHORIZE_ENDPOINT = '/restapi/oauth/authorize'
 API_VERSION = 'v1.0'
 ACCESS_TOKEN_TTL = 3600  # 60 minutes
 REFRESH_TOKEN_TTL = 604800  # 1 week
@@ -76,9 +78,18 @@ class Platform(Observable):
         except:
             return False
 
-    def login(self, username='', extension='', password='', code='', redirect_uri=''):
+    def login_url(self, redirect_uri, state='', challenge='', challenge_method='S256'):
+        built_url = self.create_url( AUTHORIZE_ENDPOINT, add_server=True )
+        built_url += '?response_type=code&client_id=' + self._key + '&redirect_uri=' + urllib.parse.quote(redirect_uri)
+        if state:
+            built_url += '&state=' + urllib.parse.quote(state)
+        if challenge:
+            built_url += '&code_challenge=' + urllib.parse.quote(challenge) + '&code_challenge_method=' + challenge_method
+        return built_url
+        
+    def login(self, username='', extension='', password='', code='', redirect_uri='', jwt='', verifier=''):
         try:
-            if not code and not username and not password:
+            if not code and not username and not password and not jwt:
                 raise Exception('Either code or username with password has to be provided')
 
             if not code:
@@ -91,12 +102,19 @@ class Platform(Observable):
                 }
                 if extension:
                     body['extension'] = extension
+            elif jwt:
+                body = {
+                    'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    'assertion': jwt
+                }
             else:
                 body = {
                     'grant_type': 'authorization_code',
                     'redirect_uri': redirect_uri if redirect_uri else self._redirect_uri,
                     'code': code
                 }
+                if verifier:
+                    body['code_verifier'] = verifier
             response = self._request_token(TOKEN_ENDPOINT, body=body)
             self._auth.set_data(response.json_dict())
             self.trigger(Events.loginSuccess, response)
