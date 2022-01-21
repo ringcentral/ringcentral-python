@@ -90,9 +90,8 @@ class Platform(Observable):
     def login(self, username='', extension='', password='', code='', redirect_uri='', jwt='', verifier=''):
         try:
             if not code and not username and not password and not jwt:
-                raise Exception('Either code or username with password has to be provided')
-
-            if not code:
+                raise Exception('Either code, or username with password, or jwt has to be provided')
+            if not code and not jwt:
                 body = {
                     'grant_type': 'password',
                     'username': username,
