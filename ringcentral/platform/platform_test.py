@@ -139,6 +139,7 @@ class TestPlatform(TestCase):
         act = sdk.platform().create_url(url, add_server=True)
         self.assertEqual(exp, act)
 
+        exp = 'mock://whatever/analytics/phone/foo'
         url = '/analytics/phone/foo'
         act = sdk.platform().create_url(url, add_server=True)
         self.assertEqual(exp, act)
