@@ -30,6 +30,16 @@ class TestPlatform(TestCase):
         else:
             self.assertEqual(text, 'code=foo&grant_type=authorization_code&redirect_uri=mock%3A%2F%2Fwhatever-redirect')
 
+    def test_login_fail(self, mock):
+        sdk = self.get_sdk(mock)
+        self.logout_mock(mock)
+        sdk.platform().logout()
+        self.authentication_mock(mock)
+        try:
+            sdk.platform().login()
+        except Exception as e:
+            self.assertTrue( e )
+            
     def test_login_code_redirect(self, mock):
         sdk = self.get_sdk(mock)
         self.logout_mock(mock)
@@ -129,6 +139,10 @@ class TestPlatform(TestCase):
         act = sdk.platform().create_url(url, add_server=True)
         self.assertEqual(exp, act)
 
+        url = '/analytics/phone/foo'
+        act = sdk.platform().create_url(url, add_server=True)
+        self.assertEqual(exp, act)
+        
 
 if __name__ == '__main__':
     unittest.main()
