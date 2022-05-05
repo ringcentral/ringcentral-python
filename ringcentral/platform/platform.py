@@ -2,7 +2,10 @@
 # encoding: utf-8
 
 import sys
-import urllib.parse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 from observable import Observable
 from functools import reduce
 from .auth import Auth
@@ -21,6 +24,7 @@ REFRESH_TOKEN_TTL = 604800  # 1 week
 KNOWN_PREFIXES = [
     URL_PREFIX,
     '/rcvideo',
+    '/analytics',
     '/scim'
 ]
 
