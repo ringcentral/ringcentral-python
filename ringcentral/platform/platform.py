@@ -2,7 +2,10 @@
 # encoding: utf-8
 
 import sys
-import urllib.parse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 from observable import Observable
 from functools import reduce
 from .auth import Auth
