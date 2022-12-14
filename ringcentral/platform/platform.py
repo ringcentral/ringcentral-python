@@ -25,6 +25,7 @@ KNOWN_PREFIXES = [
     URL_PREFIX,
     '/rcvideo',
     '/analytics',
+    '/ai',
     '/scim'
 ]
 
