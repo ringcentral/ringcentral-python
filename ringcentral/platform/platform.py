@@ -56,7 +56,7 @@ class Platform(Observable):
 
     def create_url(self, url, add_server=False, add_method=None, add_token=False):
         built_url = ''
-        has_http = url.find('http://') >= 0 or url.find('https://') >= 0
+        has_http = url.startswith('http://') or url.startswith('https://')
 
         if add_server and not has_http:
             built_url += self._server
@@ -119,7 +119,9 @@ class Platform(Observable):
                 }
                 if verifier:
                     body['code_verifier'] = verifier
-            response = self._request_token(TOKEN_ENDPOINT, body=body)
+
+            built_url = self.create_url( TOKEN_ENDPOINT, add_server=True )
+            response = self._request_token( built_url, body=body)
             self._auth.set_data(response.json_dict())
             self.trigger(Events.loginSuccess, response)
             return response

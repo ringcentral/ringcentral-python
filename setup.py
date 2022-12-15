@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.7.14'
+VERSION = '0.7.15'
 
 setup(
     name='ringcentral',
