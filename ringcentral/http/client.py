@@ -75,8 +75,7 @@ class Client:
                 url = url + ('&' if url.find('?') > 0 else '?') + query
 
         content_type = None
-        accept = None
-
+        
         if headers is None:
             headers = {}
 
@@ -86,7 +85,7 @@ class Client:
             if key.lower().find('content-type') >= 0:
                 content_type = value
             if key.lower().find('accept') >= 0:
-                accept = value
+                headers['Accept'] = value
 
         if content_type is None:
             content_type = 'application/json'
