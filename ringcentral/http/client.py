@@ -92,10 +92,6 @@ class Client:
             content_type = 'application/json'
             headers['Content-Type'] = content_type
 
-        if accept is None:
-            accept = 'application/json'
-            headers['Accept'] = accept
-
         if content_type.lower().find('application/json') >= 0:
             body = json.dumps(body) if body else None
         elif content_type.lower().find('application/x-www-form-urlencoded') >= 0:
