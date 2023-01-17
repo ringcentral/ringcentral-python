@@ -26,9 +26,9 @@ class TestPlatform(TestCase):
         sdk.platform().login(code='foo')
         text = str(mock.request_history[-1].text)
         if sys.version_info[0] == 3:
-            self.assertEqual(text, 'grant_type=authorization_code&redirect_uri=mock%3A%2F%2Fwhatever-redirect&code=foo')
+            self.assertEqual(text, 'grant_type=authorization_code&redirect_uri=https%3A%2F%2Fwhatever-redirect&code=foo')
         else:
-            self.assertEqual(text, 'code=foo&grant_type=authorization_code&redirect_uri=mock%3A%2F%2Fwhatever-redirect')
+            self.assertEqual(text, 'code=foo&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fwhatever-redirect')
 
     def test_login_fail(self, mock):
         sdk = self.get_sdk(mock)
@@ -123,7 +123,7 @@ class TestPlatform(TestCase):
     def test_api_url(self, mock):
         sdk = self.get_sdk(mock)
 
-        exp1 = 'mock://whatever/restapi/v1.0/account/~/extension/~?_method=POST&access_token=ACCESS_TOKEN'
+        exp1 = 'https://whatever/restapi/v1.0/account/~/extension/~?_method=POST&access_token=ACCESS_TOKEN'
         act1 = sdk.platform().create_url('/account/~/extension/~', add_server=True, add_method='POST', add_token=True)
         self.assertEqual(exp1, act1)
 
@@ -134,12 +134,12 @@ class TestPlatform(TestCase):
 
     def test_api_url_custom_prefixes(self, mock):
         sdk = self.get_sdk(mock)
-        exp = 'mock://whatever/scim/v2/foo'
+        exp = 'https://whatever/scim/v2/foo'
         url = '/scim/v2/foo'
         act = sdk.platform().create_url(url, add_server=True)
         self.assertEqual(exp, act)
 
-        exp = 'mock://whatever/analytics/phone/foo'
+        exp = 'https://whatever/analytics/phone/foo'
         url = '/analytics/phone/foo'
         act = sdk.platform().create_url(url, add_server=True)
         self.assertEqual(exp, act)
