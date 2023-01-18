@@ -18,7 +18,7 @@ class TestCase(unittest.TestCase):
 
     def get_sdk(self, mock):
 
-        sdk = SDK('whatever', 'whatever', 'mock://whatever', redirect_uri='mock://whatever-redirect')
+        sdk = SDK('whatever', 'whatever', 'https://whatever', redirect_uri='https://whatever-redirect')
 
         self.authentication_mock(mock)
         sdk.platform().login('18881112233', None, 'password')
@@ -44,7 +44,7 @@ class TestCase(unittest.TestCase):
     def add(self, mock, method, url, body, status=200):
         mock.register_uri(
             method=method,
-            url='mock://whatever' + url,
+            url='https://whatever' + url,
             text=json.dumps(body),
             headers={'Content-Type': 'application/json'},
             status_code=status
