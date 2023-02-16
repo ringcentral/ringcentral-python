@@ -24,8 +24,11 @@ REFRESH_TOKEN_TTL = 604800  # 1 week
 KNOWN_PREFIXES = [
     URL_PREFIX,
     '/rcvideo',
+    '/video',
+    '/webinar',
     '/analytics',
     '/ai',
+    '/team-messaging',
     '/scim'
 ]
 
