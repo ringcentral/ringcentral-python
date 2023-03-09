@@ -24,7 +24,7 @@ class MultipartBuilder:
     def contents(self):
         return self._contents
 
-    def add(self, attachment):
+    def add(self, attachment, name='attachment'):
         """
         Possible attachment formats:
 
@@ -34,9 +34,10 @@ class MultipartBuilder:
         4. Plain text: ('report.csv', 'some,data,to,send')
 
         :param attachment:
+        :param name='attachment':
         :return:
         """
-        self._contents.append(('attachment', attachment))
+        self._contents.append((name, attachment))
         return self
 
     def request(self, url, method='POST'):
