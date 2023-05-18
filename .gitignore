@@ -7,3 +7,4 @@ credentials.ini
 dist
 *.egg-info
 venv
+.env
