@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 
 class ApiException(Exception):
     def __init__(self, api_response, previous=None):

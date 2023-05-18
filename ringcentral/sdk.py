@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 from .platform import Platform
 from .subscription import Subscription
 from .http import Client, MultipartBuilder

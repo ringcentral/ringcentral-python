@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 import unittest
 import requests_mock
 
@@ -134,7 +131,7 @@ class TestSubscription(TestCase):
             self.subscription_mock(mock)
             s.register(events=['/restapi/v1.0/account/~/extension/1/presence'])
 
-            self.add(mock, 'DELETE', '/restapi/v1.0/subscription/foo-bar-baz', {}, 204)
+            self.add(mock, 'DELETE', '/restapi/v1.0/subscription/foo-bar-baz', None, 204)
             s.remove()
 
         finally:

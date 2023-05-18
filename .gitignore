@@ -6,3 +6,4 @@ _cache
 credentials.ini
 dist
 *.egg-info
+venv

@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 from time import time
 
 RELEASE_TIMEOUT = 10

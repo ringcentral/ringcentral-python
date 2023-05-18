@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 from multiprocessing import Process
 from time import sleep
 from ringcentral.subscription import Events

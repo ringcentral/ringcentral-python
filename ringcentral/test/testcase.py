@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 import unittest
 import requests_mock
 import json
@@ -45,7 +42,7 @@ class TestCase(unittest.TestCase):
         mock.register_uri(
             method=method,
             url='https://whatever' + url,
-            text=json.dumps(body),
+            text= '' if body is None else json.dumps(body),
             headers={'Content-Type': 'application/json'},
             status_code=status
         )
