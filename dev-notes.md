@@ -35,4 +35,8 @@ Copy `.env.sample` to `.env`.
 
 Edit `.env` to specify credentials
 
-Run a demo file like this `python demo_sms.py`.
+Run a demo file like this:
+
+```
+python demo_sms.py
+```
