@@ -48,6 +48,7 @@ jobs:
           source venv/bin/activate
         #Install dependencies
          pip install -r requirements.txt
+          #Install dependencies
          pip install -r requirements-dev.txt
          #Run unit tests
          python -m unittest discover . --pattern '*test.py'
