@@ -3,4 +3,4 @@ coveralls>=1.1
 discover>=0.4.0
 requests-mock>=1.2.0
 setuptools
-python-dotenv>=1.0.0
+python-dotenv>=0.1.0
