@@ -2,13 +2,16 @@ from multiprocessing import Process
 from time import sleep
 from ringcentral.subscription import Events
 from ringcentral import SDK
-from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
+from dotenv import dotenv_values
 
+#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
+
+env = dotenv_values(".env")
 
 def main():
-    sdk = SDK(APP_KEY, APP_SECRET, SERVER)
+    sdk = SDK(env['RINGCENTRAL_CLIENT_ID'], env['RINGCENTRAL_CLIENT_SECRET'], env['RINGCENTRAL_SERVER_URL'])
     platform = sdk.platform()
-    platform.login(USERNAME, EXTENSION, PASSWORD)
+    platform.login(jwt = env['RINGCENTRAL_JWT_TOKEN'])
 
     def on_message(msg):
         print(msg)
