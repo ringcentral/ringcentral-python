@@ -1,14 +1,15 @@
 from __future__ import print_function
-
+from dotenv import dotenv_values
 from ringcentral.http.api_exception import ApiException
 from ringcentral import SDK
-from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
+#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
 
 
+env = dotenv_values(".env")
 def main():
-    sdk = SDK(APP_KEY, APP_SECRET, SERVER)
+    sdk = SDK(env['RINGCENTRAL_CLIENT_ID'], env['RINGCENTRAL_CLIENT_SECRET'], env['RINGCENTRAL_SERVER_URL'])
     platform = sdk.platform()
-    platform.login(USERNAME, EXTENSION, PASSWORD)
+    platform.login(jwt = env['RINGCENTRAL_JWT_TOKEN'])
 
     # Simple GET
     response = platform.get('/account/~/extension/~')
