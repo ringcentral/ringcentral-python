@@ -1,12 +1,22 @@
 import urllib
-from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER, MOBILE
+from dotenv import dotenv_values
+
+#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER, MOBILE
 from ringcentral import SDK
 
+env = dotenv_values(".env")
 
 def main():
-    sdk = SDK(APP_KEY, APP_SECRET, SERVER)
+    #sdk = SDK(APP_KEY, APP_SECRET, SERVER)
+    sdk = SDK(env['RINGCENTRAL_CLIENT_ID'], env['RINGCENTRAL_CLIENT_SECRET'], env['RINGCENTRAL_SERVER_URL'])
     platform = sdk.platform()
-    platform.login(USERNAME, EXTENSION, PASSWORD)
+    platform.login(jwt = env['RINGCENTRAL_JWT_TOKEN'])
+
+    params = {'from': {'phoneNumber': env['RINGCENTRAL_USERNAME']},'to': [{'phoneNumber': env['RINGCENTRAL_RECEIVER']}],'text': "MMS message"}
+    response = platform.post('/restapi/v1.0/account/~/extension/~/mms', params)
+
+
+    #platform.login(USERNAME, EXTENSION, PASSWORD)
 
     # Step 1. Get MMS-enabled phone number
 
@@ -31,7 +41,7 @@ def main():
     builder = sdk.create_multipart_builder()
     builder.set_body({
         'from': {'phoneNumber': mms_number},
-        'to': [{'phoneNumber': MOBILE}],
+        'to': [{'phoneNumber': phone_number}],
         'text': 'MMS from Python'  # this is optional
     })
     builder.add(attachment)
