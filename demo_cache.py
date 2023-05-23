@@ -1,10 +1,13 @@
 import os
 import json
 from ringcentral import SDK
-from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
+from dotenv import dotenv_values
+
+#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
 
 cache_dir = os.path.join(os.getcwd(), '_cache')
 file_path = os.path.join(cache_dir, 'platform.json')
+env = dotenv_values(".env")
 
 def get_file_cache():
     try:
@@ -28,7 +31,7 @@ def main():
     cache = get_file_cache()
 
     # Create SDK instance
-    sdk = SDK(APP_KEY, APP_SECRET, SERVER)
+    sdk = SDK(env['RINGCENTRAL_CLIENT_ID'], env['RINGCENTRAL_CLIENT_SECRET'], env['RINGCENTRAL_SERVER_URL'])
     platform = sdk.platform()
 
     # Set cached authentication data
@@ -38,7 +41,7 @@ def main():
         platform.is_authorized()
         print('Authorized already by cached data')
     except Exception as e:
-        platform.login(USERNAME, EXTENSION, PASSWORD)
+        sdk = SDK(env['RINGCENTRAL_CLIENT_ID'], env['RINGCENTRAL_CLIENT_SECRET'], env['RINGCENTRAL_SERVER_URL'])
         print('Authorized by credentials')
 
     # Perform refresh by force
