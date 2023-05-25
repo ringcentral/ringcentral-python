@@ -12,8 +12,8 @@ def main():
     platform = sdk.platform()
     platform.login(jwt = env['RINGCENTRAL_JWT_TOKEN'])
 
-    params = {'from': {'phoneNumber': env['RINGCENTRAL_USERNAME']},'to': [{'phoneNumber': env['RINGCENTRAL_RECEIVER']}],'text': "MMS message"}
-    response = platform.post('/restapi/v1.0/account/~/extension/~/mms', params)
+  #  params = {'from': {'phoneNumber': env['RINGCENTRAL_USERNAME']},'to': [{'phoneNumber': env['RINGCENTRAL_RECEIVER']}],'text': "MMS message"}
+  #  response = platform.post('/restapi/v1.0/account/~/extension/~/mms', params)
 
 
     #platform.login(USERNAME, EXTENSION, PASSWORD)
@@ -41,7 +41,7 @@ def main():
     builder = sdk.create_multipart_builder()
     builder.set_body({
         'from': {'phoneNumber': mms_number},
-        'to': [{'phoneNumber': phone_number}],
+        'to': [{'phoneNumber': env.RINGCENTRAL_RECEIVER}],
         'text': 'MMS from Python'  # this is optional
     })
     builder.add(attachment)
