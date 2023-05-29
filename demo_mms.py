@@ -41,7 +41,7 @@ def main():
     builder = sdk.create_multipart_builder()
     builder.set_body({
         'from': {'phoneNumber': mms_number},
-        'to': [{'phoneNumber': phone_number}],
+        'to': [{'phoneNumber': env['RINGCENTRAL_RECEIVER']}],
         'text': 'MMS from Python'  # this is optional
     })
     builder.add(attachment)
