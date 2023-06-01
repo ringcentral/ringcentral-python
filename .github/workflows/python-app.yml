@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-
+    environment: DPW app env
     runs-on: ubuntu-latest
     strategy:
       matrix:
