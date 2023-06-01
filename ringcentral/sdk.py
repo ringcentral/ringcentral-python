@@ -2,6 +2,7 @@ from .platform import Platform
 from .websocket import WebSocketClient
 from .deprecated_pubnub_subscription import Subscription
 from .http import Client, MultipartBuilder
+import warnings
 
 
 class SDK:
@@ -13,6 +14,7 @@ class SDK:
         return self._platform
 
     def create_subscription(self):
+        warnings.warn("PubNub subscription is deprecated, please use WebSocket subscription.")
         return Subscription(self._platform)
     
     def create_web_socket_client(self):
