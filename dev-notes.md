@@ -29,6 +29,10 @@ pip install -r requirements-dev.txt
 python -m unittest discover . --pattern '*test.py'
 ```
 
+### Note
+
+subscription test requires necessary credentials in .env file
+
 ## Run demos
 
 Copy `.env.sample` to `.env`.
