@@ -1,39 +1,56 @@
 from __future__ import print_function
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 from ringcentral import SDK
-from ringcentral.websocket.web_socket_client import WebSocketClient
+import json
+import uuid
+import os
+import asyncio
 
-env = dotenv_values(".env")
+async def main():
+    try:
+        load_dotenv(override=True)
+        sdk = SDK(
+            os.environ['RINGCENTRAL_CLIENT_ID'],
+            os.environ["RINGCENTRAL_CLIENT_SECRET"],
+            os.environ["RINGCENTRAL_SERVER_URL"],
+        )
+        platform = sdk.platform()
+        platform.login(jwt=os.environ["RINGCENTRAL_JWT_TOKEN"])
 
+        # Create new websocket connection
+        web_socket_client = sdk.create_web_socket_client()
+        await web_socket_client.create_new_connection()
+        print("\n New WebSocket connection created:")
+        print(web_socket_client.get_connection_info())
+        
+        # Send API call to RingCentral WebSocket Gateway, just like using HTTPS Gateway
+        messageId = str(uuid.uuid4())
+        print(messageId)
+        requestBodyJson = json.dumps(
+            [
+                {
+                    "type": "ClientRequest",
+                    "messageId": messageId,
+                    "method": "GET",
+                    "path": "/restapi/v1.0/account/~/extension/~",
+                }
+            ]
+        )
+        ws_connection = web_socket_client.get_connection()
+        print(ws_connection)
+        await ws_connection.send(requestBodyJson)
+        response = await ws_connection.recv()
+        print("\n User email:\n")
+        print(json.loads(response)[1]['contact']['email'])
+        while True:
+            await asyncio.sleep(1)
 
-def main():
-    sdk = SDK(
-        env["RINGCENTRAL_CLIENT_ID"],
-        env["RINGCENTRAL_CLIENT_SECRET"],
-        env["RINGCENTRAL_SERVER_URL"],
-    )
-    platform = sdk.platform()
-    platform.login(jwt=env["RINGCENTRAL_JWT_TOKEN"])
-
-    # Get websocket token
-    web_socket_client = WebSocketClient(platform)
-    response = web_socket_client.get_web_socket_token()
-    print(response)
-
-    # Open websocket connection
-    open_connection_response = web_socket_client.open_connection(
-        response["uri"], response["ws_access_token"]
-    )
-    web_socket_connection = open_connection_response["connection"]
-    print("\nNew web socket connection opened as:")
-    print(type(web_socket_connection))
-    print("\nConnection details:")
-    print(open_connection_response["connection_details"])
-
-    # Close websocket connection
-    web_socket_client.close_connection(web_socket_connection)
-    print("\nWeb socket connection closed.")
+    except KeyboardInterrupt:
+        # Close websocket connection
+        web_socket_client.close_connection()
+        print("\nWebSocket connection closed.")
+        print("Stopped by User")
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.get_event_loop().run_until_complete(main())

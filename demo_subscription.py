@@ -1,44 +1,48 @@
-from multiprocessing import Process
-from time import sleep
-from ringcentral.subscription import Events
+from ringcentral.websocket import SubscriptionEvents
 from ringcentral import SDK
-from dotenv import dotenv_values
+from dotenv import load_dotenv
+import asyncio
+import os
 
-#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
+# from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
 
-env = dotenv_values(".env")
+def on_message(msg):
+    print(msg)
 
-def main():
-    sdk = SDK(env['RINGCENTRAL_CLIENT_ID'], env['RINGCENTRAL_CLIENT_SECRET'], env['RINGCENTRAL_SERVER_URL'])
+
+async def main():
+    load_dotenv(override=True)
+    sdk = SDK(
+        os.environ['RINGCENTRAL_CLIENT_ID'],
+        os.environ["RINGCENTRAL_CLIENT_SECRET"],
+        os.environ["RINGCENTRAL_SERVER_URL"],
+    )
     platform = sdk.platform()
-    platform.login(jwt = env['RINGCENTRAL_JWT_TOKEN'])
-
-    def on_message(msg):
-        print(msg)
-
-    def pubnub():
-        try:
-            s = sdk.create_subscription()
-            s.add_events(['/account/~/extension/~/message-store'])
-            s.on(Events.notification, on_message)
-            s.register()
-
-            while True:
-                sleep(0.1)
-
-        except KeyboardInterrupt:
-            print("Pubnub listener stopped...")
-
-    p = Process(target=pubnub)
+    platform.login(jwt=os.environ["RINGCENTRAL_JWT_TOKEN"])
 
     try:
-        p.start()
+        web_socket_client = sdk.create_web_socket_client()
+        await web_socket_client.create_new_connection()
+        print("\n New WebSocket connection created:")
+        print(web_socket_client.get_connection_info())
+        print("\n Creating subscription...")
+        sub = await web_socket_client.create_subscription(
+            ["/restapi/v1.0/account/~/extension/~/presence"]
+        )
+        # To update sub: await web_socket_client.update_subscription(sub, events) OR sub.update(events)
+        # To remove sub: await web_socket_client.remove_subscription(sub) OR sub.remove()
+        
+        # Test
+        # Go and change your extension status. The notification info will be received and printed here
+        while True:
+            message = await web_socket_client.get_connection().recv()
+            print("\n receiving message: \n")
+            print(message)
+            await asyncio.sleep(0.5)
     except KeyboardInterrupt:
-        p.terminate()
+        print("\nWebSocket connection closed.")
         print("Stopped by User")
 
-    print("Wait for notification...")
 
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(main())
