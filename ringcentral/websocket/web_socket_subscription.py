@@ -3,7 +3,6 @@
 import uuid
 import json
 from observable import Observable
-from .events import SubscriptionEvents
 
 # _subscription format example: https://git.ringcentral.com/platform/wsg/-/blob/master/RingCentral_WebSocket_API.md#step-4-subscribing-to-rc-events
 
@@ -61,7 +60,7 @@ class WebSocketSubscription(Observable):
 
         except Exception as e:
             self.reset()
-            self.trigger(SubscriptionEvents.subscribeError, e)
+            print(e)
             raise
 
     async def update(self, events=None):
@@ -98,7 +97,7 @@ class WebSocketSubscription(Observable):
 
         except Exception as e:
             self.reset()
-            self.trigger(SubscriptionEvents.renewError, e)
+            print(e)
             raise
 
     async def remove(self):
@@ -130,7 +129,7 @@ class WebSocketSubscription(Observable):
 
         except Exception as e:
             self.reset()
-            self.trigger(SubscriptionEvents.removeError, e)
+            print(e)
             raise
 
     def set_subscription(self, data):

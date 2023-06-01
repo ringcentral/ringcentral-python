@@ -31,7 +31,7 @@ python -m unittest discover . --pattern '*test.py'
 
 ### Note
 
-subscription test requires necessary credentials in .env file
+Subscription test requires necessary credentials in .env file. Your app will need "Websocket Subscriptions" permission.
 
 ## Run demos
 

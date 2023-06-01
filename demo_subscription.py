@@ -1,4 +1,3 @@
-from ringcentral.websocket import SubscriptionEvents
 from ringcentral import SDK
 from dotenv import load_dotenv
 import asyncio

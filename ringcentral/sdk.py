@@ -1,5 +1,6 @@
 from .platform import Platform
 from .websocket import WebSocketClient
+from .deprecated_pubnub_subscription import Subscription
 from .http import Client, MultipartBuilder
 
 
@@ -11,6 +12,9 @@ class SDK:
     def platform(self):
         return self._platform
 
+    def create_subscription(self):
+        return Subscription(self._platform)
+    
     def create_web_socket_client(self):
         return WebSocketClient(self._platform)
 
