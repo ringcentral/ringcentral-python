@@ -44,3 +44,11 @@ Run a demo file like this:
 ```
 python demo_sms.py
 ```
+
+
+## Release
+
+```
+python -m build
+twine upload dist/*
+```
