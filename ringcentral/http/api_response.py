@@ -74,7 +74,9 @@ class ApiResponse:
                 message = data['description']
 
         except Exception as e:
-            message = message + ' (and additional error happened during JSON parse: ' + e.message + ')'
+           # message = message + ' (and additional error happened during JSON parse: ' + e.message + ')'
+            message = message + ' (and additional error happened during JSON parse: ' + str(e) + ')'
+
 
         return message
 
