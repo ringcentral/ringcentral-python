@@ -55,10 +55,10 @@ print('User loaded ' + res.json().name)
 
 # Subscribing for server events
 
-## With Web Socket (recommended)
+## With WebSocket (recommended)
 Please refer to [demo_subscription.py](./demo_subscription.py)
 
-## With PubNun (deprecated)
+## With PubNub (deprecated)
 
 ```py
 from threading import Thread

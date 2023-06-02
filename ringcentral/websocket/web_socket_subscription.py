@@ -2,23 +2,33 @@
 # encoding: utf-8
 import uuid
 import json
+from .events import WebSocketEvents
 from observable import Observable
 
 # _subscription format example: https://git.ringcentral.com/platform/wsg/-/blob/master/RingCentral_WebSocket_API.md#step-4-subscribing-to-rc-events
 
 
 class WebSocketSubscription(Observable):
-    def __init__(self, web_socket_connection):
+    def __init__(self, web_socket_client):
         Observable.__init__(self)
-        self._web_socket_connection = web_socket_connection
+        self._web_socket_client = web_socket_client
         self._event_filters = []
         self._subscription = None
 
+    def on_message(self, message):
+        message_json = json.loads(message)
+        if(message_json[0]['type'] == 'ClientRequest' and message_json[0]['headers']['WSG-SubscriptionId']):
+            self.set_subscription(message_json)
+            self._web_socket_client.trigger(WebSocketEvents.subscriptionCreated, self)
+        else: 
+            if(message_json[0]['type'] == 'ServerNotification'):
+                self._web_socket_client.trigger(WebSocketEvents.receiveSubscriptionNotification, message_json)
+
     async def register(self, events=None):
         if not self._subscription:
-            return await self.subscribe(events=events)
+            await self.subscribe(events=events)
         else:
-            return await self.update(events=events)
+            await self.update(events=events)
 
     def add_events(self, events):
         self._event_filters += events
@@ -36,27 +46,20 @@ class WebSocketSubscription(Observable):
 
         try:
             messageId = str(uuid.uuid4())
-            requestBodyJson = json.dumps(
-                [
-                    {
-                        "type": "ClientRequest",
-                        "messageId": messageId,
-                        "method": "POST",
-                        "path": "/restapi/v1.0/subscription/",
-                    },
-                    {
-                        "eventFilters": self._event_filters,
-                        "deliveryMode": {"transportType": "WebSocket"},
-                    },
-                ]
-            )
-            await self._web_socket_connection.send(requestBodyJson)
-            response = await self._web_socket_connection.recv()
-            print("\n Subscription created: \n")
-            print(response)
-
-            self.set_subscription(json.loads(response))
-            return response
+            requestBodyJson = [
+                {
+                    "type": "ClientRequest",
+                    "messageId": messageId,
+                    "method": "POST",
+                    "path": "/restapi/v1.0/subscription/",
+                },
+                {
+                    "eventFilters": self._event_filters,
+                    "deliveryMode": {"transportType": "WebSocket"},
+                },
+            ]
+            await self._web_socket_client.send_message(requestBodyJson)
+            self._web_socket_client.on(WebSocketEvents.receiveMessage, self.on_message)
 
         except Exception as e:
             self.reset()
@@ -73,27 +76,20 @@ class WebSocketSubscription(Observable):
         try:
             subscriptionId = self._subscription[1]["id"]
             messageId = str(uuid.uuid4())
-            requestBodyJson = json.dumps(
-                [
-                    {
-                        "type": "ClientRequest",
-                        "messageId": messageId,
-                        "method": "PUT",
-                        "path": f"/restapi/v1.0/subscription/{subscriptionId}",
-                    },
-                    {
-                        "eventFilters": self._event_filters,
-                        "deliveryMode": {"transportType": "WebSocket"},
-                    },
-                ]
-            )
-            await self._web_socket_connection.send(requestBodyJson)
-            response = await self._web_socket_connection.recv()
-            print("\n Subscription updated: \n")
-            print(response)
-
-            self.set_subscription(json.loads(response))
-            return response
+            requestBodyJson = [
+                {
+                    "type": "ClientRequest",
+                    "messageId": messageId,
+                    "method": "PUT",
+                    "path": f"/restapi/v1.0/subscription/{subscriptionId}",
+                },
+                {
+                    "eventFilters": self._event_filters,
+                    "deliveryMode": {"transportType": "WebSocket"},
+                },
+            ]
+            await self._web_socket_client.send_message(requestBodyJson)
+            self._web_socket_client.trigger(WebSocketEvents.subscriptionUpdated, self)
 
         except Exception as e:
             self.reset()
@@ -107,25 +103,20 @@ class WebSocketSubscription(Observable):
 
         try:
             messageId = str(uuid.uuid4())
-            requestBodyJson = json.dumps(
-                [
-                    {
-                        "type": "ClientRequest",
-                        "messageId": messageId,
-                        "method": "DELETE",
-                        "path": f"/restapi/v1.0/subscription/{subscriptionId}",
-                    }
-                ]
-            )
+            requestBodyJson = [
+                {
+                    "type": "ClientRequest",
+                    "messageId": messageId,
+                    "method": "DELETE",
+                    "path": f"/restapi/v1.0/subscription/{subscriptionId}",
+                }
+            ]
 
-            await self._web_socket_connection.send(requestBodyJson)
-            response = await self._web_socket_connection.recv()
-            print("\n Subscription deleted: \n")
-            print(response)
+            await self._web_socket_client.send_message(requestBodyJson)
+            self._web_socket_client.off(WebSocketEvents.receiveMessage, self.on_message)
+            self._web_socket_client.trigger(WebSocketEvents.subscriptionRemoved)
 
             self.reset()
-
-            return response
 
         except Exception as e:
             self.reset()
@@ -144,6 +135,7 @@ class WebSocketSubscription(Observable):
     def destroy(self):
         self.reset()
         self.off()
+
 
 if __name__ == "__main__":
     pass

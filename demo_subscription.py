@@ -2,12 +2,20 @@ from ringcentral import SDK
 from dotenv import load_dotenv
 import asyncio
 import os
+from ringcentral.websocket.events import WebSocketEvents
 
-# from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
+def on_notification(message):
+    print("\n Subscription notification:\n")
+    print(message)
 
-def on_message(msg):
-    print(msg)
+def on_sub_created(sub):
+    print("\n Subscription created:\n")
+    print(sub.get_subscription_info())
+    print("\n Please go and change your user status \n")
 
+def on_ws_created(web_socket_client):
+    print("\n New WebSocket connection created:")
+    print(web_socket_client.get_connection_info())
 
 async def main():
     load_dotenv(override=True)
@@ -21,25 +29,14 @@ async def main():
 
     try:
         web_socket_client = sdk.create_web_socket_client()
-        await web_socket_client.create_new_connection()
-        print("\n New WebSocket connection created:")
-        print(web_socket_client.get_connection_info())
-        print("\n Creating subscription...")
-        sub = await web_socket_client.create_subscription(
-            ["/restapi/v1.0/account/~/extension/~/presence"]
+        web_socket_client.on(WebSocketEvents.connectionCreated, on_ws_created)
+        web_socket_client.on(WebSocketEvents.subscriptionCreated, on_sub_created)
+        web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, on_notification)
+        await asyncio.gather(
+            web_socket_client.create_new_connection(), 
+            web_socket_client.create_subscription(["/restapi/v1.0/account/~/extension/~/presence"])
         )
-        # To update sub: await web_socket_client.update_subscription(sub, events) OR sub.update(events)
-        # To remove sub: await web_socket_client.remove_subscription(sub) OR sub.remove()
-        
-        # Test
-        # Go and change your extension status. The notification info will be received and printed here
-        while True:
-            message = await web_socket_client.get_connection().recv()
-            print("\n receiving message: \n")
-            print(message)
-            await asyncio.sleep(0.5)
     except KeyboardInterrupt:
-        print("\nWebSocket connection closed.")
         print("Stopped by User")
 
 

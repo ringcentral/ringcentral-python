@@ -3,6 +3,9 @@
 from observable import Observable
 import websockets
 from .web_socket_subscription import WebSocketSubscription
+from .events import WebSocketEvents
+import json
+import asyncio
 
 
 class WebSocketClient(Observable):
@@ -11,6 +14,8 @@ class WebSocketClient(Observable):
         self._platform = platform
         self._web_socket = None
         self._done = False
+        self._is_ready = False
+        self._send_attempt_counter = 0
 
     async def create_new_connection(self):
         try:
@@ -20,7 +25,7 @@ class WebSocketClient(Observable):
             )
             return open_connection_response
         except Exception as e:
-            self.trigger("Create new WebSocket connection error", e)
+            self.trigger(WebSocketEvents.createConnectionError, e)
             raise
 
     def get_web_socket_token(self):
@@ -28,20 +33,28 @@ class WebSocketClient(Observable):
             response = self._platform.post("/restapi/oauth/wstoken", body={})
             return response.json_dict()
         except Exception as e:
-            self.trigger("Get WebSocket token error", e)
+            self.trigger(WebSocketEvents.getTokenError, e)
             raise
 
     async def open_connection(self, ws_uri, ws_access_token):
         try:
-            websocket = await websockets.connect(f"{ws_uri}?access_token={ws_access_token}")
+            websocket = await websockets.connect(
+                f"{ws_uri}?access_token={ws_access_token}"
+            )
             connectionMessage = await websocket.recv()
             connection_info = {}
             connection_info["connection"] = websocket
             connection_info["connection_details"] = connectionMessage
             self._web_socket = connection_info
-            return connection_info
+            self._is_ready = True
+            self.trigger(WebSocketEvents.connectionCreated, self)
+            await asyncio.sleep(0)
+            while True:
+                message = await websocket.recv()
+                self.trigger(WebSocketEvents.receiveMessage, message)
+                await asyncio.sleep(0)
         except Exception as e:
-            self.trigger("Open WebSocket connection error", e)
+            self.trigger(WebSocketEvents.createConnectionError, e)
             raise
 
     def get_connection_info(self):
@@ -53,10 +66,11 @@ class WebSocketClient(Observable):
     async def close_connection(self):
         try:
             self._done = True
+            self._is_ready = False
             ws_connection = self.get_connection()
             await ws_connection.close()
         except Exception as e:
-            self.trigger("Close WebSocket error", e)
+            self.trigger(WebSocketEvents.closeConnectionError, e)
             raise
 
     async def recover_connection(self):
@@ -70,16 +84,44 @@ class WebSocketClient(Observable):
             # IMPORTANT: WebSocket creation is successful if it doesn't raise any exception
             return recovered_connection_info
         except Exception as e:
-            self.trigger("Recover WebSocket error", e)
+            self.trigger(WebSocketEvents.recoverConnectionError, e)
+            raise
+
+    async def send_message(self, message):
+        try:
+            if self._is_ready:
+                self._send_attempt_counter = 0
+                requestBodyJson = json.dumps(message)
+                await self.get_connection().send(requestBodyJson)
+            else:
+                await asyncio.sleep(1)
+                await self.send_message(message)
+                self._send_attempt_counter += 1
+                if(self._send_attempt_counter > 10):
+                    self.trigger(WebSocketEvents.connectionNotReady)
+                    self._send_attempt_counter = 0
+                    raise
+        except Exception as e:
+            self.trigger(WebSocketEvents.sendMessageError, e)
             raise
 
     async def create_subscription(self, events=None):
         try:
-            subscription = WebSocketSubscription(self.get_connection())
-            await subscription.register(events)
-            return subscription
+            if self._is_ready:
+                self._send_attempt_counter = 0
+                subscription = WebSocketSubscription(self)
+                await subscription.register(events)
+            else:
+                await asyncio.sleep(1)
+                await self.create_subscription(events)
+                self._send_attempt_counter += 1
+                if(self._send_attempt_counter > 10):
+                    self.trigger(WebSocketEvents.connectionNotReady)
+                    self._send_attempt_counter = 0
+                    raise
+                
         except Exception as e:
-            self.trigger("Create subscription error", e)
+            self.trigger(WebSocketEvents.createSubscriptionError, e)
             raise
 
     async def update_subscription(self, subscription, events=None):
@@ -87,14 +129,14 @@ class WebSocketClient(Observable):
             await subscription.update(events)
             return subscription
         except Exception as e:
-            self.trigger("Update subscription error", e)
+            self.trigger(WebSocketEvents.updateSubscriptionError, e)
             raise
 
     async def remove_subscription(self, subscription):
         try:
             await subscription.remove()
         except Exception as e:
-            self.trigger("Remove subscription error", e)
+            self.trigger(WebSocketEvents.removeSubscriptionError, e)
             raise
 
 
