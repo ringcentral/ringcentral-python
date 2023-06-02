@@ -2,7 +2,6 @@ from __future__ import print_function
 from dotenv import dotenv_values
 from ringcentral.http.api_exception import ApiException
 from ringcentral import SDK
-#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER
 
 
 env = dotenv_values(".env")

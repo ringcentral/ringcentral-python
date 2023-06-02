@@ -1,6 +1,5 @@
 import urllib
 from dotenv import dotenv_values
-#from config import USERNAME, EXTENSION, PASSWORD, APP_KEY, APP_SECRET, SERVER, MOBILE
 from ringcentral import SDK
 
 env = dotenv_values(".env")
