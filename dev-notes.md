@@ -29,6 +29,10 @@ pip install -r requirements-dev.txt
 python -m unittest discover . --pattern '*test.py'
 ```
 
+### Note
+
+Subscription test requires necessary credentials in .env file. Your app will need "Websocket Subscriptions" permission.
+
 ## Run demos
 
 Copy `.env.sample` to `.env`.

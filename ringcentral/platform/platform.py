@@ -8,6 +8,7 @@ from functools import reduce
 from .auth import Auth
 from .events import Events
 from ..core import base64encode
+import warnings
 
 ACCOUNT_ID = '~'
 ACCOUNT_PREFIX = '/account/'
@@ -96,6 +97,8 @@ class Platform(Observable):
         try:
             if not code and not username and not password and not jwt:
                 raise Exception('Either code, or username with password, or jwt has to be provided')
+            if username and password:
+                warnings.warn("username-password login will soon be deprecated. Please use jwt or OAuth instead.")
             if not code and not jwt:
                 body = {
                     'grant_type': 'password',
