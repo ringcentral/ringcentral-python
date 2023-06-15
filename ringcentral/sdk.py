@@ -14,7 +14,7 @@ class SDK:
         return self._platform
 
     def create_subscription(self):
-        warnings.warn("PubNub subscription is deprecated, please use WebSocket subscription.")
+        warnings.warn("PubNub support is deprecated. Please migrate your application to WebSockets.")
         return Subscription(self._platform)
     
     def create_web_socket_client(self):
