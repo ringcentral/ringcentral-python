@@ -1,0 +1,47 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on: 
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version}}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Test with pytest
+        env:
+          RINGCENTRAL_SERVER_URL: ${{secrets.RINGCENTRAL_SERVER_URL}}
+          RINGCENTRAL_CLIENT_ID: ${{secrets.RINGCENTRAL_CLIENT_ID}}
+          RINGCENTRAL_CLIENT_SECRET: ${{secrets.RINGCENTRAL_CLIENT_SECRET}}
+          RINGCENTRAL_JWT_TOKEN: ${{secrets.RINGCENTRAL_JWT_TOKEN}}
+        run: |
+          #Create virtual environment
+            python -m venv venv
+          #Activate virtual environment
+            source venv/bin/activate
+          #Install dependencies
+           pip install -r requirements.txt
+           pip install -r requirements-dev.txt
+           #Run unit tests
+           python -m unittest discover . --pattern '*test.py'
+      - name: release
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python -m build
+          twine upload dist/*

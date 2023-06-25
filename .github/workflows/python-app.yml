@@ -35,11 +35,3 @@ jobs:
            pip install -r requirements-dev.txt
            #Run unit tests
            python -m unittest discover . --pattern '*test.py'
-      - name: release
-        if: ${{ env.TAG != '' && !contains(env.TAG, '/') && !contains(env.TAG, '-') && github.repository == 'ringcentral/ringcentral-python' }}
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          python -m build
-          twine upload dist/*
