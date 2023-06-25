@@ -48,7 +48,4 @@ python demo_sms.py
 
 ## Release
 
-```
-python -m build
-twine upload dist/*
-```
+Release will be done by Github Action once a tag is pushed to remote repo
