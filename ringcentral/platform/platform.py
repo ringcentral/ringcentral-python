@@ -187,6 +187,10 @@ class Platform(Observable):
         request = self._client.create_request('PUT', url, query_params=query_params, headers=headers, body=body)
         return self.send_request(request, skip_auth_check=skip_auth_check)
 
+    def patch(self, url, body=None, query_params=None, headers=None, skip_auth_check=False):
+        request = self._client.create_request('PATCH', url, query_params=query_params, headers=headers, body=body)
+        return self.send_request(request, skip_auth_check=skip_auth_check)
+
     def delete(self, url, query_params=None, headers=None, skip_auth_check=False):
         request = self._client.create_request('DELETE', url, query_params=query_params, headers=headers)
         return self.send_request(request, skip_auth_check=skip_auth_check)
