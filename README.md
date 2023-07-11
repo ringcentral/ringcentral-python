@@ -13,6 +13,10 @@ __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https
 
 This SDK is tested against Python 3.7 so we recommend [installing using it with Python 3.7 or newer](https://www.python.org/downloads/)
 
+# dev-notes 
+
+https://github.com/LohithNarayan/ringcentral-python/blob/master/dev-notes.md
+
 ## Manual
 
 ```sh
