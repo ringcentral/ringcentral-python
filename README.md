@@ -15,7 +15,7 @@ This SDK is tested against Python 3.7 so we recommend [installing using it with 
 
 # dev-notes 
 
-https://github.com/LohithNarayan/ringcentral-python/blob/master/dev-notes.md
+https://github.com/ringcentral/ringcentral-python/blob/master/dev-notes.md
 
 ## Manual
 
