@@ -60,7 +60,7 @@ print('User loaded ' + res.json().name)
 # Subscribing for server events
 
 ## With WebSocket (recommended)
-Please refer to [demo_subscription.py](./demo_subscription.py)
+Please refer to [demo_subscription.py](./ringcentral/demos/demo_subscription.py)
 
 ## With PubNub (deprecated)
 
