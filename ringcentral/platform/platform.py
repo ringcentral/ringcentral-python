@@ -36,6 +36,12 @@ class Platform(Observable):
                  known_prefixes=None):
 
         Observable.__init__(self)
+        if(server == None):
+            raise Exception("SDK init error: RINGCENTRAL_SERVER_URL value not found.")
+        if(key == None):
+            raise Exception("SDK init error: RINGCENTRAL_CLIENT_ID value not found.")
+        if(secret == None):
+            raise Exception("SDK init error: RINGCENTRAL_CLIENT_SECRET value not found.")
 
         self._server = server
         self._key = key
