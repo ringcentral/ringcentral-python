@@ -13,6 +13,10 @@ __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https
 
 This SDK is tested against Python 3.7 so we recommend [installing using it with Python 3.7 or newer](https://www.python.org/downloads/)
 
+# dev-notes 
+
+https://github.com/ringcentral/ringcentral-python/blob/master/dev-notes.md
+
 ## Manual
 
 ```sh
@@ -56,7 +60,7 @@ print('User loaded ' + res.json().name)
 # Subscribing for server events
 
 ## With WebSocket (recommended)
-Please refer to [demo_subscription.py](./demo_subscription.py)
+Please refer to [demo_subscription.py](./ringcentral/demos/demo_subscription.py)
 
 ## With PubNub (deprecated)
 
