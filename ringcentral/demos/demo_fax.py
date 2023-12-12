@@ -58,7 +58,7 @@ RECIPIENT = os.environ.get('RINGCENTRAL_RECEIVER')
 # Authenticate a user using a personal JWT token
 def login():
     try:
-      platform.login( jwt=os.environ.get('RINGCENTRAL_JWT_TOKEN') )
+      platform.login(jwt=os.environ.get('RINGCENTRAL_JWT_TOKEN') )
       send_fax()
     except Exception as e:
       print ("Unable to authenticate to platform. Check credentials." + str(e))
