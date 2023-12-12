@@ -1,8 +1,10 @@
 import os,time,ssl
 from dotenv import load_dotenv
-from ringcentral import SDK
 import certifi
 import urllib.request
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))  # Add the project root to sys.path
+from ringcentral import SDK
 
 load_dotenv()
 #env = dotenv_values(".env")
@@ -23,17 +25,14 @@ def send_fax():
             'coverPageText': "This is a demo Fax page from Python"
         })
 
-        with open('test.txt', "r") as f:
-            content = f.read()
-            #attachment = ('test.jpg', content)
-            attachment = (
-                            'test.png',
-                            urllib.request.urlopen('https://www.ringcentral.com/content/dam/rc-2018/en_us/images/logo.jpg', 
-                                                context=ssl.create_default_context(cafile=certifi.where())).read(),
-                            'image/png'
-            ) 
-            builder.add(attachment)
-            request = builder.request('/restapi/v1.0/account/~/extension/~/fax')
+        attachment = (
+            'test.png',
+            urllib.request.urlopen('https://www.ringcentral.com/content/dam/rc-2018/en_us/images/logo.jpg', 
+                                context=ssl.create_default_context(cafile=certifi.where())).read(),
+            'image/png'
+        ) 
+        builder.add(attachment)
+        request = builder.request('/restapi/v1.0/account/~/extension/~/fax')
         resp = platform.send_request(request)
         jsonObj = resp.json()
         print ("Fax sent. Message id: " + str(jsonObj.id))
@@ -59,7 +58,7 @@ RECIPIENT = os.environ.get('RINGCENTRAL_RECEIVER')
 # Authenticate a user using a personal JWT token
 def login():
     try:
-      platform.login( jwt=os.environ.get('RINGCENTRAL_JWT_TOKEN') )
+      platform.login(jwt=os.environ.get('RINGCENTRAL_JWT_TOKEN') )
       send_fax()
     except Exception as e:
       print ("Unable to authenticate to platform. Check credentials." + str(e))

@@ -18,7 +18,7 @@ class TestCase(unittest.TestCase):
         sdk = SDK('whatever', 'whatever', 'https://whatever', redirect_uri='https://whatever-redirect')
 
         self.authentication_mock(mock)
-        sdk.platform().login('18881112233', None, 'password')
+        sdk.platform().login(jwt='jwt-token')
 
         matcher = re.compile('pubsub\.pubnub\.com')
 

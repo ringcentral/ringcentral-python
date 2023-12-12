@@ -51,7 +51,8 @@ from ringcentral import SDK
 
 sdk = SDK('CLIENT_ID', 'CLIENT_SECRET', 'SERVER')
 platform = sdk.platform()
-platform.login('USERNAME', 'EXTENSION', 'PASSWORD')
+platform.login(jwt='JWT_TOKEN')
+```
 
 res = platform.get('/account/~/extension/~')
 print('User loaded ' + res.json().name)
@@ -110,7 +111,7 @@ database.append({"Customer":"Lukas","Payment":"Due","PhoneNumber":"xxxxxxxxxxx"}
 
 sdk = SDK('CLIENT_ID', 'CLIENT_SECRET', 'SERVER')
 platform = sdk.platform()
-platform.login('USERNAME', 'EXTENSION', 'PASSWORD')
+platform.login(jwt='JWT_TOKEN')
 
 def sendSMS(message, number):  
     params = {'from': {'phoneNumber': 'USERNAME'},'to': [{'phoneNumber': number}],'text': message}
