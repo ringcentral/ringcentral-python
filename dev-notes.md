@@ -42,7 +42,7 @@ Edit `.env` to specify credentials
 Run a demo file like this:
 
 ```
-python demo_sms.py
+python3 ringcentral/demos/demo_fax.py
 ```
 
 
