@@ -1,17 +1,20 @@
 from dotenv import load_dotenv
-from ringcentral import SDK
-from ringcentral.websocket.events import WebSocketEvents
 import json
 import uuid
 import os
 import asyncio
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))  # Add the project root to sys.path
+from ringcentral import SDK
+from ringcentral.websocket.events import WebSocketEvents
 
 
 def on_message(message):
     print("\n WebSocket message:\n")
     print(json.loads(message))
-    print("\n User email:\n")
-    print(json.loads(message)[1]["contact"]["email"])
+    if(len(json.loads(message)) > 1):
+        print("\n User email:\n")
+        print(json.loads(message)[1]["contact"]["email"])
 
 
 def on_created(web_socket_client):

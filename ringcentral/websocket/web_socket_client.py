@@ -6,7 +6,7 @@ from .web_socket_subscription import WebSocketSubscription
 from .events import WebSocketEvents
 import json
 import asyncio
-
+import uuid
 
 class WebSocketClient(Observable):
     def __init__(self, platform):
@@ -48,6 +48,17 @@ class WebSocketClient(Observable):
             self._web_socket = connection_info
             self._is_ready = True
             self.trigger(WebSocketEvents.connectionCreated, self)
+
+            # heartbeat every 10 minutes
+            async def timer_function():
+                while True:
+                    if self._done:
+                        timer.cancel()
+                        break
+                    await asyncio.sleep(600)
+                    await self.send_message([{"type": "Heartbeat", "messageId": str(uuid.uuid4())}])
+            timer = asyncio.create_task(timer_function())
+
             await asyncio.sleep(0)
             while True:
                 message = await websocket.recv()
