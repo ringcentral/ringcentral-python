@@ -27,7 +27,8 @@ KNOWN_PREFIXES = [
     '/analytics',
     '/ai',
     '/team-messaging',
-    '/scim'
+    '/scim',
+    '/cx/'
 ]
 
 
