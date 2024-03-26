@@ -2,4 +2,4 @@ observable==0.3.*
 pubnub==4.*
 pycryptodome==3.*
 requests==2.*
-websockets==11.*
+websockets==12.*
