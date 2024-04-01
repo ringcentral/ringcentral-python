@@ -8,7 +8,7 @@ def main():
     platform = sdk.platform()
     platform.login(jwt = env['RINGCENTRAL_JWT_TOKEN'])
 
-    params = {'from': {'phoneNumber': env['RINGCENTRAL_USERNAME']},'to': [{'phoneNumber': env['RINGCENTRAL_RECEIVER']}],'text': "SMS message"}
+    params = {'from': {'phoneNumber': env['RINGCENTRAL_SENDER']},'to': [{'phoneNumber': env['RINGCENTRAL_RECEIVER']}],'text': "SMS message"}
     response = platform.post('/restapi/v1.0/account/~/extension/~/sms', params)
 
     print('Sent SMS: ' + response.json().uri)
