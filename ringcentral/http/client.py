@@ -14,6 +14,18 @@ class Client:
         pass
 
     def send(self, request):
+        """
+            Send the HTTP request and handle the response.
+
+            Args:
+                request (obj): The HTTP request object.
+
+            Returns:
+                obj: The HTTP response object.
+
+            Raises:
+                ApiException: If an error occurs during the request or response handling.
+        """
         response = None
 
         try:
@@ -51,14 +63,19 @@ class Client:
 
     def create_request(self, method='', url='', query_params=None, body=None, headers=None):
         """
-        :param method:
-        :param url:
-        :param query_params:
-        :param body:
-        :param headers:
-        :return:requests.Request
-        """
+            Create an HTTP request object.
 
+            Args:
+                method (str): The HTTP method (e.g., GET, POST).
+                url (str): The URL for the request.
+                query_params (dict, optional): Dictionary containing query parameters.
+                body (dict, optional): Request body data.
+                headers (dict, optional): Request headers.
+
+            Returns:
+                requests.Request: The HTTP request object.
+
+            """
         if query_params:
             if type(query_params) is dict:
                 query = ""
@@ -75,7 +92,7 @@ class Client:
                 url = url + ('&' if url.find('?') > 0 else '?') + query
 
         content_type = None
-        
+
         if headers is None:
             headers = {}
 
