@@ -3,7 +3,7 @@
 
 name: Python application
 
-on: 
+on:
   push:
     tags:
       - '*'
@@ -37,7 +37,8 @@ jobs:
            pip install -r requirements.txt
            pip install -r requirements-dev.txt
            #Run unit tests
-           python -m unittest discover . --pattern '*test.py'
+           coverage run -m unittest discover . --pattern '*test.py'
+           coverage report
       - name: release
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
