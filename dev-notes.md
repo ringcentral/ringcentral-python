@@ -28,6 +28,22 @@ pip install -r requirements-dev.txt
 ```
 python -m unittest discover . --pattern '*test.py'
 ```
+## Run unit tests with coverage report
+
+```
+coverage run -m unittest discover . --pattern '*test.py'
+
+coverage report
+```
+Coverage Report Supported On
+<ol>
+    <li>Python 3.8 through 3.12, and 3.13.0a3 and up.</li>
+    <li>PyPy3 versions 3.8 through 3.10</li>
+</ol>
+
+
+
+
 
 ### Note
 
