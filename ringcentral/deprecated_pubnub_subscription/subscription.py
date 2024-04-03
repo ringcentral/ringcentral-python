@@ -34,16 +34,32 @@ class Subscription(Observable):
         }
         self._pubnub = None
 
+    # Retrieve the PubNub instance associated with this object.
     def pubnub(self):
         return self._pubnub
 
     def register(self, events=None):
+        """
+            Register for events. If the connection is alive, renews the registration; otherwise, subscribes.
+
+            Args:
+                events (list, optional): List of events to register for.
+
+            Returns:
+                obj: Result of renewal or subscription.
+        """
         if self.alive():
             return self.renew(events=events)
         else:
             return self.subscribe(events=events)
 
     def add_events(self, events):
+        """
+        Add additional events to be filtered.
+
+        Args:
+            events (list): List of events to add.
+        """
         self._event_filters += events
         pass
 
@@ -51,7 +67,19 @@ class Subscription(Observable):
         self._event_filters = events
 
     def subscribe(self, events=None):
+        """
+        Subscribe to events using the defined event filters.
 
+        Args:
+            events (list, optional): List of events to subscribe to.
+
+        Raises:
+            Exception: If events are undefined.
+            Exception: If there's an error during subscription Unsubscribe PUBNUB and trigger subscribeError event.
+
+        Returns:
+            obj: Response object from the subscription request.
+        """
         if events:
             self.set_events(events)
 
@@ -78,7 +106,20 @@ class Subscription(Observable):
             raise
 
     def renew(self, events=None):
+        """
+            Renew the subscription with the current or specified events.
 
+            Args:
+                events (list, optional): List of events to renew the subscription with.
+
+            Raises:
+                Exception: If the subscription is not alive.
+                Exception: If events are undefined.
+                Exception: If there's an error during renewal Unsubscribe PUBNUB and trigger renewError event.
+
+            Returns:
+                obj: Response object from the renewal request.
+        """
         if events:
             self.set_events(events)
 
@@ -106,6 +147,16 @@ class Subscription(Observable):
             raise
 
     def remove(self):
+        """
+            Remove the subscription.
+
+            Raises:
+                Exception: If the subscription is not alive.
+                Exception: If there's an error during removal Unsubscribe PUBNUB and trigger removeError event.
+
+            Returns:
+                obj: Response object from the removal request.
+        """
         if not self.alive():
             raise Exception('Subscription is not alive')
 
@@ -181,6 +232,20 @@ class Subscription(Observable):
         self.trigger(Events.notification, message)
 
     def _decrypt(self, message):
+        """
+        Decrypt the message if encryption is enabled in the subscription.
+
+        Args:
+            message (str): Encrypted message.
+
+        Raises:
+            ValueError: If the subscription is not alive.
+            ImportError: If Crypto.Cipher or required modules are not available.
+            Exception: If there's an error during decryption.
+
+        Returns:
+            dict: Decrypted message.
+        """
         if not self.alive():
             raise Exception('Subscription is not alive')
 

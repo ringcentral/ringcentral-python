@@ -18,6 +18,20 @@ class WebSocketClient(Observable):
         self._send_attempt_counter = 0
 
     async def create_new_connection(self):
+        """
+        Creates a new WebSocket connection.
+
+        Returns:
+            Any: Response object containing the result of the connection creation.
+
+        Raises:
+            Exception: If any error occurs during the process.
+
+        Note:
+            - Retrieves the WebSocket token using `get_web_socket_token`.
+            - Attempts to open a WebSocket connection using the retrieved token's URI and access token.
+            - Triggers the createConnectionError event if an error occurs and raises the exception.
+        """
         try:
             web_socket_token = self.get_web_socket_token()
             open_connection_response = await self.open_connection(
@@ -29,6 +43,20 @@ class WebSocketClient(Observable):
             raise
 
     def get_web_socket_token(self):
+        """
+            Retrieves a WebSocket token.
+
+            Returns:
+                dict: WebSocket token containing URI and access token.
+
+            Raises:
+                Exception: If any error occurs during the process.
+
+            Note:
+                - Sends a POST request to the '/restapi/oauth/wstoken' endpoint to obtain the WebSocket token.
+                - Returns the WebSocket token as a dictionary containing the URI and access token.
+                - Triggers the getTokenError event if an error occurs and raises the exception.
+        """
         try:
             response = self._platform.post("/restapi/oauth/wstoken", body={})
             return response.json_dict()
@@ -37,6 +65,23 @@ class WebSocketClient(Observable):
             raise
 
     async def open_connection(self, ws_uri, ws_access_token):
+        """
+            Opens a WebSocket connection.
+
+            Args:
+                ws_uri (str): The WebSocket URI.
+                ws_access_token (str): The access token for WebSocket authentication.
+
+            Raises:
+                Exception: If any error occurs during the process.
+
+            Note:
+                - Attempts to establish a WebSocket connection to the provided URI with the given access token.
+                - Upon successful connection, sets up a heartbeat mechanism to maintain the connection.
+                - Triggers the connectionCreated event upon successful connection establishment.
+                - Listens for incoming messages and triggers the receiveMessage event for each received message.
+                - Triggers the createConnectionError event if an error occurs during the connection process and raises the exception.
+        """
         try:
             websocket = await websockets.connect(
                 f"{ws_uri}?access_token={ws_access_token}"
@@ -75,6 +120,19 @@ class WebSocketClient(Observable):
         return self._web_socket["connection"]
 
     async def close_connection(self):
+        """
+            Closes the WebSocket connection.
+
+            Raises:
+                Exception: If any error occurs during the process.
+
+            Note:
+                - Sets the `_done` flag to True to signal the termination of the heartbeat mechanism.
+                - Sets the `_is_ready` flag to False to indicate that the connection is no longer ready.
+                - Retrieves the WebSocket connection using `get_connection`.
+                - Closes the WebSocket connection.
+                - Triggers the closeConnectionError event if an error occurs during the closing process and raises the exception.
+        """
         try:
             self._done = True
             self._is_ready = False
@@ -99,6 +157,21 @@ class WebSocketClient(Observable):
             raise
 
     async def send_message(self, message):
+        """
+            Sends a message over the WebSocket connection.
+
+            Args:
+                message (Any): The message to be sent.
+
+            Raises:
+                Exception: If any error occurs during the process or if the connection is not ready after multiple attempts.
+
+            Note:
+                - Checks if the WebSocket connection is ready (`_is_ready` flag).
+                - If the connection is ready, resets the send attempt counter and sends the message.
+                - If the connection is not ready, retries after a delay and increments the send attempt counter.
+                - If the send attempt counter exceeds a threshold, triggers the connectionNotReady event and raises an exception.
+        """
         try:
             if self._is_ready:
                 self._send_attempt_counter = 0
@@ -117,6 +190,21 @@ class WebSocketClient(Observable):
             raise
 
     async def create_subscription(self, events=None):
+        """
+            Creates a subscription to WebSocket events.
+
+            Args:
+                events (list, optional): A list of events to subscribe to. Default is None.
+
+            Raises:
+                Exception: If any error occurs during the process or if the connection is not ready after multiple attempts.
+
+            Note:
+                - If the WebSocket connection is ready (`_is_ready` flag), resets the send attempt counter and creates a WebSocketSubscription instance.
+                - Registers the subscription with the specified events.
+                - If the connection is not ready, retries after a delay and increments the send attempt counter.
+                - If the send attempt counter exceeds a threshold, triggers the connectionNotReady event and raises an exception.
+        """
         try:
             if self._is_ready:
                 self._send_attempt_counter = 0
@@ -130,12 +218,30 @@ class WebSocketClient(Observable):
                     self.trigger(WebSocketEvents.connectionNotReady)
                     self._send_attempt_counter = 0
                     raise
-                
+
         except Exception as e:
             self.trigger(WebSocketEvents.createSubscriptionError, e)
             raise
 
     async def update_subscription(self, subscription, events=None):
+        """
+            Updates an existing WebSocket subscription with new events.
+
+            Args:
+                subscription : The WebSocket subscription to update.
+                events (list, optional): A list of events to update the subscription with. Default is None.
+
+            Returns:
+                WebSocketSubscription: The updated WebSocket subscription.
+
+            Raises:
+                Exception: If any error occurs during the process.
+
+            Note:
+                - Updates the specified WebSocket subscription with the new events provided.
+                - If the update is successful, returns the updated WebSocket subscription.
+                - If an error occurs during the update process, triggers the updateSubscriptionError event and raises an exception.
+        """
         try:
             await subscription.update(events)
             return subscription
@@ -144,6 +250,20 @@ class WebSocketClient(Observable):
             raise
 
     async def remove_subscription(self, subscription):
+        """
+            Removes an existing WebSocket subscription.
+
+            Args:
+                subscription : The WebSocket subscription to remove.
+
+            Raises:
+                Exception: If any error occurs during the removal process.
+
+            Note:
+                - Removes the specified WebSocket subscription.
+                - If the removal is successful, the subscription is effectively unsubscribed from the events it was subscribed to.
+                - If an error occurs during the removal process, triggers the removeSubscriptionError event and raises an exception.
+        """
         try:
             await subscription.remove()
         except Exception as e:
