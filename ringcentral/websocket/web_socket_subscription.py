@@ -17,7 +17,7 @@ class WebSocketSubscription(Observable):
 
     def on_message(self, message):
         message_json = json.loads(message)
-        if(message_json[0]['type'] == 'ClientRequest' and message_json[0]['headers']['WSG-SubscriptionId']):
+        if(message_json[0]['type'] == 'ClientRequest' and 'WSG-SubscriptionId' in message_json[0]['headers']):
             self.set_subscription(message_json)
             self._web_socket_client.trigger(WebSocketEvents.subscriptionCreated, self)
         else: 
