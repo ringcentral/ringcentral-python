@@ -33,14 +33,7 @@ jobs:
           #Install dependencies
            pip install -r requirements.txt
            pip install -r requirements-dev.txt
+           pip install mkdocs-material && mkdocs gh-deploy --force
            #Run unit tests
            coverage run -m unittest discover . --pattern '*test.py'
            coverage report
-      - name: Github Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          CLEAN: true
-        run:
-          pip install mkdocs-material && mkdocs gh-deploy --force
