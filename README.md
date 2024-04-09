@@ -9,40 +9,15 @@ __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https
 
 [API Reference](https://developer.ringcentral.com/api-docs/latest/index.html) and [APIs Explorer](https://developer.ringcentral.com/api-explorer/latest/index.html).
 
-# Installation
+## Installation
 
 This SDK is tested against Python 3.7 so we recommend [installing using it with Python 3.7 or newer](https://www.python.org/downloads/)
-
-# dev-notes 
-
-https://github.com/ringcentral/ringcentral-python/blob/master/dev-notes.md
-
-## Manual
-
-```sh
-$ git clone https://github.com/ringcentral/python-sdk.git ./ringcentral-python-sdk
-```
-
-Install dependencies:
-
-- [Pubnub](https://www.pubnub.com/docs/python/pubnub-python-sdk)
-- [Requests](http://docs.python-requests.org/en/latest)
-
-## PIP
 
 ```sh
 $ pip3 install ringcentral
 ```
-# Setup
 
-Rename credentials-sample.ini to credentials.ini.
-
-Edit credentials.ini and update appropriate parameters.
-CLIENT\_ID is synonymous with APP\_KEY.
-CLIENT\_SECRET is synonymous with APP\_SECRET.
-In this repository, the latter convention is used that of APP\_KEY and APP\_SECRET.
-
-# Usage
+## Usage
 
 Take a look at a sample code.
 
@@ -52,48 +27,17 @@ from ringcentral import SDK
 sdk = SDK('CLIENT_ID', 'CLIENT_SECRET', 'SERVER')
 platform = sdk.platform()
 platform.login(jwt='JWT_TOKEN')
-```
-
 res = platform.get('/account/~/extension/~')
 print('User loaded ' + res.json().name)
 ```
 
-# Subscribing for server events
 
-## With WebSocket (recommended)
+## Subscribing for server events
+
 Please refer to [demo_subscription.py](./ringcentral/demos/demo_subscription.py)
 
-## With PubNub (deprecated)
 
-```py
-from threading import Thread
-from time import sleep
-from ringcentral.subscription import Events
-
-def on_message(msg):
-    print(msg)
-
-def pubnub():
-    s = sdk.create_subscription()
-    s.add_events(['/account/~/extension/~/message-store'])
-    s.on(Events.notification, on_message)
-    s.register()
-    while True:
-        sleep(0.1)
-
-try:
-    try:
-        import Pubnub
-        t = Thread(target=pubnub)
-        t.start()
-    except ImportError as e:
-        print("No Pubnub SDK, skipping Pubnub test")
-
-except KeyboardInterrupt:
-    pass
-```
-
-# Send sms
+## Send sms
 ```py
 from ringcentral import SDK
 
@@ -129,3 +73,8 @@ def main():
 if __name__ == '__main__':
     main()
 ```
+
+
+## dev-notes 
+
+https://github.com/ringcentral/ringcentral-python/blob/master/dev-notes.md

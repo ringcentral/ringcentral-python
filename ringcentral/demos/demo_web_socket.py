@@ -12,7 +12,7 @@ from ringcentral.websocket.events import WebSocketEvents
 def on_message(message):
     print("\n WebSocket message:\n")
     print(json.loads(message))
-    if(len(json.loads(message)) > 1):
+    if len(json.loads(message)) > 1:
         print("\n User email:\n")
         print(json.loads(message)[1]["contact"]["email"])
 

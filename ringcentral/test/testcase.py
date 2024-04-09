@@ -14,28 +14,9 @@ class TestCase(unittest.TestCase):
         unittest.TestCase.__init__(self, method_name)
 
     def get_sdk(self, mock):
-
         sdk = SDK('whatever', 'whatever', 'https://whatever', redirect_uri='https://whatever-redirect')
-
         self.authentication_mock(mock)
         sdk.platform().login(jwt='jwt-token')
-
-        matcher = re.compile('pubsub\.pubnub\.com')
-
-        mock.register_uri(
-            method=requests_mock.ANY,
-            url=matcher,
-            text=''
-        )
-
-        matcher = re.compile('ps\.pndsn\.com')
-
-        mock.register_uri(
-            method=requests_mock.ANY,
-            url=matcher,
-            text=''
-        )
-
         return sdk
 
     def add(self, mock, method, url, body, status=200):
@@ -71,7 +52,7 @@ class TestCase(unittest.TestCase):
             'expirationTime': date.fromtimestamp(time() + expires_in).isoformat(),
             'expiresIn': expires_in,
             'deliveryMode': {
-                'transportType': 'PubNub',
+                'transportType': 'WebSocket',
                 'encryption': True,
                 'address': '123_foo',
                 'subscriberKey': 'sub-c-foo',
@@ -113,7 +94,7 @@ class TestCase(unittest.TestCase):
             'expirationTime': date.fromtimestamp(time() + expires_in).isoformat(),
             'expiresIn': expires_in,
             'deliveryMode': {
-                'transportType': 'PubNub',
+                'transportType': 'WebSocket',
                 'encryption': False,
                 'address': '123_foo',
                 'subscriberKey': 'sub-c-foo',

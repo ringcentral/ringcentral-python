@@ -64,4 +64,25 @@ python3 ringcentral/demos/demo_fax.py
 
 ## Release
 
-Release will be done by Github Action once a tag is pushed to remote repo
+Release will be done by GitHub Action once a tag is pushed to remote repo.
+
+GitHub Action will run the following commands to release:
+
+```
+python3 -m pip install --upgrade build
+python3 -m pip install --upgrade twine
+python3 -m build
+twine upload dist/*
+```
+
+If you want to release it from your laptop, you need to have a ~/.pypirc file like this:
+
+```
+[distutils]
+index-servers = pypi
+
+[pypi]
+repository = https://upload.pypi.org/legacy/
+username = __token__
+password = pypi-<your-token>
+```
