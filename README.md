@@ -1,6 +1,6 @@
 # RingCentral SDK for Python
 
-[![Build Status](https://img.shields.io/travis/ringcentral/ringcentral-python/master.svg)](https://travis-ci.org/ringcentral/ringcentral-python)
+[![Unit Tests](https://github.com/ringcentral/ringcentral-python/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/ringcentral/ringcentral-python/actions/workflows/unit-tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/ringcentral/ringcentral-python/badge.svg?branch=master)](https://coveralls.io/github/ringcentral/ringcentral-python?branch=master)
 [![Twitter](https://img.shields.io/twitter/follow/ringcentraldevs.svg?style=social&label=follow)](https://twitter.com/RingCentralDevs)
 
@@ -8,6 +8,13 @@ __[RingCentral Developers](https://developer.ringcentral.com/api-products)__ is 
 __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https://developer.ringcentral.com/api-products/sms), [Fax](https://developer.ringcentral.com/api-products/fax), [Glip Team Messaging](https://developer.ringcentral.com/api-products/team-messaging), [Data and Configurations](https://developer.ringcentral.com/api-products/configuration)__.
 
 [API Reference](https://developer.ringcentral.com/api-docs/latest/index.html) and [APIs Explorer](https://developer.ringcentral.com/api-explorer/latest/index.html).
+
+
+## Important change logs
+
+- In version 0.9.0, we removed PubNub support. If you need subscription to events, please use WebSocket instead. Please refer to [demo_subscription.py](./ringcentral/demos/demo_subscription.py) for more information.
+  - If you still need PubNub support, please use version 0.8.x.
+
 
 ## Installation
 
