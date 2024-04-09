@@ -33,6 +33,8 @@ jobs:
           #Install dependencies
            pip install -r requirements.txt
            pip install -r requirements-dev.txt
+           pip install mkdocs-material
+           mkdocs gh-deploy --force
            #Run unit tests
            coverage run -m unittest discover . --pattern '*test.py'
            coverage report
