@@ -43,5 +43,4 @@ jobs:
           BRANCH: gh-pages
           CLEAN: true
         run:
-          pip install mkdocs-material
-          mkdocs gh-deploy --force
+          pip install mkdocs-material && mkdocs gh-deploy --force
