@@ -1,3 +1,4 @@
 observable==0.3.*
 requests==2.*
 websockets==12.*
+pdoc==14.4.0

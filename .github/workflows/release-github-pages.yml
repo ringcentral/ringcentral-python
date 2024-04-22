@@ -1,18 +1,48 @@
-name: GitHub Pages release
+
+name: Generate Python Docs
+
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
 permissions:
   contents: write
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version}}
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
+
+      - name: Generate Docs
+        env:
+          RINGCENTRAL_SERVER_URL: ${{secrets.RINGCENTRAL_SERVER_URL}}
+          RINGCENTRAL_CLIENT_ID: ${{secrets.RINGCENTRAL_CLIENT_ID}}
+          RINGCENTRAL_CLIENT_SECRET: ${{secrets.RINGCENTRAL_CLIENT_SECRET}}
+          RINGCENTRAL_JWT_TOKEN: ${{secrets.RINGCENTRAL_JWT_TOKEN}}
+        run: |
+          #Create virtual environment
+            python -m venv venv
+          #Activate virtual environment
+            source venv/bin/activate
+          #Install dependencies
+           python -m pip install python-dotenv
+           pip install -r requirements.txt
+           pip install -r requirements-dev.txt
+           pdoc --output ./docs ./ringcentral
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
