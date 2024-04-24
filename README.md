@@ -2,12 +2,16 @@
 
 [![Unit Tests](https://github.com/ringcentral/ringcentral-python/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/ringcentral/ringcentral-python/actions/workflows/unit-tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/ringcentral/ringcentral-python/badge.svg?branch=master)](https://coveralls.io/github/ringcentral/ringcentral-python?branch=master)
+[![Code Document](https://img.shields.io/badge/pythondoc-reference-blue?branch=master&service=github)](https://ringcentral.github.io/ringcentral-python/ringcentral.html)
 [![Twitter](https://img.shields.io/twitter/follow/ringcentraldevs.svg?style=social&label=follow)](https://twitter.com/RingCentralDevs)
 
 __[RingCentral Developers](https://developer.ringcentral.com/api-products)__ is a cloud communications platform which can be accessed via more than 70 APIs. The platform's main capabilities include technologies that enable:
 __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https://developer.ringcentral.com/api-products/sms), [Fax](https://developer.ringcentral.com/api-products/fax), [Glip Team Messaging](https://developer.ringcentral.com/api-products/team-messaging), [Data and Configurations](https://developer.ringcentral.com/api-products/configuration)__.
 
-[API Reference](https://developer.ringcentral.com/api-docs/latest/index.html) and [APIs Explorer](https://developer.ringcentral.com/api-explorer/latest/index.html).
+## Additional resources
+
+* [RingCentral API Reference](https://developer.ringcentral.com/api-docs/latest/index.html) - an interactive reference for the RingCentral API that allows developers to make API calls with no code.
+* [Document](https://ringcentral.github.io/ringcentral-python/ringcentral.html) - an interactive reference for the SDK code documentation.
 
 
 ## Important change logs
@@ -64,7 +68,7 @@ sdk = SDK('CLIENT_ID', 'CLIENT_SECRET', 'SERVER')
 platform = sdk.platform()
 platform.login(jwt='JWT_TOKEN')
 
-def sendSMS(message, number):  
+def sendSMS(message, number):
     params = {'from': {'phoneNumber': 'USERNAME'},'to': [{'phoneNumber': number}],'text': message}
     response = platform.post('/restapi/v1.0/account/~/extension/~/sms', params)
     print('Sent payment reminder to ' + number)
@@ -82,6 +86,6 @@ if __name__ == '__main__':
 ```
 
 
-## dev-notes 
+## dev-notes
 
 https://github.com/ringcentral/ringcentral-python/blob/master/dev-notes.md
