@@ -105,3 +105,9 @@ class TestCase(unittest.TestCase):
             'status': 'Active',
             'uri': 'https://platform.ringcentral.com/restapi/v1.0/subscription/foo-bar-baz'
         })
+
+    def delete_mock_with_body(self,mock):
+        return self.add(mock, 'DELETE', '/restapi/v2/accounts/~/extensions', {"keepAssetsInInventory": True,"records": [{"id": "123"}]})
+
+    def delete_mock_without_body(self,mock):
+        return self.add(mock, 'DELETE', '/restapi/v2/accounts/~/extensions', body=None)
