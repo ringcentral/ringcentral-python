@@ -69,12 +69,6 @@
                         <li>
                                 <a class="function" href="#TestPlatform.test_api_url_custom_prefixes">test_api_url_custom_prefixes</a>
                         </li>
-                        <li>
-                                <a class="function" href="#TestPlatform.test_delete_with_body">test_delete_with_body</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#TestPlatform.test_delete_without_body">test_delete_without_body</a>
-                        </li>
                 </ul>
 
             </li>
@@ -137,7 +131,7 @@
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>            <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>            
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">def</span> <span class="nf">test_login_code_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock</span><span class="p">):</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logout_mock</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
@@ -241,21 +235,10 @@
 </span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;/analytics/phone/foo&#39;</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>        <span class="n">act</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">create_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">act</span><span class="p">)</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">def</span> <span class="nf">test_delete_with_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">delete_mock_with_body</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span><span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;keepAssetsInInventory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}]})</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="k">def</span> <span class="nf">test_delete_without_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock</span><span class="p">):</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">delete_mock_without_body</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">)</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -303,7 +286,7 @@
 </span><span id="TestPlatform-37"><a href="#TestPlatform-37"><span class="linenos"> 37</span></a>            <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
 </span><span id="TestPlatform-38"><a href="#TestPlatform-38"><span class="linenos"> 38</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 </span><span id="TestPlatform-39"><a href="#TestPlatform-39"><span class="linenos"> 39</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">e</span> <span class="p">)</span>
-</span><span id="TestPlatform-40"><a href="#TestPlatform-40"><span class="linenos"> 40</span></a>
+</span><span id="TestPlatform-40"><a href="#TestPlatform-40"><span class="linenos"> 40</span></a>            
 </span><span id="TestPlatform-41"><a href="#TestPlatform-41"><span class="linenos"> 41</span></a>    <span class="k">def</span> <span class="nf">test_login_code_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock</span><span class="p">):</span>
 </span><span id="TestPlatform-42"><a href="#TestPlatform-42"><span class="linenos"> 42</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
 </span><span id="TestPlatform-43"><a href="#TestPlatform-43"><span class="linenos"> 43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logout_mock</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
@@ -407,18 +390,6 @@
 </span><span id="TestPlatform-141"><a href="#TestPlatform-141"><span class="linenos">141</span></a>        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;/analytics/phone/foo&#39;</span>
 </span><span id="TestPlatform-142"><a href="#TestPlatform-142"><span class="linenos">142</span></a>        <span class="n">act</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">create_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="TestPlatform-143"><a href="#TestPlatform-143"><span class="linenos">143</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">act</span><span class="p">)</span>
-</span><span id="TestPlatform-144"><a href="#TestPlatform-144"><span class="linenos">144</span></a>
-</span><span id="TestPlatform-145"><a href="#TestPlatform-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">test_delete_with_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="TestPlatform-146"><a href="#TestPlatform-146"><span class="linenos">146</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform-147"><a href="#TestPlatform-147"><span class="linenos">147</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">delete_mock_with_body</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform-148"><a href="#TestPlatform-148"><span class="linenos">148</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span><span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;keepAssetsInInventory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}]})</span>
-</span><span id="TestPlatform-149"><a href="#TestPlatform-149"><span class="linenos">149</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
-</span><span id="TestPlatform-150"><a href="#TestPlatform-150"><span class="linenos">150</span></a>
-</span><span id="TestPlatform-151"><a href="#TestPlatform-151"><span class="linenos">151</span></a>    <span class="k">def</span> <span class="nf">test_delete_without_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock</span><span class="p">):</span>
-</span><span id="TestPlatform-152"><a href="#TestPlatform-152"><span class="linenos">152</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform-153"><a href="#TestPlatform-153"><span class="linenos">153</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">delete_mock_without_body</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform-154"><a href="#TestPlatform-154"><span class="linenos">154</span></a>        <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">)</span>
-</span><span id="TestPlatform-155"><a href="#TestPlatform-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -784,50 +755,6 @@ attribute so can be configured by individual tests if required.</li>
     
 
                             </div>
-                            <div id="TestPlatform.test_delete_with_body" class="classattr">
-                                        <input id="TestPlatform.test_delete_with_body-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">test_delete_with_body</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">mock</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="TestPlatform.test_delete_with_body-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#TestPlatform.test_delete_with_body"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestPlatform.test_delete_with_body-145"><a href="#TestPlatform.test_delete_with_body-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">test_delete_with_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="TestPlatform.test_delete_with_body-146"><a href="#TestPlatform.test_delete_with_body-146"><span class="linenos">146</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform.test_delete_with_body-147"><a href="#TestPlatform.test_delete_with_body-147"><span class="linenos">147</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">delete_mock_with_body</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform.test_delete_with_body-148"><a href="#TestPlatform.test_delete_with_body-148"><span class="linenos">148</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span><span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;keepAssetsInInventory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}]})</span>
-</span><span id="TestPlatform.test_delete_with_body-149"><a href="#TestPlatform.test_delete_with_body-149"><span class="linenos">149</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
-                            <div id="TestPlatform.test_delete_without_body" class="classattr">
-                                        <input id="TestPlatform.test_delete_without_body-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">test_delete_without_body</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">mock</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="TestPlatform.test_delete_without_body-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#TestPlatform.test_delete_without_body"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestPlatform.test_delete_without_body-151"><a href="#TestPlatform.test_delete_without_body-151"><span class="linenos">151</span></a>    <span class="k">def</span> <span class="nf">test_delete_without_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock</span><span class="p">):</span>
-</span><span id="TestPlatform.test_delete_without_body-152"><a href="#TestPlatform.test_delete_without_body-152"><span class="linenos">152</span></a>        <span class="n">sdk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sdk</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform.test_delete_without_body-153"><a href="#TestPlatform.test_delete_without_body-153"><span class="linenos">153</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">delete_mock_without_body</span><span class="p">(</span><span class="n">mock</span><span class="p">)</span>
-</span><span id="TestPlatform.test_delete_without_body-154"><a href="#TestPlatform.test_delete_without_body-154"><span class="linenos">154</span></a>        <span class="n">sdk</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">)</span>
-</span><span id="TestPlatform.test_delete_without_body-155"><a href="#TestPlatform.test_delete_without_body-155"><span class="linenos">155</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">mock</span><span class="o">.</span><span class="n">called</span><span class="p">)</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
                             <div class="inherited">
                                 <h5>Inherited Members</h5>
                                 <dl>
@@ -840,8 +767,6 @@ attribute so can be configured by individual tests if required.</li>
                 <dd id="TestPlatform.presence_subscription_mock" class="function"><a href="../test/testcase.html#TestCase.presence_subscription_mock">presence_subscription_mock</a></dd>
                 <dd id="TestPlatform.refresh_mock" class="function"><a href="../test/testcase.html#TestCase.refresh_mock">refresh_mock</a></dd>
                 <dd id="TestPlatform.subscription_mock" class="function"><a href="../test/testcase.html#TestCase.subscription_mock">subscription_mock</a></dd>
-                <dd id="TestPlatform.delete_mock_with_body" class="function"><a href="../test/testcase.html#TestCase.delete_mock_with_body">delete_mock_with_body</a></dd>
-                <dd id="TestPlatform.delete_mock_without_body" class="function"><a href="../test/testcase.html#TestCase.delete_mock_without_body">delete_mock_without_body</a></dd>
 
             </div>
             <div><dt>unittest.case.TestCase</dt>

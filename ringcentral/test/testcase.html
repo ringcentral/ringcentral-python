@@ -57,12 +57,6 @@
                         <li>
                                 <a class="function" href="#TestCase.subscription_mock">subscription_mock</a>
                         </li>
-                        <li>
-                                <a class="function" href="#TestCase.delete_mock_with_body">delete_mock_with_body</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#TestCase.delete_mock_without_body">delete_mock_without_body</a>
-                        </li>
                 </ul>
 
             </li>
@@ -194,12 +188,6 @@
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>            <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>            <span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="s1">&#39;https://platform.ringcentral.com/restapi/v1.0/subscription/foo-bar-baz&#39;</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="p">})</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="k">def</span> <span class="nf">delete_mock_with_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;keepAssetsInInventory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}]})</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="k">def</span> <span class="nf">delete_mock_without_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -311,12 +299,6 @@
 </span><span id="TestCase-106"><a href="#TestCase-106"><span class="linenos">106</span></a>            <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
 </span><span id="TestCase-107"><a href="#TestCase-107"><span class="linenos">107</span></a>            <span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="s1">&#39;https://platform.ringcentral.com/restapi/v1.0/subscription/foo-bar-baz&#39;</span>
 </span><span id="TestCase-108"><a href="#TestCase-108"><span class="linenos">108</span></a>        <span class="p">})</span>
-</span><span id="TestCase-109"><a href="#TestCase-109"><span class="linenos">109</span></a>
-</span><span id="TestCase-110"><a href="#TestCase-110"><span class="linenos">110</span></a>    <span class="k">def</span> <span class="nf">delete_mock_with_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="TestCase-111"><a href="#TestCase-111"><span class="linenos">111</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;keepAssetsInInventory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}]})</span>
-</span><span id="TestCase-112"><a href="#TestCase-112"><span class="linenos">112</span></a>
-</span><span id="TestCase-113"><a href="#TestCase-113"><span class="linenos">113</span></a>    <span class="k">def</span> <span class="nf">delete_mock_without_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="TestCase-114"><a href="#TestCase-114"><span class="linenos">114</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -577,44 +559,6 @@ not have a method with the specified name.</p>
 </span><span id="TestCase.subscription_mock-106"><a href="#TestCase.subscription_mock-106"><span class="linenos">106</span></a>            <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;Active&#39;</span><span class="p">,</span>
 </span><span id="TestCase.subscription_mock-107"><a href="#TestCase.subscription_mock-107"><span class="linenos">107</span></a>            <span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="s1">&#39;https://platform.ringcentral.com/restapi/v1.0/subscription/foo-bar-baz&#39;</span>
 </span><span id="TestCase.subscription_mock-108"><a href="#TestCase.subscription_mock-108"><span class="linenos">108</span></a>        <span class="p">})</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
-                            <div id="TestCase.delete_mock_with_body" class="classattr">
-                                        <input id="TestCase.delete_mock_with_body-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">delete_mock_with_body</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">mock</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="TestCase.delete_mock_with_body-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#TestCase.delete_mock_with_body"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestCase.delete_mock_with_body-110"><a href="#TestCase.delete_mock_with_body-110"><span class="linenos">110</span></a>    <span class="k">def</span> <span class="nf">delete_mock_with_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="TestCase.delete_mock_with_body-111"><a href="#TestCase.delete_mock_with_body-111"><span class="linenos">111</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;keepAssetsInInventory&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">}]})</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
-                            <div id="TestCase.delete_mock_without_body" class="classattr">
-                                        <input id="TestCase.delete_mock_without_body-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">delete_mock_without_body</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">mock</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="TestCase.delete_mock_without_body-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#TestCase.delete_mock_without_body"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestCase.delete_mock_without_body-113"><a href="#TestCase.delete_mock_without_body-113"><span class="linenos">113</span></a>    <span class="k">def</span> <span class="nf">delete_mock_without_body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mock</span><span class="p">):</span>
-</span><span id="TestCase.delete_mock_without_body-114"><a href="#TestCase.delete_mock_without_body-114"><span class="linenos">114</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mock</span><span class="p">,</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">,</span> <span class="s1">&#39;/restapi/v2/accounts/~/extensions&#39;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </span></pre></div>
 
 
