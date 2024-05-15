@@ -36,7 +36,7 @@ class TestPlatform(TestCase):
             sdk.platform().login()
         except Exception as e:
             self.assertTrue( e )
-            
+
     def test_login_code_redirect(self, mock):
         sdk = self.get_sdk(mock)
         self.logout_mock(mock)
@@ -140,7 +140,18 @@ class TestPlatform(TestCase):
         url = '/analytics/phone/foo'
         act = sdk.platform().create_url(url, add_server=True)
         self.assertEqual(exp, act)
-        
+
+    def test_delete_with_body(self,mock):
+        sdk = self.get_sdk(mock)
+        self.delete_mock_with_body(mock)
+        res = sdk.platform().delete(url='/restapi/v2/accounts/~/extensions',body={"keepAssetsInInventory": True,"records": [{"id": "123"}]})
+        self.assertTrue(mock.called)
+
+    def test_delete_without_body(self, mock):
+        sdk = self.get_sdk(mock)
+        self.delete_mock_without_body(mock)
+        sdk.platform().delete(url='/restapi/v2/accounts/~/extensions')
+        self.assertTrue(mock.called)
 
 if __name__ == '__main__':
     unittest.main()
