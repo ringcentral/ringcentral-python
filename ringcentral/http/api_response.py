@@ -83,19 +83,6 @@ class ApiResponse:
         if self._request is not None:
             message = message + ' (request details: ' + get_prepared_request_details(self._request) + ')'
 
-        # try:
-        #     data = self.json_dict()
-
-        #     if 'message' in data:
-        #         message = data['message']
-        #     elif 'error_description' in data:
-        #         message = data['error_description']
-        #     elif 'description' in data:
-        #         message = data['description']
-
-        # except Exception as e:
-        #     message = message + ' (and additional error happened during JSON parse: ' + e.message + ')'
-
         return message
 
     def request(self):
