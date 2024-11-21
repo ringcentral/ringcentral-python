@@ -6,6 +6,23 @@ from email.feedparser import FeedParser
 from .json_object import *
 from ..core import is_third
 
+def get_prepared_request_details(request):
+    if request is None:
+        return "The request is None."
+    
+    try:
+        method = request.method or "Unknown Method"
+        url = request.url or "Unknown URL"
+        headers = dict(request.headers) if request.headers else {}
+        details = [
+            f"Method: {method}",
+            f"URL: {url}",
+            f"Headers: {headers}"
+        ]
+        return "\n".join(details)
+    except Exception as e:
+        return f"Error generating request details: {str(e)}"
+
 
 class ApiResponse:
     def __init__(self, request=None, response=None):
@@ -62,6 +79,9 @@ class ApiResponse:
             return None
 
         message = 'HTTP ' + str(self._response.status_code) + ' ' + self._response.text
+
+        if self._request is not None:
+            message = message + ' (request details: ' + get_prepared_request_details(self._request) + ')'
 
         # try:
         #     data = self.json_dict()
