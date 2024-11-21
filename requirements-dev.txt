@@ -5,4 +5,4 @@ requests-mock>=1.2.0
 python-dotenv>=1.0.0
 twine
 build
-pdoc==14.4.0
+pdoc==14.5.1
