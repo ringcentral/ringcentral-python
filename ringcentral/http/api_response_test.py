@@ -76,7 +76,7 @@ class TestApiResponse(TestCase):
         r = ApiResponse(response=create_response(response, 207, multipart_headers))
 
         self.assertEqual('bar', r.multipart()[0].json().foo)
-        self.assertEqual('object not found', r.multipart()[1].error())
+        self.assertIn('object not found', r.multipart()[1].error())
         self.assertEqual('qux', r.multipart()[2].json().baz)
 
     def test_multipart_bad_response(self):

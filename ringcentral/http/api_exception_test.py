@@ -12,15 +12,15 @@ class TestApiException(TestCase):
     def test_simple(self):
         api_response = ApiResponse(response=create_response('{"error_description": "foo"}', 400, json_headers))
         ex = ApiException(api_response)
-        self.assertEqual(str(ex), 'foo')
+        self.assertIn('foo', str(ex))
 
         api_response = ApiResponse(response=create_response('{"description": "foo"}', 400, json_headers))
         ex = ApiException(api_response)
-        self.assertEqual(str(ex), 'foo')
+        self.assertIn('foo', str(ex))
 
         api_response = ApiResponse(response=create_response('{"message": "foo"}', 400, json_headers))
         ex = ApiException(api_response)
-        self.assertEqual(str(ex), 'foo')
+        self.assertIn('foo', str(ex))
 
 
 if __name__ == '__main__':

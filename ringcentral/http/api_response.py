@@ -61,20 +61,20 @@ class ApiResponse:
         if self._response is None or self.ok():
             return None
 
-        message = 'HTTP' + str(self._response.status_code)  # TODO Status text
+        message = 'HTTP ' + str(self._response.status_code) + ' ' + self._response.text
 
-        try:
-            data = self.json_dict()
+        # try:
+        #     data = self.json_dict()
 
-            if 'message' in data:
-                message = data['message']
-            elif 'error_description' in data:
-                message = data['error_description']
-            elif 'description' in data:
-                message = data['description']
+        #     if 'message' in data:
+        #         message = data['message']
+        #     elif 'error_description' in data:
+        #         message = data['error_description']
+        #     elif 'description' in data:
+        #         message = data['description']
 
-        except Exception as e:
-            message = message + ' (and additional error happened during JSON parse: ' + e.message + ')'
+        # except Exception as e:
+        #     message = message + ' (and additional error happened during JSON parse: ' + e.message + ')'
 
         return message
 
