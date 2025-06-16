@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Tests with pytest
+      - name: Test with pytest
         env:
           RINGCENTRAL_SERVER_URL: ${{secrets.RINGCENTRAL_SERVER_URL}}
           RINGCENTRAL_CLIENT_ID: ${{secrets.RINGCENTRAL_CLIENT_ID}}
