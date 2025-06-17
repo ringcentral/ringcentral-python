@@ -72,19 +72,19 @@
 
                         <label class="view-source-button" for="mod-multipart_builder_test-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">unittest</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">..test</span> <span class="kn">import</span> <span class="n">TestCase</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span> <span class="nn">.multipart_builder</span> <span class="kn">import</span> <span class="n">MultipartBuilder</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">..test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.multipart_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultipartBuilder</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">MockPlatform</span><span class="p">:</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span> <span class="nf">create_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="p">):</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span><span class="w"> </span><span class="nc">MockPlatform</span><span class="p">:</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="p">):</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="k">if</span> <span class="n">add_server</span><span class="p">:</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>            <span class="k">return</span> <span class="s1">&#39;http://example.com/&#39;</span> <span class="o">+</span> <span class="n">url</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="k">return</span> <span class="n">url</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">TestMultipartBuilder</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TestMultipartBuilder</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="n">mb</span> <span class="o">=</span> <span class="n">MultipartBuilder</span><span class="p">(</span><span class="n">MockPlatform</span><span class="p">())</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="n">mb</span><span class="o">.</span><span class="n">set_body</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
@@ -99,7 +99,7 @@
 </span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>            <span class="p">(</span><span class="s1">&#39;attachment&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;report.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;some,data,to,send&#39;</span><span class="p">))</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="p">])</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="k">def</span> <span class="nf">test_multipart_mixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_multipart_mixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>        <span class="n">mb</span> <span class="o">=</span> <span class="n">MultipartBuilder</span><span class="p">(</span><span class="n">MockPlatform</span><span class="p">())</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>        <span class="n">mb</span><span class="o">.</span><span class="n">set_body</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
@@ -130,8 +130,8 @@
 
     </div>
     <a class="headerlink" href="#MockPlatform"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="MockPlatform-7"><a href="#MockPlatform-7"><span class="linenos"> 7</span></a><span class="k">class</span> <span class="nc">MockPlatform</span><span class="p">:</span>
-</span><span id="MockPlatform-8"><a href="#MockPlatform-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="nf">create_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="MockPlatform-7"><a href="#MockPlatform-7"><span class="linenos"> 7</span></a><span class="k">class</span><span class="w"> </span><span class="nc">MockPlatform</span><span class="p">:</span>
+</span><span id="MockPlatform-8"><a href="#MockPlatform-8"><span class="linenos"> 8</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="p">):</span>
 </span><span id="MockPlatform-9"><a href="#MockPlatform-9"><span class="linenos"> 9</span></a>        <span class="k">if</span> <span class="n">add_server</span><span class="p">:</span>
 </span><span id="MockPlatform-10"><a href="#MockPlatform-10"><span class="linenos">10</span></a>            <span class="k">return</span> <span class="s1">&#39;http://example.com/&#39;</span> <span class="o">+</span> <span class="n">url</span>
 </span><span id="MockPlatform-11"><a href="#MockPlatform-11"><span class="linenos">11</span></a>        <span class="k">return</span> <span class="n">url</span>
@@ -151,7 +151,7 @@
 
     </div>
     <a class="headerlink" href="#MockPlatform.create_url"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="MockPlatform.create_url-8"><a href="#MockPlatform.create_url-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="nf">create_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="MockPlatform.create_url-8"><a href="#MockPlatform.create_url-8"><span class="linenos"> 8</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">add_server</span><span class="p">):</span>
 </span><span id="MockPlatform.create_url-9"><a href="#MockPlatform.create_url-9"><span class="linenos"> 9</span></a>        <span class="k">if</span> <span class="n">add_server</span><span class="p">:</span>
 </span><span id="MockPlatform.create_url-10"><a href="#MockPlatform.create_url-10"><span class="linenos">10</span></a>            <span class="k">return</span> <span class="s1">&#39;http://example.com/&#39;</span> <span class="o">+</span> <span class="n">url</span>
 </span><span id="MockPlatform.create_url-11"><a href="#MockPlatform.create_url-11"><span class="linenos">11</span></a>        <span class="k">return</span> <span class="n">url</span>
@@ -173,8 +173,8 @@
 
     </div>
     <a class="headerlink" href="#TestMultipartBuilder"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestMultipartBuilder-13"><a href="#TestMultipartBuilder-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">TestMultipartBuilder</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
-</span><span id="TestMultipartBuilder-14"><a href="#TestMultipartBuilder-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TestMultipartBuilder-13"><a href="#TestMultipartBuilder-13"><span class="linenos">13</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TestMultipartBuilder</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+</span><span id="TestMultipartBuilder-14"><a href="#TestMultipartBuilder-14"><span class="linenos">14</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="TestMultipartBuilder-15"><a href="#TestMultipartBuilder-15"><span class="linenos">15</span></a>        <span class="n">mb</span> <span class="o">=</span> <span class="n">MultipartBuilder</span><span class="p">(</span><span class="n">MockPlatform</span><span class="p">())</span>
 </span><span id="TestMultipartBuilder-16"><a href="#TestMultipartBuilder-16"><span class="linenos">16</span></a>
 </span><span id="TestMultipartBuilder-17"><a href="#TestMultipartBuilder-17"><span class="linenos">17</span></a>        <span class="n">mb</span><span class="o">.</span><span class="n">set_body</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
@@ -189,7 +189,7 @@
 </span><span id="TestMultipartBuilder-26"><a href="#TestMultipartBuilder-26"><span class="linenos">26</span></a>            <span class="p">(</span><span class="s1">&#39;attachment&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;report.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;some,data,to,send&#39;</span><span class="p">))</span>
 </span><span id="TestMultipartBuilder-27"><a href="#TestMultipartBuilder-27"><span class="linenos">27</span></a>        <span class="p">])</span>
 </span><span id="TestMultipartBuilder-28"><a href="#TestMultipartBuilder-28"><span class="linenos">28</span></a>
-</span><span id="TestMultipartBuilder-29"><a href="#TestMultipartBuilder-29"><span class="linenos">29</span></a>    <span class="k">def</span> <span class="nf">test_multipart_mixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TestMultipartBuilder-29"><a href="#TestMultipartBuilder-29"><span class="linenos">29</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_multipart_mixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="TestMultipartBuilder-30"><a href="#TestMultipartBuilder-30"><span class="linenos">30</span></a>        <span class="n">mb</span> <span class="o">=</span> <span class="n">MultipartBuilder</span><span class="p">(</span><span class="n">MockPlatform</span><span class="p">())</span>
 </span><span id="TestMultipartBuilder-31"><a href="#TestMultipartBuilder-31"><span class="linenos">31</span></a>
 </span><span id="TestMultipartBuilder-32"><a href="#TestMultipartBuilder-32"><span class="linenos">32</span></a>        <span class="n">mb</span><span class="o">.</span><span class="n">set_body</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
@@ -251,7 +251,7 @@ attribute so can be configured by individual tests if required.</li>
 
     </div>
     <a class="headerlink" href="#TestMultipartBuilder.test_add"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestMultipartBuilder.test_add-14"><a href="#TestMultipartBuilder.test_add-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TestMultipartBuilder.test_add-14"><a href="#TestMultipartBuilder.test_add-14"><span class="linenos">14</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_add</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="TestMultipartBuilder.test_add-15"><a href="#TestMultipartBuilder.test_add-15"><span class="linenos">15</span></a>        <span class="n">mb</span> <span class="o">=</span> <span class="n">MultipartBuilder</span><span class="p">(</span><span class="n">MockPlatform</span><span class="p">())</span>
 </span><span id="TestMultipartBuilder.test_add-16"><a href="#TestMultipartBuilder.test_add-16"><span class="linenos">16</span></a>
 </span><span id="TestMultipartBuilder.test_add-17"><a href="#TestMultipartBuilder.test_add-17"><span class="linenos">17</span></a>        <span class="n">mb</span><span class="o">.</span><span class="n">set_body</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
@@ -282,7 +282,7 @@ attribute so can be configured by individual tests if required.</li>
 
     </div>
     <a class="headerlink" href="#TestMultipartBuilder.test_multipart_mixed"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TestMultipartBuilder.test_multipart_mixed-29"><a href="#TestMultipartBuilder.test_multipart_mixed-29"><span class="linenos">29</span></a>    <span class="k">def</span> <span class="nf">test_multipart_mixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TestMultipartBuilder.test_multipart_mixed-29"><a href="#TestMultipartBuilder.test_multipart_mixed-29"><span class="linenos">29</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">test_multipart_mixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="TestMultipartBuilder.test_multipart_mixed-30"><a href="#TestMultipartBuilder.test_multipart_mixed-30"><span class="linenos">30</span></a>        <span class="n">mb</span> <span class="o">=</span> <span class="n">MultipartBuilder</span><span class="p">(</span><span class="n">MockPlatform</span><span class="p">())</span>
 </span><span id="TestMultipartBuilder.test_multipart_mixed-31"><a href="#TestMultipartBuilder.test_multipart_mixed-31"><span class="linenos">31</span></a>
 </span><span id="TestMultipartBuilder.test_multipart_mixed-32"><a href="#TestMultipartBuilder.test_multipart_mixed-32"><span class="linenos">32</span></a>        <span class="n">mb</span><span class="o">.</span><span class="n">set_body</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>

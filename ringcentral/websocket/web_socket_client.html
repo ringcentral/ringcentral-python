@@ -95,16 +95,16 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="ch">#!/usr/bin/env python</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="c1"># encoding: utf-8</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span> <span class="nn">observable</span> <span class="kn">import</span> <span class="n">Observable</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span> <span class="nn">websockets</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span> <span class="nn">.web_socket_subscription</span> <span class="kn">import</span> <span class="n">WebSocketSubscription</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span> <span class="nn">.events</span> <span class="kn">import</span> <span class="n">WebSocketEvents</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span> <span class="nn">json</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">import</span> <span class="nn">asyncio</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span> <span class="nn">uuid</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">observable</span><span class="w"> </span><span class="kn">import</span> <span class="n">Observable</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">websockets</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.web_socket_subscription</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketSubscription</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketEvents</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="k">class</span> <span class="nc">WebSocketClient</span><span class="p">(</span><span class="n">Observable</span><span class="p">):</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="k">class</span><span class="w"> </span><span class="nc">WebSocketClient</span><span class="p">(</span><span class="n">Observable</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>        <span class="n">Observable</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_platform</span> <span class="o">=</span> <span class="n">platform</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span> <span class="o">=</span> <span class="kc">None</span>
@@ -112,7 +112,7 @@
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_is_ready</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_send_attempt_counter</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_new_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_new_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="sd">        Creates a new WebSocket connection.</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
@@ -137,7 +137,7 @@
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">createConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>            <span class="k">raise</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="k">def</span> <span class="nf">get_web_socket_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_web_socket_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">            Retrieves a WebSocket token.</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>
@@ -159,7 +159,7 @@
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">getTokenError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>            <span class="k">raise</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws_uri</span><span class="p">,</span> <span class="n">ws_access_token</span><span class="p">):</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws_uri</span><span class="p">,</span> <span class="n">ws_access_token</span><span class="p">):</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">            Opens a WebSocket connection.</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
@@ -190,7 +190,7 @@
 </span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">connectionCreated</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>            <span class="c1"># heartbeat every 10 minutes</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>            <span class="k">async</span> <span class="k">def</span> <span class="nf">timer_function</span><span class="p">():</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">timer_function</span><span class="p">():</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_done</span><span class="p">:</span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>                        <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
@@ -208,13 +208,13 @@
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">createConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>            <span class="k">raise</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">get_connection_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span><span class="p">[</span><span class="s2">&quot;connection&quot;</span><span class="p">]</span>
 </span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">            Closes the WebSocket connection.</span>
 </span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
@@ -237,7 +237,7 @@
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">closeConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>            <span class="k">raise</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">recover_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recover_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>            <span class="n">ws_connection_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_socket_token</span><span class="p">()</span>
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>            <span class="n">recovered_connection_info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span>
@@ -251,7 +251,7 @@
 </span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">recoverConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>            <span class="k">raise</span>
 </span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
 </span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">            Sends a message over the WebSocket connection.</span>
 </span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a>
@@ -284,7 +284,7 @@
 </span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">sendMessageError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>            <span class="k">raise</span>
 </span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>
-</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a><span class="sd">            Creates a subscription to WebSocket events.</span>
 </span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>
@@ -318,7 +318,7 @@
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">createSubscriptionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>            <span class="k">raise</span>
 </span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a><span class="sd">            Updates an existing WebSocket subscription with new events.</span>
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>
@@ -344,7 +344,7 @@
 </span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">updateSubscriptionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>            <span class="k">raise</span>
 </span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>
-</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">remove_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">):</span>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">):</span>
 </span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="sd">            Removes an existing WebSocket subscription.</span>
 </span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a>
@@ -383,8 +383,8 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient-12"><a href="#WebSocketClient-12"><span class="linenos"> 12</span></a><span class="k">class</span> <span class="nc">WebSocketClient</span><span class="p">(</span><span class="n">Observable</span><span class="p">):</span>
-</span><span id="WebSocketClient-13"><a href="#WebSocketClient-13"><span class="linenos"> 13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient-12"><a href="#WebSocketClient-12"><span class="linenos"> 12</span></a><span class="k">class</span><span class="w"> </span><span class="nc">WebSocketClient</span><span class="p">(</span><span class="n">Observable</span><span class="p">):</span>
+</span><span id="WebSocketClient-13"><a href="#WebSocketClient-13"><span class="linenos"> 13</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
 </span><span id="WebSocketClient-14"><a href="#WebSocketClient-14"><span class="linenos"> 14</span></a>        <span class="n">Observable</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="WebSocketClient-15"><a href="#WebSocketClient-15"><span class="linenos"> 15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_platform</span> <span class="o">=</span> <span class="n">platform</span>
 </span><span id="WebSocketClient-16"><a href="#WebSocketClient-16"><span class="linenos"> 16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span> <span class="o">=</span> <span class="kc">None</span>
@@ -392,7 +392,7 @@
 </span><span id="WebSocketClient-18"><a href="#WebSocketClient-18"><span class="linenos"> 18</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_is_ready</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="WebSocketClient-19"><a href="#WebSocketClient-19"><span class="linenos"> 19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_send_attempt_counter</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="WebSocketClient-20"><a href="#WebSocketClient-20"><span class="linenos"> 20</span></a>
-</span><span id="WebSocketClient-21"><a href="#WebSocketClient-21"><span class="linenos"> 21</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_new_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="WebSocketClient-21"><a href="#WebSocketClient-21"><span class="linenos"> 21</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_new_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient-22"><a href="#WebSocketClient-22"><span class="linenos"> 22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-23"><a href="#WebSocketClient-23"><span class="linenos"> 23</span></a><span class="sd">        Creates a new WebSocket connection.</span>
 </span><span id="WebSocketClient-24"><a href="#WebSocketClient-24"><span class="linenos"> 24</span></a>
@@ -417,7 +417,7 @@
 </span><span id="WebSocketClient-43"><a href="#WebSocketClient-43"><span class="linenos"> 43</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">createConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-44"><a href="#WebSocketClient-44"><span class="linenos"> 44</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-45"><a href="#WebSocketClient-45"><span class="linenos"> 45</span></a>
-</span><span id="WebSocketClient-46"><a href="#WebSocketClient-46"><span class="linenos"> 46</span></a>    <span class="k">def</span> <span class="nf">get_web_socket_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="WebSocketClient-46"><a href="#WebSocketClient-46"><span class="linenos"> 46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_web_socket_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient-47"><a href="#WebSocketClient-47"><span class="linenos"> 47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-48"><a href="#WebSocketClient-48"><span class="linenos"> 48</span></a><span class="sd">            Retrieves a WebSocket token.</span>
 </span><span id="WebSocketClient-49"><a href="#WebSocketClient-49"><span class="linenos"> 49</span></a>
@@ -439,7 +439,7 @@
 </span><span id="WebSocketClient-65"><a href="#WebSocketClient-65"><span class="linenos"> 65</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">getTokenError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-66"><a href="#WebSocketClient-66"><span class="linenos"> 66</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-67"><a href="#WebSocketClient-67"><span class="linenos"> 67</span></a>
-</span><span id="WebSocketClient-68"><a href="#WebSocketClient-68"><span class="linenos"> 68</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws_uri</span><span class="p">,</span> <span class="n">ws_access_token</span><span class="p">):</span>
+</span><span id="WebSocketClient-68"><a href="#WebSocketClient-68"><span class="linenos"> 68</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws_uri</span><span class="p">,</span> <span class="n">ws_access_token</span><span class="p">):</span>
 </span><span id="WebSocketClient-69"><a href="#WebSocketClient-69"><span class="linenos"> 69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-70"><a href="#WebSocketClient-70"><span class="linenos"> 70</span></a><span class="sd">            Opens a WebSocket connection.</span>
 </span><span id="WebSocketClient-71"><a href="#WebSocketClient-71"><span class="linenos"> 71</span></a>
@@ -470,7 +470,7 @@
 </span><span id="WebSocketClient-96"><a href="#WebSocketClient-96"><span class="linenos"> 96</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">connectionCreated</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 </span><span id="WebSocketClient-97"><a href="#WebSocketClient-97"><span class="linenos"> 97</span></a>
 </span><span id="WebSocketClient-98"><a href="#WebSocketClient-98"><span class="linenos"> 98</span></a>            <span class="c1"># heartbeat every 10 minutes</span>
-</span><span id="WebSocketClient-99"><a href="#WebSocketClient-99"><span class="linenos"> 99</span></a>            <span class="k">async</span> <span class="k">def</span> <span class="nf">timer_function</span><span class="p">():</span>
+</span><span id="WebSocketClient-99"><a href="#WebSocketClient-99"><span class="linenos"> 99</span></a>            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">timer_function</span><span class="p">():</span>
 </span><span id="WebSocketClient-100"><a href="#WebSocketClient-100"><span class="linenos">100</span></a>                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 </span><span id="WebSocketClient-101"><a href="#WebSocketClient-101"><span class="linenos">101</span></a>                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_done</span><span class="p">:</span>
 </span><span id="WebSocketClient-102"><a href="#WebSocketClient-102"><span class="linenos">102</span></a>                        <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
@@ -488,13 +488,13 @@
 </span><span id="WebSocketClient-114"><a href="#WebSocketClient-114"><span class="linenos">114</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">createConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-115"><a href="#WebSocketClient-115"><span class="linenos">115</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-116"><a href="#WebSocketClient-116"><span class="linenos">116</span></a>
-</span><span id="WebSocketClient-117"><a href="#WebSocketClient-117"><span class="linenos">117</span></a>    <span class="k">def</span> <span class="nf">get_connection_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="WebSocketClient-117"><a href="#WebSocketClient-117"><span class="linenos">117</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient-118"><a href="#WebSocketClient-118"><span class="linenos">118</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span>
 </span><span id="WebSocketClient-119"><a href="#WebSocketClient-119"><span class="linenos">119</span></a>
-</span><span id="WebSocketClient-120"><a href="#WebSocketClient-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="WebSocketClient-120"><a href="#WebSocketClient-120"><span class="linenos">120</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient-121"><a href="#WebSocketClient-121"><span class="linenos">121</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span><span class="p">[</span><span class="s2">&quot;connection&quot;</span><span class="p">]</span>
 </span><span id="WebSocketClient-122"><a href="#WebSocketClient-122"><span class="linenos">122</span></a>
-</span><span id="WebSocketClient-123"><a href="#WebSocketClient-123"><span class="linenos">123</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="WebSocketClient-123"><a href="#WebSocketClient-123"><span class="linenos">123</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient-124"><a href="#WebSocketClient-124"><span class="linenos">124</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-125"><a href="#WebSocketClient-125"><span class="linenos">125</span></a><span class="sd">            Closes the WebSocket connection.</span>
 </span><span id="WebSocketClient-126"><a href="#WebSocketClient-126"><span class="linenos">126</span></a>
@@ -517,7 +517,7 @@
 </span><span id="WebSocketClient-143"><a href="#WebSocketClient-143"><span class="linenos">143</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">closeConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-144"><a href="#WebSocketClient-144"><span class="linenos">144</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-145"><a href="#WebSocketClient-145"><span class="linenos">145</span></a>
-</span><span id="WebSocketClient-146"><a href="#WebSocketClient-146"><span class="linenos">146</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">recover_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="WebSocketClient-146"><a href="#WebSocketClient-146"><span class="linenos">146</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recover_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient-147"><a href="#WebSocketClient-147"><span class="linenos">147</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="WebSocketClient-148"><a href="#WebSocketClient-148"><span class="linenos">148</span></a>            <span class="n">ws_connection_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_socket_token</span><span class="p">()</span>
 </span><span id="WebSocketClient-149"><a href="#WebSocketClient-149"><span class="linenos">149</span></a>            <span class="n">recovered_connection_info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span>
@@ -531,7 +531,7 @@
 </span><span id="WebSocketClient-157"><a href="#WebSocketClient-157"><span class="linenos">157</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">recoverConnectionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-158"><a href="#WebSocketClient-158"><span class="linenos">158</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-159"><a href="#WebSocketClient-159"><span class="linenos">159</span></a>
-</span><span id="WebSocketClient-160"><a href="#WebSocketClient-160"><span class="linenos">160</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+</span><span id="WebSocketClient-160"><a href="#WebSocketClient-160"><span class="linenos">160</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
 </span><span id="WebSocketClient-161"><a href="#WebSocketClient-161"><span class="linenos">161</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-162"><a href="#WebSocketClient-162"><span class="linenos">162</span></a><span class="sd">            Sends a message over the WebSocket connection.</span>
 </span><span id="WebSocketClient-163"><a href="#WebSocketClient-163"><span class="linenos">163</span></a>
@@ -564,7 +564,7 @@
 </span><span id="WebSocketClient-190"><a href="#WebSocketClient-190"><span class="linenos">190</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">sendMessageError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-191"><a href="#WebSocketClient-191"><span class="linenos">191</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-192"><a href="#WebSocketClient-192"><span class="linenos">192</span></a>
-</span><span id="WebSocketClient-193"><a href="#WebSocketClient-193"><span class="linenos">193</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="WebSocketClient-193"><a href="#WebSocketClient-193"><span class="linenos">193</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="WebSocketClient-194"><a href="#WebSocketClient-194"><span class="linenos">194</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-195"><a href="#WebSocketClient-195"><span class="linenos">195</span></a><span class="sd">            Creates a subscription to WebSocket events.</span>
 </span><span id="WebSocketClient-196"><a href="#WebSocketClient-196"><span class="linenos">196</span></a>
@@ -598,7 +598,7 @@
 </span><span id="WebSocketClient-224"><a href="#WebSocketClient-224"><span class="linenos">224</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">createSubscriptionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-225"><a href="#WebSocketClient-225"><span class="linenos">225</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-226"><a href="#WebSocketClient-226"><span class="linenos">226</span></a>
-</span><span id="WebSocketClient-227"><a href="#WebSocketClient-227"><span class="linenos">227</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="WebSocketClient-227"><a href="#WebSocketClient-227"><span class="linenos">227</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="WebSocketClient-228"><a href="#WebSocketClient-228"><span class="linenos">228</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-229"><a href="#WebSocketClient-229"><span class="linenos">229</span></a><span class="sd">            Updates an existing WebSocket subscription with new events.</span>
 </span><span id="WebSocketClient-230"><a href="#WebSocketClient-230"><span class="linenos">230</span></a>
@@ -624,7 +624,7 @@
 </span><span id="WebSocketClient-250"><a href="#WebSocketClient-250"><span class="linenos">250</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">updateSubscriptionError</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="WebSocketClient-251"><a href="#WebSocketClient-251"><span class="linenos">251</span></a>            <span class="k">raise</span>
 </span><span id="WebSocketClient-252"><a href="#WebSocketClient-252"><span class="linenos">252</span></a>
-</span><span id="WebSocketClient-253"><a href="#WebSocketClient-253"><span class="linenos">253</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">remove_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">):</span>
+</span><span id="WebSocketClient-253"><a href="#WebSocketClient-253"><span class="linenos">253</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">):</span>
 </span><span id="WebSocketClient-254"><a href="#WebSocketClient-254"><span class="linenos">254</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient-255"><a href="#WebSocketClient-255"><span class="linenos">255</span></a><span class="sd">            Removes an existing WebSocket subscription.</span>
 </span><span id="WebSocketClient-256"><a href="#WebSocketClient-256"><span class="linenos">256</span></a>
@@ -661,7 +661,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.__init__-13"><a href="#WebSocketClient.__init__-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.__init__-13"><a href="#WebSocketClient.__init__-13"><span class="linenos">13</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform</span><span class="p">):</span>
 </span><span id="WebSocketClient.__init__-14"><a href="#WebSocketClient.__init__-14"><span class="linenos">14</span></a>        <span class="n">Observable</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="WebSocketClient.__init__-15"><a href="#WebSocketClient.__init__-15"><span class="linenos">15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_platform</span> <span class="o">=</span> <span class="n">platform</span>
 </span><span id="WebSocketClient.__init__-16"><a href="#WebSocketClient.__init__-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span> <span class="o">=</span> <span class="kc">None</span>
@@ -685,7 +685,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.create_new_connection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.create_new_connection-21"><a href="#WebSocketClient.create_new_connection-21"><span class="linenos">21</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_new_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.create_new_connection-21"><a href="#WebSocketClient.create_new_connection-21"><span class="linenos">21</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_new_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient.create_new_connection-22"><a href="#WebSocketClient.create_new_connection-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.create_new_connection-23"><a href="#WebSocketClient.create_new_connection-23"><span class="linenos">23</span></a><span class="sd">        Creates a new WebSocket connection.</span>
 </span><span id="WebSocketClient.create_new_connection-24"><a href="#WebSocketClient.create_new_connection-24"><span class="linenos">24</span></a>
@@ -739,7 +739,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.get_web_socket_token"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.get_web_socket_token-46"><a href="#WebSocketClient.get_web_socket_token-46"><span class="linenos">46</span></a>    <span class="k">def</span> <span class="nf">get_web_socket_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.get_web_socket_token-46"><a href="#WebSocketClient.get_web_socket_token-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_web_socket_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient.get_web_socket_token-47"><a href="#WebSocketClient.get_web_socket_token-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.get_web_socket_token-48"><a href="#WebSocketClient.get_web_socket_token-48"><span class="linenos">48</span></a><span class="sd">            Retrieves a WebSocket token.</span>
 </span><span id="WebSocketClient.get_web_socket_token-49"><a href="#WebSocketClient.get_web_socket_token-49"><span class="linenos">49</span></a>
@@ -790,7 +790,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.open_connection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.open_connection-68"><a href="#WebSocketClient.open_connection-68"><span class="linenos"> 68</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws_uri</span><span class="p">,</span> <span class="n">ws_access_token</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.open_connection-68"><a href="#WebSocketClient.open_connection-68"><span class="linenos"> 68</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">open_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws_uri</span><span class="p">,</span> <span class="n">ws_access_token</span><span class="p">):</span>
 </span><span id="WebSocketClient.open_connection-69"><a href="#WebSocketClient.open_connection-69"><span class="linenos"> 69</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.open_connection-70"><a href="#WebSocketClient.open_connection-70"><span class="linenos"> 70</span></a><span class="sd">            Opens a WebSocket connection.</span>
 </span><span id="WebSocketClient.open_connection-71"><a href="#WebSocketClient.open_connection-71"><span class="linenos"> 71</span></a>
@@ -821,7 +821,7 @@
 </span><span id="WebSocketClient.open_connection-96"><a href="#WebSocketClient.open_connection-96"><span class="linenos"> 96</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">WebSocketEvents</span><span class="o">.</span><span class="n">connectionCreated</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 </span><span id="WebSocketClient.open_connection-97"><a href="#WebSocketClient.open_connection-97"><span class="linenos"> 97</span></a>
 </span><span id="WebSocketClient.open_connection-98"><a href="#WebSocketClient.open_connection-98"><span class="linenos"> 98</span></a>            <span class="c1"># heartbeat every 10 minutes</span>
-</span><span id="WebSocketClient.open_connection-99"><a href="#WebSocketClient.open_connection-99"><span class="linenos"> 99</span></a>            <span class="k">async</span> <span class="k">def</span> <span class="nf">timer_function</span><span class="p">():</span>
+</span><span id="WebSocketClient.open_connection-99"><a href="#WebSocketClient.open_connection-99"><span class="linenos"> 99</span></a>            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">timer_function</span><span class="p">():</span>
 </span><span id="WebSocketClient.open_connection-100"><a href="#WebSocketClient.open_connection-100"><span class="linenos">100</span></a>                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
 </span><span id="WebSocketClient.open_connection-101"><a href="#WebSocketClient.open_connection-101"><span class="linenos">101</span></a>                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_done</span><span class="p">:</span>
 </span><span id="WebSocketClient.open_connection-102"><a href="#WebSocketClient.open_connection-102"><span class="linenos">102</span></a>                        <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
@@ -871,7 +871,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.get_connection_info"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.get_connection_info-117"><a href="#WebSocketClient.get_connection_info-117"><span class="linenos">117</span></a>    <span class="k">def</span> <span class="nf">get_connection_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.get_connection_info-117"><a href="#WebSocketClient.get_connection_info-117"><span class="linenos">117</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient.get_connection_info-118"><a href="#WebSocketClient.get_connection_info-118"><span class="linenos">118</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span>
 </span></pre></div>
 
@@ -890,7 +890,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.get_connection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.get_connection-120"><a href="#WebSocketClient.get_connection-120"><span class="linenos">120</span></a>    <span class="k">def</span> <span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.get_connection-120"><a href="#WebSocketClient.get_connection-120"><span class="linenos">120</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient.get_connection-121"><a href="#WebSocketClient.get_connection-121"><span class="linenos">121</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_web_socket</span><span class="p">[</span><span class="s2">&quot;connection&quot;</span><span class="p">]</span>
 </span></pre></div>
 
@@ -909,7 +909,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.close_connection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.close_connection-123"><a href="#WebSocketClient.close_connection-123"><span class="linenos">123</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.close_connection-123"><a href="#WebSocketClient.close_connection-123"><span class="linenos">123</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient.close_connection-124"><a href="#WebSocketClient.close_connection-124"><span class="linenos">124</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.close_connection-125"><a href="#WebSocketClient.close_connection-125"><span class="linenos">125</span></a><span class="sd">            Closes the WebSocket connection.</span>
 </span><span id="WebSocketClient.close_connection-126"><a href="#WebSocketClient.close_connection-126"><span class="linenos">126</span></a>
@@ -960,7 +960,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.recover_connection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.recover_connection-146"><a href="#WebSocketClient.recover_connection-146"><span class="linenos">146</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">recover_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.recover_connection-146"><a href="#WebSocketClient.recover_connection-146"><span class="linenos">146</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recover_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketClient.recover_connection-147"><a href="#WebSocketClient.recover_connection-147"><span class="linenos">147</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="WebSocketClient.recover_connection-148"><a href="#WebSocketClient.recover_connection-148"><span class="linenos">148</span></a>            <span class="n">ws_connection_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_socket_token</span><span class="p">()</span>
 </span><span id="WebSocketClient.recover_connection-149"><a href="#WebSocketClient.recover_connection-149"><span class="linenos">149</span></a>            <span class="n">recovered_connection_info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span>
@@ -990,7 +990,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.send_message"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.send_message-160"><a href="#WebSocketClient.send_message-160"><span class="linenos">160</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.send_message-160"><a href="#WebSocketClient.send_message-160"><span class="linenos">160</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
 </span><span id="WebSocketClient.send_message-161"><a href="#WebSocketClient.send_message-161"><span class="linenos">161</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.send_message-162"><a href="#WebSocketClient.send_message-162"><span class="linenos">162</span></a><span class="sd">            Sends a message over the WebSocket connection.</span>
 </span><span id="WebSocketClient.send_message-163"><a href="#WebSocketClient.send_message-163"><span class="linenos">163</span></a>
@@ -1053,7 +1053,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.create_subscription"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.create_subscription-193"><a href="#WebSocketClient.create_subscription-193"><span class="linenos">193</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.create_subscription-193"><a href="#WebSocketClient.create_subscription-193"><span class="linenos">193</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="WebSocketClient.create_subscription-194"><a href="#WebSocketClient.create_subscription-194"><span class="linenos">194</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.create_subscription-195"><a href="#WebSocketClient.create_subscription-195"><span class="linenos">195</span></a><span class="sd">            Creates a subscription to WebSocket events.</span>
 </span><span id="WebSocketClient.create_subscription-196"><a href="#WebSocketClient.create_subscription-196"><span class="linenos">196</span></a>
@@ -1117,7 +1117,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.update_subscription"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.update_subscription-227"><a href="#WebSocketClient.update_subscription-227"><span class="linenos">227</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">update_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.update_subscription-227"><a href="#WebSocketClient.update_subscription-227"><span class="linenos">227</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="WebSocketClient.update_subscription-228"><a href="#WebSocketClient.update_subscription-228"><span class="linenos">228</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.update_subscription-229"><a href="#WebSocketClient.update_subscription-229"><span class="linenos">229</span></a><span class="sd">            Updates an existing WebSocket subscription with new events.</span>
 </span><span id="WebSocketClient.update_subscription-230"><a href="#WebSocketClient.update_subscription-230"><span class="linenos">230</span></a>
@@ -1176,7 +1176,7 @@
 
     </div>
     <a class="headerlink" href="#WebSocketClient.remove_subscription"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.remove_subscription-253"><a href="#WebSocketClient.remove_subscription-253"><span class="linenos">253</span></a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">remove_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketClient.remove_subscription-253"><a href="#WebSocketClient.remove_subscription-253"><span class="linenos">253</span></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove_subscription</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subscription</span><span class="p">):</span>
 </span><span id="WebSocketClient.remove_subscription-254"><a href="#WebSocketClient.remove_subscription-254"><span class="linenos">254</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="WebSocketClient.remove_subscription-255"><a href="#WebSocketClient.remove_subscription-255"><span class="linenos">255</span></a><span class="sd">            Removes an existing WebSocket subscription.</span>
 </span><span id="WebSocketClient.remove_subscription-256"><a href="#WebSocketClient.remove_subscription-256"><span class="linenos">256</span></a>

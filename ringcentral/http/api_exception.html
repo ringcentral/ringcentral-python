@@ -63,8 +63,8 @@
 
                         <label class="view-source-button" for="mod-api_exception-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="k">class</span> <span class="nc">ApiException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_response</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ApiException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_response</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__apiResponse</span> <span class="o">=</span> <span class="n">api_response</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="n">previous</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">previous</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;Unknown error&#39;</span>
@@ -80,7 +80,7 @@
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="nb">super</span><span class="p">(</span><span class="n">ApiException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span> <span class="nf">api_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__apiResponse</span>
 </span></pre></div>
 
@@ -97,8 +97,8 @@
 
     </div>
     <a class="headerlink" href="#ApiException"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ApiException-3"><a href="#ApiException-3"><span class="linenos"> 3</span></a><span class="k">class</span> <span class="nc">ApiException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-</span><span id="ApiException-4"><a href="#ApiException-4"><span class="linenos"> 4</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_response</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ApiException-3"><a href="#ApiException-3"><span class="linenos"> 3</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ApiException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span id="ApiException-4"><a href="#ApiException-4"><span class="linenos"> 4</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_response</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="ApiException-5"><a href="#ApiException-5"><span class="linenos"> 5</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__apiResponse</span> <span class="o">=</span> <span class="n">api_response</span>
 </span><span id="ApiException-6"><a href="#ApiException-6"><span class="linenos"> 6</span></a>
 </span><span id="ApiException-7"><a href="#ApiException-7"><span class="linenos"> 7</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="n">previous</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">previous</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;Unknown error&#39;</span>
@@ -114,7 +114,7 @@
 </span><span id="ApiException-17"><a href="#ApiException-17"><span class="linenos">17</span></a>
 </span><span id="ApiException-18"><a href="#ApiException-18"><span class="linenos">18</span></a>        <span class="nb">super</span><span class="p">(</span><span class="n">ApiException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </span><span id="ApiException-19"><a href="#ApiException-19"><span class="linenos">19</span></a>
-</span><span id="ApiException-20"><a href="#ApiException-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="nf">api_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="ApiException-20"><a href="#ApiException-20"><span class="linenos">20</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="ApiException-21"><a href="#ApiException-21"><span class="linenos">21</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__apiResponse</span>
 </span></pre></div>
 
@@ -133,7 +133,7 @@
 
     </div>
     <a class="headerlink" href="#ApiException.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ApiException.__init__-4"><a href="#ApiException.__init__-4"><span class="linenos"> 4</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_response</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ApiException.__init__-4"><a href="#ApiException.__init__-4"><span class="linenos"> 4</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_response</span><span class="p">,</span> <span class="n">previous</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="ApiException.__init__-5"><a href="#ApiException.__init__-5"><span class="linenos"> 5</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__apiResponse</span> <span class="o">=</span> <span class="n">api_response</span>
 </span><span id="ApiException.__init__-6"><a href="#ApiException.__init__-6"><span class="linenos"> 6</span></a>
 </span><span id="ApiException.__init__-7"><a href="#ApiException.__init__-7"><span class="linenos"> 7</span></a>        <span class="n">message</span> <span class="o">=</span> <span class="n">previous</span><span class="o">.</span><span class="n">message</span> <span class="k">if</span> <span class="n">previous</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;Unknown error&#39;</span>
@@ -165,7 +165,7 @@
 
     </div>
     <a class="headerlink" href="#ApiException.api_response"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ApiException.api_response-20"><a href="#ApiException.api_response-20"><span class="linenos">20</span></a>    <span class="k">def</span> <span class="nf">api_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ApiException.api_response-20"><a href="#ApiException.api_response-20"><span class="linenos">20</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="ApiException.api_response-21"><a href="#ApiException.api_response-21"><span class="linenos">21</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__apiResponse</span>
 </span></pre></div>
 

@@ -68,20 +68,20 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="ch">#!/usr/bin/env python</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="c1"># encoding: utf-8</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span> <span class="nn">json</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span> <span class="nn">urllib</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span> <span class="nn">requests</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">urllib</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span> <span class="nn">.api_response</span> <span class="kn">import</span> <span class="n">ApiResponse</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">.api_exception</span> <span class="kn">import</span> <span class="n">ApiException</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">urlencode</span><span class="p">,</span> <span class="n">iterator</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.api_response</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApiResponse</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.api_exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">ApiException</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlencode</span><span class="p">,</span> <span class="n">iterator</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="k">class</span> <span class="nc">Client</span><span class="p">:</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Client</span><span class="p">:</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a>        <span class="k">pass</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">            Send the HTTP request and handle the response.</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a>
@@ -113,7 +113,7 @@
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>            <span class="k">raise</span> <span class="n">ApiException</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">def</span> <span class="nf">load_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="c1"># TODO Persist between requests?</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>        <span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
@@ -129,7 +129,7 @@
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>                <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>            <span class="k">raise</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">def</span> <span class="nf">create_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">            Create an HTTP request object.</span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
@@ -197,11 +197,11 @@
 
     </div>
     <a class="headerlink" href="#Client"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Client-13"><a href="#Client-13"><span class="linenos"> 13</span></a><span class="k">class</span> <span class="nc">Client</span><span class="p">:</span>
-</span><span id="Client-14"><a href="#Client-14"><span class="linenos"> 14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Client-13"><a href="#Client-13"><span class="linenos"> 13</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Client</span><span class="p">:</span>
+</span><span id="Client-14"><a href="#Client-14"><span class="linenos"> 14</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="Client-15"><a href="#Client-15"><span class="linenos"> 15</span></a>        <span class="k">pass</span>
 </span><span id="Client-16"><a href="#Client-16"><span class="linenos"> 16</span></a>
-</span><span id="Client-17"><a href="#Client-17"><span class="linenos"> 17</span></a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span id="Client-17"><a href="#Client-17"><span class="linenos"> 17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
 </span><span id="Client-18"><a href="#Client-18"><span class="linenos"> 18</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Client-19"><a href="#Client-19"><span class="linenos"> 19</span></a><span class="sd">            Send the HTTP request and handle the response.</span>
 </span><span id="Client-20"><a href="#Client-20"><span class="linenos"> 20</span></a>
@@ -233,7 +233,7 @@
 </span><span id="Client-46"><a href="#Client-46"><span class="linenos"> 46</span></a>
 </span><span id="Client-47"><a href="#Client-47"><span class="linenos"> 47</span></a>            <span class="k">raise</span> <span class="n">ApiException</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 </span><span id="Client-48"><a href="#Client-48"><span class="linenos"> 48</span></a>
-</span><span id="Client-49"><a href="#Client-49"><span class="linenos"> 49</span></a>    <span class="k">def</span> <span class="nf">load_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+</span><span id="Client-49"><a href="#Client-49"><span class="linenos"> 49</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
 </span><span id="Client-50"><a href="#Client-50"><span class="linenos"> 50</span></a>        <span class="c1"># TODO Persist between requests?</span>
 </span><span id="Client-51"><a href="#Client-51"><span class="linenos"> 51</span></a>        <span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="Client-52"><a href="#Client-52"><span class="linenos"> 52</span></a>
@@ -249,7 +249,7 @@
 </span><span id="Client-62"><a href="#Client-62"><span class="linenos"> 62</span></a>                <span class="n">session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span><span id="Client-63"><a href="#Client-63"><span class="linenos"> 63</span></a>            <span class="k">raise</span>
 </span><span id="Client-64"><a href="#Client-64"><span class="linenos"> 64</span></a>
-</span><span id="Client-65"><a href="#Client-65"><span class="linenos"> 65</span></a>    <span class="k">def</span> <span class="nf">create_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="Client-65"><a href="#Client-65"><span class="linenos"> 65</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="Client-66"><a href="#Client-66"><span class="linenos"> 66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Client-67"><a href="#Client-67"><span class="linenos"> 67</span></a><span class="sd">            Create an HTTP request object.</span>
 </span><span id="Client-68"><a href="#Client-68"><span class="linenos"> 68</span></a>
@@ -318,7 +318,7 @@
 
     </div>
     <a class="headerlink" href="#Client.send"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Client.send-17"><a href="#Client.send-17"><span class="linenos">17</span></a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Client.send-17"><a href="#Client.send-17"><span class="linenos">17</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
 </span><span id="Client.send-18"><a href="#Client.send-18"><span class="linenos">18</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Client.send-19"><a href="#Client.send-19"><span class="linenos">19</span></a><span class="sd">            Send the HTTP request and handle the response.</span>
 </span><span id="Client.send-20"><a href="#Client.send-20"><span class="linenos">20</span></a>
@@ -377,7 +377,7 @@
 
     </div>
     <a class="headerlink" href="#Client.load_response"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Client.load_response-49"><a href="#Client.load_response-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="nf">load_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Client.load_response-49"><a href="#Client.load_response-49"><span class="linenos">49</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
 </span><span id="Client.load_response-50"><a href="#Client.load_response-50"><span class="linenos">50</span></a>        <span class="c1"># TODO Persist between requests?</span>
 </span><span id="Client.load_response-51"><a href="#Client.load_response-51"><span class="linenos">51</span></a>        <span class="n">session</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span id="Client.load_response-52"><a href="#Client.load_response-52"><span class="linenos">52</span></a>
@@ -409,7 +409,7 @@
 
     </div>
     <a class="headerlink" href="#Client.create_request"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Client.create_request-65"><a href="#Client.create_request-65"><span class="linenos"> 65</span></a>    <span class="k">def</span> <span class="nf">create_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Client.create_request-65"><a href="#Client.create_request-65"><span class="linenos"> 65</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="Client.create_request-66"><a href="#Client.create_request-66"><span class="linenos"> 66</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Client.create_request-67"><a href="#Client.create_request-67"><span class="linenos"> 67</span></a><span class="sd">            Create an HTTP request object.</span>
 </span><span id="Client.create_request-68"><a href="#Client.create_request-68"><span class="linenos"> 68</span></a>

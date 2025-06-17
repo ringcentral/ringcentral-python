@@ -68,7 +68,7 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># !/usr/bin/env python</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># encoding: utf-8</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">..core</span> <span class="kn">import</span> <span class="n">iterator</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">iterator</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="n">PYTHON_KEYWORDS</span> <span class="o">=</span> <span class="p">(</span>
@@ -77,19 +77,19 @@
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;for&quot;</span><span class="p">,</span> <span class="s2">&quot;lambda&quot;</span><span class="p">,</span> <span class="s2">&quot;try&quot;</span><span class="p">,)</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span> <span class="nc">JsonObject</span><span class="p">:</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="k">class</span><span class="w"> </span><span class="nc">JsonObject</span><span class="p">:</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="k">pass</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="k">def</span> <span class="nf">safe_name</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="k">def</span><span class="w"> </span><span class="nf">safe_name</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">PYTHON_KEYWORDS</span><span class="p">:</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="k">return</span> <span class="n">n</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="k">else</span><span class="p">:</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="k">return</span> <span class="n">n</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="k">def</span> <span class="nf">unfold</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="k">def</span><span class="w"> </span><span class="nf">unfold</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="n">o</span> <span class="o">=</span> <span class="n">JsonObject</span><span class="p">()</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -128,8 +128,8 @@
 
     </div>
     <a class="headerlink" href="#JsonObject"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="JsonObject-13"><a href="#JsonObject-13"><span class="linenos">13</span></a><span class="k">class</span> <span class="nc">JsonObject</span><span class="p">:</span>
-</span><span id="JsonObject-14"><a href="#JsonObject-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="JsonObject-13"><a href="#JsonObject-13"><span class="linenos">13</span></a><span class="k">class</span><span class="w"> </span><span class="nc">JsonObject</span><span class="p">:</span>
+</span><span id="JsonObject-14"><a href="#JsonObject-14"><span class="linenos">14</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="JsonObject-15"><a href="#JsonObject-15"><span class="linenos">15</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
@@ -148,7 +148,7 @@
 
     </div>
     <a class="headerlink" href="#safe_name"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="safe_name-18"><a href="#safe_name-18"><span class="linenos">18</span></a><span class="k">def</span> <span class="nf">safe_name</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="safe_name-18"><a href="#safe_name-18"><span class="linenos">18</span></a><span class="k">def</span><span class="w"> </span><span class="nf">safe_name</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
 </span><span id="safe_name-19"><a href="#safe_name-19"><span class="linenos">19</span></a>    <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">PYTHON_KEYWORDS</span><span class="p">:</span>
 </span><span id="safe_name-20"><a href="#safe_name-20"><span class="linenos">20</span></a>        <span class="k">return</span> <span class="n">n</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span>
 </span><span id="safe_name-21"><a href="#safe_name-21"><span class="linenos">21</span></a>    <span class="k">else</span><span class="p">:</span>
@@ -170,7 +170,7 @@
 
     </div>
     <a class="headerlink" href="#unfold"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="unfold-25"><a href="#unfold-25"><span class="linenos">25</span></a><span class="k">def</span> <span class="nf">unfold</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="unfold-25"><a href="#unfold-25"><span class="linenos">25</span></a><span class="k">def</span><span class="w"> </span><span class="nf">unfold</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
 </span><span id="unfold-26"><a href="#unfold-26"><span class="linenos">26</span></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="unfold-27"><a href="#unfold-27"><span class="linenos">27</span></a>        <span class="n">o</span> <span class="o">=</span> <span class="n">JsonObject</span><span class="p">()</span>
 </span><span id="unfold-28"><a href="#unfold-28"><span class="linenos">28</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
