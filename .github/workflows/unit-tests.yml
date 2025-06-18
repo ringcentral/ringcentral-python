@@ -20,11 +20,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Test with pytest
-        env:
-          RINGCENTRAL_SERVER_URL: ${{secrets.RINGCENTRAL_SERVER_URL}}
-          RINGCENTRAL_CLIENT_ID: ${{secrets.RINGCENTRAL_CLIENT_ID}}
-          RINGCENTRAL_CLIENT_SECRET: ${{secrets.RINGCENTRAL_CLIENT_SECRET}}
-          RINGCENTRAL_JWT_TOKEN: ${{secrets.RINGCENTRAL_JWT_TOKEN}}
         run: |
           #Create virtual environment
             python -m venv venv
