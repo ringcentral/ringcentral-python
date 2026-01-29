@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import asyncio
 import sys
 import os
+import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))  # Add the project root to sys.path
 from ringcentral.websocket.events import WebSocketEvents
 from ringcentral import SDK
@@ -19,6 +20,10 @@ def on_ws_created(web_socket_client):
     print("\n New WebSocket connection created:")
     print(web_socket_client.get_connection_info())
 
+def on_message(message):
+    print("\n WebSocket message:\n")
+    print(json.loads(message))
+
 async def main():
     load_dotenv(override=True)
     sdk = SDK(
@@ -31,6 +36,7 @@ async def main():
 
     try:
         web_socket_client = sdk.create_web_socket_client()
+        web_socket_client.on(WebSocketEvents.receiveMessage, on_message)
         web_socket_client.on(WebSocketEvents.connectionCreated, on_ws_created)
         web_socket_client.on(WebSocketEvents.subscriptionCreated, on_sub_created)
         web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, on_notification)
