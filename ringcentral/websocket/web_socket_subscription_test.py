@@ -79,6 +79,48 @@ def rejected_creation_response(request, status=403):
     return response
 
 
+def update_response(request, status=200, message_type="ClientRequest"):
+    return [
+        {
+            "type": message_type,
+            "messageId": request[0]["messageId"],
+            "status": status,
+            "headers": {
+                "Server": "nginx",
+                "Date": "Wed, 20 Aug 2025 22:23:55 GMT",
+                "Content-Type": "application/json",
+                "RoutingKey": "SJC01P07",
+                "RCRequestId": "bedff5ae-9d68-4bc9-8653-7e34603ef562-2686696-1-19",
+            },
+        },
+        {
+            "uri": "/restapi/v1.0/subscription/9d3b7f10-5c11-4b6e-8a2f-6f8b56f0f1c2",
+            "id": "9d3b7f10-5c11-4b6e-8a2f-6f8b56f0f1c2",
+            "creationTime": "2025-08-20T22:23:55.169Z",
+            "status": "Active",
+            "eventFilters": request[1]["eventFilters"],
+            "expirationTime": "2025-08-21T22:23:55.169Z",
+            "expiresIn": 86399,
+            "deliveryMode": {"transportType": "WebSocket", "encryption": False},
+        },
+    ]
+
+
+def removal_response(request, status=200, message_type="ClientRequest"):
+    return [
+        {
+            "type": message_type,
+            "messageId": request[0]["messageId"],
+            "status": status,
+            "headers": {
+                "Server": "nginx",
+                "Date": "Wed, 20 Aug 2025 22:23:55 GMT",
+                "RCRequestId": "bedff5ae-9d68-4bc9-8653-7e34603ef562-2686696-1-19",
+            },
+        }
+    ]
+
+
 EVENT_FILTERS = ["/restapi/v1.0/account/~/extension/~/presence"]
 OTHER_FILTERS = ["/restapi/v1.0/account/~/extension/~/message-store"]
 
@@ -300,6 +342,487 @@ class WebSocketSubscriptionTest(unittest.IsolatedAsyncioTestCase):
         self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(server_notification()))
         self.assertEqual(len(notifications.calls), 2)
         self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+    async def test_update_send_without_response_emits_nothing_and_preserves_confirmed_state(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        updated = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+
+        self.web_socket_client._responder = None
+        await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertEqual(self.web_socket_client.sent_messages[1][0]["method"], "PUT")
+        self.assertEqual(self.web_socket_client.sent_messages[1][1]["eventFilters"], OTHER_FILTERS)
+        self.assertEqual(updated.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+    async def test_confirmed_update_response_commits_envelope_and_filters_before_single_event(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+
+        observed_at_event = []
+
+        def on_updated(updated_subscription):
+            observed_at_event.append(updated_subscription.get_subscription_info())
+
+        updated = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, on_updated)
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+
+        self.web_socket_client._responder = update_response
+        await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(len(updated.calls), 1)
+        self.assertIs(updated.calls[0][0], subscription)
+        self.assertEqual(failed.calls, [])
+        stored = subscription.get_subscription_info()
+        self.assertEqual(
+            stored[0]["messageId"], self.web_socket_client.sent_messages[1][0]["messageId"]
+        )
+        self.assertEqual(stored[1]["id"], "9d3b7f10-5c11-4b6e-8a2f-6f8b56f0f1c2")
+        self.assertEqual(stored[1]["eventFilters"], OTHER_FILTERS)
+        self.assertEqual(observed_at_event, [stored])
+
+        self.web_socket_client._responder = None
+        await subscription.update()
+        self.assertEqual(self.web_socket_client.sent_messages[2][1]["eventFilters"], OTHER_FILTERS)
+
+    async def test_rejected_update_response_emits_single_error_preserves_state_and_permits_retry(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        updated = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+
+        self.web_socket_client._responder = lambda request: update_response(request, status=404)
+        await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(len(failed.calls), 1)
+        error = failed.calls[0][0]
+        self.assertIsInstance(error, Exception)
+        self.assertEqual(
+            str(error), "WebSocket subscription update failed with status 404"
+        )
+        self.assertEqual(updated.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+
+        self.web_socket_client._responder = update_response
+        await subscription.update()
+
+        self.assertEqual(len(updated.calls), 1)
+        self.assertEqual(self.web_socket_client.sent_messages[2][1]["eventFilters"], EVENT_FILTERS)
+
+    async def test_unrelated_update_response_is_ignored_and_pending_update_still_completes(self):
+        def unrelated_update_response(request):
+            response = update_response(request)
+            response[0]["messageId"] = "unrelated-" + request[0]["messageId"]
+            return response
+
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        updated = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+
+        self.web_socket_client._responder = unrelated_update_response
+        await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(updated.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+
+        pending_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(update_response(pending_request))
+        )
+
+        self.assertEqual(len(updated.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertEqual(
+            subscription.get_subscription_info()[0]["messageId"], pending_request[0]["messageId"]
+        )
+
+    async def test_update_send_failure_preserves_state_and_permits_retry_after_late_response(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        updated = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+
+        self.web_socket_client._send_error = Exception("connection closed")
+        with self.assertRaises(Exception):
+            await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(updated.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+
+        pending_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(update_response(pending_request))
+        )
+        self.assertEqual(updated.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+
+        self.web_socket_client._responder = update_response
+        await subscription.update()
+
+        self.assertEqual(len(updated.calls), 1)
+        self.assertEqual(self.web_socket_client.sent_messages[2][1]["eventFilters"], EVENT_FILTERS)
+
+    async def test_overlapping_update_and_removal_while_update_pending_are_rejected_without_side_effects(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        updated = RecordingHandler()
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+
+        self.web_socket_client._responder = None
+        await subscription.update(events=OTHER_FILTERS)
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+
+        with self.assertRaises(Exception):
+            await subscription.update(events=OTHER_FILTERS)
+        with self.assertRaises(Exception):
+            await subscription.remove()
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(updated.calls, [])
+        self.assertEqual(removed.calls, [])
+
+        pending_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(update_response(pending_request, status=403))
+        )
+        self.assertEqual(len(failed.calls), 1)
+        self.assertEqual(updated.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+
+        self.web_socket_client._responder = update_response
+        await subscription.update()
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 3)
+        self.assertEqual(self.web_socket_client.sent_messages[2][1]["eventFilters"], EVENT_FILTERS)
+
+    async def test_removal_send_without_response_preserves_state_listener_and_emits_nothing(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        notifications = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, failed)
+        self.web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        self.web_socket_client._responder = None
+        await subscription.remove()
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertEqual(self.web_socket_client.sent_messages[1][0]["method"], "DELETE")
+        self.assertEqual(removed.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(server_notification()))
+        self.assertEqual(len(notifications.calls), 1)
+
+    async def test_confirmed_removal_clears_state_and_detaches_listener_before_single_event(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        notifications = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        observed_at_event = []
+
+        def on_removed(*args):
+            observed_at_event.append(
+                (
+                    args,
+                    subscription.get_subscription_info(),
+                    self.web_socket_client.receive_message_listener_count,
+                )
+            )
+
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, on_removed)
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, failed)
+
+        self.web_socket_client._responder = removal_response
+        await subscription.remove()
+
+        self.assertEqual(len(removed.calls), 1)
+        self.assertEqual(removed.calls[0], ())
+        self.assertEqual(failed.calls, [])
+        self.assertEqual(observed_at_event, [((), None, 0)])
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(server_notification()))
+        self.assertEqual(len(notifications.calls), 0)
+
+    async def test_rejected_removal_response_emits_single_error_and_preserves_everything(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+        notifications = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, failed)
+
+        self.web_socket_client._responder = lambda request: removal_response(request, status=404)
+        await subscription.remove()
+
+        self.assertEqual(len(failed.calls), 1)
+        error = failed.calls[0][0]
+        self.assertIsInstance(error, Exception)
+        self.assertEqual(
+            str(error), "WebSocket subscription removal failed with status 404"
+        )
+        self.assertEqual(removed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(server_notification()))
+        self.assertEqual(len(notifications.calls), 1)
+
+        self.web_socket_client._responder = removal_response
+        await subscription.remove()
+
+        self.assertEqual(len(removed.calls), 1)
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+    async def test_unrelated_removal_response_is_ignored_and_pending_removal_still_completes(self):
+        def unrelated_removal_response(request):
+            response = removal_response(request)
+            response[0]["messageId"] = "unrelated-" + request[0]["messageId"]
+            return response
+
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, failed)
+
+        self.web_socket_client._responder = unrelated_removal_response
+        await subscription.remove()
+
+        self.assertEqual(removed.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+        pending_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(removal_response(pending_request))
+        )
+
+        self.assertEqual(len(removed.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+    async def test_removal_send_failure_preserves_state_and_listener_and_permits_retry(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, failed)
+
+        self.web_socket_client._send_error = Exception("connection closed")
+        with self.assertRaises(Exception):
+            await subscription.remove()
+
+        self.assertEqual(removed.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+        pending_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(removal_response(pending_request))
+        )
+        self.assertEqual(removed.calls, [])
+        self.assertEqual(failed.calls, [])
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+        self.web_socket_client._responder = removal_response
+        await subscription.remove()
+
+        self.assertEqual(len(removed.calls), 1)
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+    async def test_overlapping_removal_and_update_while_removal_pending_are_rejected_without_side_effects(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        confirmed = subscription.get_subscription_info()
+
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, failed)
+
+        self.web_socket_client._responder = None
+        await subscription.remove()
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+
+        with self.assertRaises(Exception):
+            await subscription.remove()
+        with self.assertRaises(Exception):
+            await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertIs(subscription.get_subscription_info(), confirmed)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+        self.assertEqual(removed.calls, [])
+        self.assertEqual(failed.calls, [])
+
+        pending_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(removal_response(pending_request))
+        )
+        self.assertEqual(len(removed.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+    async def test_duplicate_and_late_responses_after_completion_produce_no_events_or_changes(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+        creation_request = self.web_socket_client.sent_messages[0]
+
+        updated = RecordingHandler()
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        remove_failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, remove_failed)
+
+        self.web_socket_client._responder = update_response
+        await subscription.update(events=OTHER_FILTERS)
+        self.assertEqual(len(updated.calls), 1)
+        stored = subscription.get_subscription_info()
+
+        update_request = self.web_socket_client.sent_messages[1]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(update_response(update_request))
+        )
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(creation_response(creation_request))
+        )
+        self.assertEqual(len(updated.calls), 1)
+        self.assertIs(subscription.get_subscription_info(), stored)
+        self.assertEqual(failed.calls, [])
+        self.assertEqual(removed.calls, [])
+
+        self.web_socket_client._responder = removal_response
+        await subscription.remove()
+        self.assertEqual(len(removed.calls), 1)
+        self.assertIsNone(subscription.get_subscription_info())
+
+        removal_request = self.web_socket_client.sent_messages[2]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(removal_response(removal_request))
+        )
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(update_response(update_request))
+        )
+        self.assertEqual(len(removed.calls), 1)
+        self.assertEqual(len(updated.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertEqual(remove_failed.calls, [])
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+    async def test_responses_correlated_by_message_id_regardless_of_type(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        await subscription.subscribe(events=EVENT_FILTERS)
+
+        updated = RecordingHandler()
+        removed = RecordingHandler()
+        failed = RecordingHandler()
+        remove_failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.web_socket_client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.web_socket_client.on(WebSocketEvents.updateSubscriptionError, failed)
+        self.web_socket_client.on(WebSocketEvents.removeSubscriptionError, remove_failed)
+
+        self.web_socket_client._responder = lambda request: update_response(
+            request, message_type="ClientResponse"
+        )
+        await subscription.update(events=OTHER_FILTERS)
+
+        self.assertEqual(len(updated.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertIsNotNone(subscription.get_subscription_info())
+
+        self.web_socket_client._responder = lambda request: removal_response(
+            request, message_type="ClientResponse"
+        )
+        await subscription.remove()
+
+        self.assertEqual(len(removed.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertEqual(remove_failed.calls, [])
+        self.assertIsNone(subscription.get_subscription_info())
 
 
 if __name__ == "__main__":

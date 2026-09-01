@@ -15,7 +15,17 @@ class WebSocketSubscription(Observable):
         self._event_filters = []
         self._subscription = None
         self._pending_creation_message_id = None
+        self._pending_update_message_id = None
+        self._pending_update_filters = None
+        self._pending_removal_message_id = None
         self._receive_message_listener_attached = False
+
+    def _operation_pending(self):
+        return (
+            self._pending_creation_message_id is not None
+            or self._pending_update_message_id is not None
+            or self._pending_removal_message_id is not None
+        )
 
     def on_message(self, message):
         message_json = json.loads(message)
@@ -32,6 +42,36 @@ class WebSocketSubscription(Observable):
             else:
                 error = Exception(f"WebSocket subscription creation failed with status {status}")
                 self._web_socket_client.trigger(WebSocketEvents.createSubscriptionError, error)
+        elif(
+            self._pending_update_message_id is not None
+            and message_json[0].get('messageId') == self._pending_update_message_id
+        ):
+            status = message_json[0].get('status', 0)
+            proposed_filters = self._pending_update_filters
+            self._pending_update_message_id = None
+            self._pending_update_filters = None
+            if 200 <= status < 300:
+                self.set_subscription(message_json)
+                self.set_events(proposed_filters)
+                self._web_socket_client.trigger(WebSocketEvents.subscriptionUpdated, self)
+            else:
+                error = Exception(f"WebSocket subscription update failed with status {status}")
+                self._web_socket_client.trigger(WebSocketEvents.updateSubscriptionError, error)
+        elif(
+            self._pending_removal_message_id is not None
+            and message_json[0].get('messageId') == self._pending_removal_message_id
+        ):
+            status = message_json[0].get('status', 0)
+            self._pending_removal_message_id = None
+            if 200 <= status < 300:
+                if self._receive_message_listener_attached:
+                    self._web_socket_client.off(WebSocketEvents.receiveMessage, self.on_message)
+                    self._receive_message_listener_attached = False
+                self.reset()
+                self._web_socket_client.trigger(WebSocketEvents.subscriptionRemoved)
+            else:
+                error = Exception(f"WebSocket subscription removal failed with status {status}")
+                self._web_socket_client.trigger(WebSocketEvents.removeSubscriptionError, error)
         elif message_json[0].get('type') == 'ServerNotification':
             self._web_socket_client.trigger(WebSocketEvents.receiveSubscriptionNotification, message_json)
 
@@ -90,15 +130,18 @@ class WebSocketSubscription(Observable):
             raise
 
     async def update(self, events=None):
-        if events:
-            self.set_events(events)
+        if self._operation_pending():
+            raise Exception("Subscription update is already in progress")
 
-        if not self._event_filters or len(self._event_filters) == 0:
+        proposed_filters = events if events else self._event_filters
+        if not proposed_filters or len(proposed_filters) == 0:
             raise Exception("Events are undefined")
 
         try:
             subscriptionId = self._subscription[1]["id"]
             messageId = str(uuid.uuid4())
+            self._pending_update_message_id = messageId
+            self._pending_update_filters = proposed_filters
             requestBodyJson = [
                 {
                     "type": "ClientRequest",
@@ -107,25 +150,29 @@ class WebSocketSubscription(Observable):
                     "path": f"/restapi/v1.0/subscription/{subscriptionId}",
                 },
                 {
-                    "eventFilters": self._event_filters,
+                    "eventFilters": proposed_filters,
                     "deliveryMode": {"transportType": "WebSocket"},
                 },
             ]
             await self._web_socket_client.send_message(requestBodyJson)
-            self._web_socket_client.trigger(WebSocketEvents.subscriptionUpdated, self)
 
         except Exception as e:
-            self.reset()
+            self._pending_update_message_id = None
+            self._pending_update_filters = None
             print(e)
             raise
 
     async def remove(self):
+        if self._operation_pending():
+            raise Exception("Subscription removal is already in progress")
+
         subscriptionId = self._subscription[1]["id"]
         if not subscriptionId:
             raise Exception("Missing subscriptionId")
 
         try:
             messageId = str(uuid.uuid4())
+            self._pending_removal_message_id = messageId
             requestBodyJson = [
                 {
                     "type": "ClientRequest",
@@ -136,15 +183,9 @@ class WebSocketSubscription(Observable):
             ]
 
             await self._web_socket_client.send_message(requestBodyJson)
-            if self._receive_message_listener_attached:
-                self._web_socket_client.off(WebSocketEvents.receiveMessage, self.on_message)
-                self._receive_message_listener_attached = False
-            self._web_socket_client.trigger(WebSocketEvents.subscriptionRemoved)
-
-            self.reset()
 
         except Exception as e:
-            self.reset()
+            self._pending_removal_message_id = None
             print(e)
             raise
 
