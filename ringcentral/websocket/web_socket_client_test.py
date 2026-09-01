@@ -30,7 +30,13 @@ class FakeWebSocket:
         self.sent = []
         self.received = []
         self.closed = False
+        self._fail_next_recv = False
+        self._receive_error = None
         self._frames = asyncio.Queue()
+
+    def fail_next_receive(self, error):
+        self._fail_next_recv = True
+        self._receive_error = error
 
     def push(self, frame):
         self._frames.put_nowait(frame)
@@ -39,7 +45,12 @@ class FakeWebSocket:
         return self._frames.qsize() > 0
 
     async def recv(self):
+        if self._fail_next_recv:
+            self._fail_next_recv = False
+            raise self._receive_error
         frame = await self._frames.get()
+        if frame is None:
+            raise ConnectionResetError("connection closed")
         self.received.append(frame)
         return frame
 
@@ -48,6 +59,7 @@ class FakeWebSocket:
 
     async def close(self):
         self.closed = True
+        self._frames.put_nowait(None)
 
 
 class RecordingHandler:
@@ -293,6 +305,121 @@ class WebSocketClientTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(failing.calls, [(self.client,)])
         self.assertEqual(healthy.calls, [])
+
+    async def test_recv_failure_after_handshake_reports_receive_error_and_cleans_up(self):
+        receive_error = RuntimeError("receive failure")
+        receive_errors = RecordingHandler()
+        connection_errors = RecordingHandler()
+        self.client.on(WebSocketEvents.receiveMessageError, receive_errors)
+        self.client.on(WebSocketEvents.createConnectionError, connection_errors)
+
+        sockets = []
+
+        def on_connected(*_):
+            sockets[0].fail_next_receive(receive_error)
+
+        self.client.on(WebSocketEvents.connectionCreated, on_connected)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        sockets.append(fake_socket)
+
+        result = await connection_task
+
+        self.assertIsNone(result)
+        self.assertEqual(len(receive_errors.calls), 1)
+        self.assertEqual(len(receive_errors.calls[0]), 1)
+        self.assertIs(receive_errors.calls[0][0], receive_error)
+        self.assertEqual(connection_errors.calls, [])
+        self.assertFalse(self.client._is_ready)
+        await self.wait_until(lambda: self.client._heartbeat_task.done())
+        self.assertTrue(self.client._heartbeat_task.cancelled())
+
+    async def test_receive_loop_cancellation_marks_client_not_ready_and_cancels_heartbeat(self):
+        receive_errors = RecordingHandler()
+        connection_errors = RecordingHandler()
+        self.client.on(WebSocketEvents.receiveMessageError, receive_errors)
+        self.client.on(WebSocketEvents.createConnectionError, connection_errors)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+        self.assertTrue(self.client._is_ready)
+
+        await self.stop_receive_loop(connection_task)
+
+        self.assertFalse(self.client._is_ready)
+        await self.wait_until(lambda: self.client._heartbeat_task.done())
+        self.assertTrue(self.client._heartbeat_task.cancelled())
+        self.assertEqual(receive_errors.calls, [])
+        self.assertEqual(connection_errors.calls, [])
+
+    async def test_intentional_close_performs_cleanup_without_receive_error(self):
+        receive_errors = RecordingHandler()
+        connection_errors = RecordingHandler()
+        close_errors = RecordingHandler()
+        self.client.on(WebSocketEvents.receiveMessageError, receive_errors)
+        self.client.on(WebSocketEvents.createConnectionError, connection_errors)
+        self.client.on(WebSocketEvents.closeConnectionError, close_errors)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        await self.client.close_connection()
+        result = await connection_task
+
+        self.assertIsNone(result)
+        self.assertTrue(fake_socket.closed)
+        self.assertFalse(self.client._is_ready)
+        await self.wait_until(lambda: self.client._heartbeat_task.done())
+        self.assertTrue(self.client._heartbeat_task.cancelled())
+        self.assertEqual(receive_errors.calls, [])
+        self.assertEqual(connection_errors.calls, [])
+        self.assertEqual(close_errors.calls, [])
+
+    async def test_connection_establishment_failure_retains_create_connection_error(self):
+        connect_error = RuntimeError("connect failure")
+        receive_errors = RecordingHandler()
+        connection_errors = RecordingHandler()
+        self.client.on(WebSocketEvents.receiveMessageError, receive_errors)
+        self.client.on(WebSocketEvents.createConnectionError, connection_errors)
+
+        async def connect(uri):
+            raise connect_error
+
+        with mock.patch("websockets.connect", connect):
+            with self.assertRaises(RuntimeError):
+                await self.client.create_new_connection()
+
+        self.assertTrue(connection_errors.calls)
+        for call in connection_errors.calls:
+            self.assertIs(call[0], connect_error)
+        self.assertEqual(receive_errors.calls, [])
+
+    async def test_initial_handshake_failure_retains_create_connection_error(self):
+        handshake_error = RuntimeError("handshake failure")
+        receive_errors = RecordingHandler()
+        connection_errors = RecordingHandler()
+        self.client.on(WebSocketEvents.receiveMessageError, receive_errors)
+        self.client.on(WebSocketEvents.createConnectionError, connection_errors)
+
+        fake_socket = FakeWebSocket()
+        fake_socket.fail_next_receive(handshake_error)
+
+        async def connect(uri):
+            return fake_socket
+
+        with mock.patch("websockets.connect", connect):
+            with self.assertRaises(RuntimeError):
+                await self.client.create_new_connection()
+
+        self.assertTrue(connection_errors.calls)
+        for call in connection_errors.calls:
+            self.assertIs(call[0], handshake_error)
+        self.assertEqual(receive_errors.calls, [])
+        self.assertFalse(self.client._is_ready)
+        self.assertIsNone(self.client._heartbeat_task)
 
 
 if __name__ == "__main__":

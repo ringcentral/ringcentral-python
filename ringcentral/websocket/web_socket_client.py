@@ -15,6 +15,7 @@ class WebSocketClient(Observable):
         self._web_socket = None
         self._done = False
         self._is_ready = False
+        self._heartbeat_task = None
         self._send_attempt_counter = 0
 
     async def create_new_connection(self):
@@ -81,38 +82,50 @@ class WebSocketClient(Observable):
                 - Triggers the connectionCreated event upon successful connection establishment.
                 - Listens for incoming messages and triggers the receiveMessage event for each received message.
                 - Isolates receive-message handler failures so a handler that raises does not stop delivery to the remaining handlers or reception of future messages; each failure triggers the receiveMessageError event with the original exception.
-                - Triggers the createConnectionError event if an error occurs during the connection process and raises the exception.
+                - Triggers the createConnectionError event if an error occurs while establishing the connection or during the initial handshake, and raises the exception.
+                - A failure from receiving messages after the initial handshake triggers the receiveMessageError event once; it is not reported as a connection-creation error and does not propagate to the connection-setup or recovery wrappers.
+                - When the receive loop terminates (receive failure, cancellation, or intentional closure), the client is marked not ready and its heartbeat task is cancelled.
+                - An intentional closure does not trigger the receiveMessageError event.
         """
         try:
             websocket = await websockets.connect(
                 f"{ws_uri}?access_token={ws_access_token}"
             )
             connectionMessage = await websocket.recv()
-            connection_info = {}
-            connection_info["connection"] = websocket
-            connection_info["connection_details"] = connectionMessage
-            self._web_socket = connection_info
-            self._is_ready = True
-            self.trigger(WebSocketEvents.connectionCreated, self)
+        except Exception as e:
+            self.trigger(WebSocketEvents.createConnectionError, e)
+            raise
 
-            # heartbeat every 10 minutes
-            async def timer_function():
-                while True:
-                    if self._done:
-                        timer.cancel()
-                        break
-                    await asyncio.sleep(600)
-                    await self.send_message([{"type": "Heartbeat", "messageId": str(uuid.uuid4())}])
-            timer = asyncio.create_task(timer_function())
+        connection_info = {}
+        connection_info["connection"] = websocket
+        connection_info["connection_details"] = connectionMessage
+        self._web_socket = connection_info
+        self._is_ready = True
+        self.trigger(WebSocketEvents.connectionCreated, self)
 
+        # heartbeat every 10 minutes
+        async def timer_function():
+            while True:
+                if self._done:
+                    timer.cancel()
+                    break
+                await asyncio.sleep(600)
+                await self.send_message([{"type": "Heartbeat", "messageId": str(uuid.uuid4())}])
+        timer = asyncio.create_task(timer_function())
+        self._heartbeat_task = timer
+
+        try:
             await asyncio.sleep(0)
             while True:
                 message = await websocket.recv()
                 self.trigger(WebSocketEvents.receiveMessage, message)
                 await asyncio.sleep(0)
         except Exception as e:
-            self.trigger(WebSocketEvents.createConnectionError, e)
-            raise
+            if not self._done:
+                self.trigger(WebSocketEvents.receiveMessageError, e)
+        finally:
+            self._is_ready = False
+            timer.cancel()
 
     def trigger(self, event, *args, **kw):
         """
