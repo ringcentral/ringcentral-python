@@ -103,7 +103,7 @@
                         <label class="view-source-button" for="mod-events-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="k">class</span><span class="w"> </span><span class="nc">WebSocketEvents</span><span class="p">:</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="w">    </span><span class="sd">"""</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">        WebSocketEvents class representing various events related to WebSocket communication.</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">        Attributes:</span>
@@ -122,22 +122,22 @@
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">            subscriptionUpdated (str): Event triggered when a subscription is successfully updated.</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">            subscriptionRemoved (str): Event triggered when a subscription is successfully removed.</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">            receiveSubscriptionNotification (str): Event triggered when a subscription notification is received.</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">getTokenError</span> <span class="o">=</span> <span class="s1">&#39;getTokenError&#39;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">createConnectionError</span> <span class="o">=</span> <span class="s1">&#39;createConnectionError&#39;</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">connectionCreated</span> <span class="o">=</span> <span class="s1">&#39;connectionCreated&#39;</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">closeConnectionError</span> <span class="o">=</span> <span class="s1">&#39;closeConnectionError&#39;</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="n">recoverConnectionError</span> <span class="o">=</span> <span class="s1">&#39;recoverConnectionError&#39;</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="n">receiveMessage</span> <span class="o">=</span> <span class="s1">&#39;receiveMessage&#39;</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="n">sendMessageError</span> <span class="o">=</span> <span class="s1">&#39;sendMessageError&#39;</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="n">connectionNotReady</span> <span class="o">=</span> <span class="s1">&#39;connectionNotReady&#39;</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="n">createSubscriptionError</span> <span class="o">=</span> <span class="s1">&#39;createSubscriptionError&#39;</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="n">updateSubscriptionError</span> <span class="o">=</span> <span class="s1">&#39;updateSubscriptionError&#39;</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="n">removeSubscriptionError</span> <span class="o">=</span> <span class="s1">&#39;removeSubscriptionError&#39;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="n">subscriptionCreated</span> <span class="o">=</span> <span class="s1">&#39;subscriptionCreated&#39;</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="n">subscriptionUpdated</span> <span class="o">=</span> <span class="s1">&#39;subscriptionUpdated&#39;</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="n">subscriptionRemoved</span> <span class="o">=</span> <span class="s1">&#39;subscriptionRemoved&#39;</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="n">receiveSubscriptionNotification</span> <span class="o">=</span> <span class="s1">&#39;receiveSubscriptionNotification&#39;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">    """</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">getTokenError</span> <span class="o">=</span> <span class="s1">'getTokenError'</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">createConnectionError</span> <span class="o">=</span> <span class="s1">'createConnectionError'</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">connectionCreated</span> <span class="o">=</span> <span class="s1">'connectionCreated'</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">closeConnectionError</span> <span class="o">=</span> <span class="s1">'closeConnectionError'</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="n">recoverConnectionError</span> <span class="o">=</span> <span class="s1">'recoverConnectionError'</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="n">receiveMessage</span> <span class="o">=</span> <span class="s1">'receiveMessage'</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="n">sendMessageError</span> <span class="o">=</span> <span class="s1">'sendMessageError'</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="n">connectionNotReady</span> <span class="o">=</span> <span class="s1">'connectionNotReady'</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="n">createSubscriptionError</span> <span class="o">=</span> <span class="s1">'createSubscriptionError'</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="n">updateSubscriptionError</span> <span class="o">=</span> <span class="s1">'updateSubscriptionError'</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="n">removeSubscriptionError</span> <span class="o">=</span> <span class="s1">'removeSubscriptionError'</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="n">subscriptionCreated</span> <span class="o">=</span> <span class="s1">'subscriptionCreated'</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="n">subscriptionUpdated</span> <span class="o">=</span> <span class="s1">'subscriptionUpdated'</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="n">subscriptionRemoved</span> <span class="o">=</span> <span class="s1">'subscriptionRemoved'</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="n">receiveSubscriptionNotification</span> <span class="o">=</span> <span class="s1">'receiveSubscriptionNotification'</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>        <span class="k">pass</span>
@@ -157,7 +157,7 @@
     </div>
     <a class="headerlink" href="#WebSocketEvents"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="WebSocketEvents-3"><a href="#WebSocketEvents-3"><span class="linenos"> 3</span></a><span class="k">class</span><span class="w"> </span><span class="nc">WebSocketEvents</span><span class="p">:</span>
-</span><span id="WebSocketEvents-4"><a href="#WebSocketEvents-4"><span class="linenos"> 4</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="WebSocketEvents-4"><a href="#WebSocketEvents-4"><span class="linenos"> 4</span></a><span class="w">    </span><span class="sd">"""</span>
 </span><span id="WebSocketEvents-5"><a href="#WebSocketEvents-5"><span class="linenos"> 5</span></a><span class="sd">        WebSocketEvents class representing various events related to WebSocket communication.</span>
 </span><span id="WebSocketEvents-6"><a href="#WebSocketEvents-6"><span class="linenos"> 6</span></a>
 </span><span id="WebSocketEvents-7"><a href="#WebSocketEvents-7"><span class="linenos"> 7</span></a><span class="sd">        Attributes:</span>
@@ -176,22 +176,22 @@
 </span><span id="WebSocketEvents-20"><a href="#WebSocketEvents-20"><span class="linenos">20</span></a><span class="sd">            subscriptionUpdated (str): Event triggered when a subscription is successfully updated.</span>
 </span><span id="WebSocketEvents-21"><a href="#WebSocketEvents-21"><span class="linenos">21</span></a><span class="sd">            subscriptionRemoved (str): Event triggered when a subscription is successfully removed.</span>
 </span><span id="WebSocketEvents-22"><a href="#WebSocketEvents-22"><span class="linenos">22</span></a><span class="sd">            receiveSubscriptionNotification (str): Event triggered when a subscription notification is received.</span>
-</span><span id="WebSocketEvents-23"><a href="#WebSocketEvents-23"><span class="linenos">23</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="WebSocketEvents-24"><a href="#WebSocketEvents-24"><span class="linenos">24</span></a>    <span class="n">getTokenError</span> <span class="o">=</span> <span class="s1">&#39;getTokenError&#39;</span>
-</span><span id="WebSocketEvents-25"><a href="#WebSocketEvents-25"><span class="linenos">25</span></a>    <span class="n">createConnectionError</span> <span class="o">=</span> <span class="s1">&#39;createConnectionError&#39;</span>
-</span><span id="WebSocketEvents-26"><a href="#WebSocketEvents-26"><span class="linenos">26</span></a>    <span class="n">connectionCreated</span> <span class="o">=</span> <span class="s1">&#39;connectionCreated&#39;</span>
-</span><span id="WebSocketEvents-27"><a href="#WebSocketEvents-27"><span class="linenos">27</span></a>    <span class="n">closeConnectionError</span> <span class="o">=</span> <span class="s1">&#39;closeConnectionError&#39;</span>
-</span><span id="WebSocketEvents-28"><a href="#WebSocketEvents-28"><span class="linenos">28</span></a>    <span class="n">recoverConnectionError</span> <span class="o">=</span> <span class="s1">&#39;recoverConnectionError&#39;</span>
-</span><span id="WebSocketEvents-29"><a href="#WebSocketEvents-29"><span class="linenos">29</span></a>    <span class="n">receiveMessage</span> <span class="o">=</span> <span class="s1">&#39;receiveMessage&#39;</span>
-</span><span id="WebSocketEvents-30"><a href="#WebSocketEvents-30"><span class="linenos">30</span></a>    <span class="n">sendMessageError</span> <span class="o">=</span> <span class="s1">&#39;sendMessageError&#39;</span>
-</span><span id="WebSocketEvents-31"><a href="#WebSocketEvents-31"><span class="linenos">31</span></a>    <span class="n">connectionNotReady</span> <span class="o">=</span> <span class="s1">&#39;connectionNotReady&#39;</span>
-</span><span id="WebSocketEvents-32"><a href="#WebSocketEvents-32"><span class="linenos">32</span></a>    <span class="n">createSubscriptionError</span> <span class="o">=</span> <span class="s1">&#39;createSubscriptionError&#39;</span>
-</span><span id="WebSocketEvents-33"><a href="#WebSocketEvents-33"><span class="linenos">33</span></a>    <span class="n">updateSubscriptionError</span> <span class="o">=</span> <span class="s1">&#39;updateSubscriptionError&#39;</span>
-</span><span id="WebSocketEvents-34"><a href="#WebSocketEvents-34"><span class="linenos">34</span></a>    <span class="n">removeSubscriptionError</span> <span class="o">=</span> <span class="s1">&#39;removeSubscriptionError&#39;</span>
-</span><span id="WebSocketEvents-35"><a href="#WebSocketEvents-35"><span class="linenos">35</span></a>    <span class="n">subscriptionCreated</span> <span class="o">=</span> <span class="s1">&#39;subscriptionCreated&#39;</span>
-</span><span id="WebSocketEvents-36"><a href="#WebSocketEvents-36"><span class="linenos">36</span></a>    <span class="n">subscriptionUpdated</span> <span class="o">=</span> <span class="s1">&#39;subscriptionUpdated&#39;</span>
-</span><span id="WebSocketEvents-37"><a href="#WebSocketEvents-37"><span class="linenos">37</span></a>    <span class="n">subscriptionRemoved</span> <span class="o">=</span> <span class="s1">&#39;subscriptionRemoved&#39;</span>
-</span><span id="WebSocketEvents-38"><a href="#WebSocketEvents-38"><span class="linenos">38</span></a>    <span class="n">receiveSubscriptionNotification</span> <span class="o">=</span> <span class="s1">&#39;receiveSubscriptionNotification&#39;</span>
+</span><span id="WebSocketEvents-23"><a href="#WebSocketEvents-23"><span class="linenos">23</span></a><span class="sd">    """</span>
+</span><span id="WebSocketEvents-24"><a href="#WebSocketEvents-24"><span class="linenos">24</span></a>    <span class="n">getTokenError</span> <span class="o">=</span> <span class="s1">'getTokenError'</span>
+</span><span id="WebSocketEvents-25"><a href="#WebSocketEvents-25"><span class="linenos">25</span></a>    <span class="n">createConnectionError</span> <span class="o">=</span> <span class="s1">'createConnectionError'</span>
+</span><span id="WebSocketEvents-26"><a href="#WebSocketEvents-26"><span class="linenos">26</span></a>    <span class="n">connectionCreated</span> <span class="o">=</span> <span class="s1">'connectionCreated'</span>
+</span><span id="WebSocketEvents-27"><a href="#WebSocketEvents-27"><span class="linenos">27</span></a>    <span class="n">closeConnectionError</span> <span class="o">=</span> <span class="s1">'closeConnectionError'</span>
+</span><span id="WebSocketEvents-28"><a href="#WebSocketEvents-28"><span class="linenos">28</span></a>    <span class="n">recoverConnectionError</span> <span class="o">=</span> <span class="s1">'recoverConnectionError'</span>
+</span><span id="WebSocketEvents-29"><a href="#WebSocketEvents-29"><span class="linenos">29</span></a>    <span class="n">receiveMessage</span> <span class="o">=</span> <span class="s1">'receiveMessage'</span>
+</span><span id="WebSocketEvents-30"><a href="#WebSocketEvents-30"><span class="linenos">30</span></a>    <span class="n">sendMessageError</span> <span class="o">=</span> <span class="s1">'sendMessageError'</span>
+</span><span id="WebSocketEvents-31"><a href="#WebSocketEvents-31"><span class="linenos">31</span></a>    <span class="n">connectionNotReady</span> <span class="o">=</span> <span class="s1">'connectionNotReady'</span>
+</span><span id="WebSocketEvents-32"><a href="#WebSocketEvents-32"><span class="linenos">32</span></a>    <span class="n">createSubscriptionError</span> <span class="o">=</span> <span class="s1">'createSubscriptionError'</span>
+</span><span id="WebSocketEvents-33"><a href="#WebSocketEvents-33"><span class="linenos">33</span></a>    <span class="n">updateSubscriptionError</span> <span class="o">=</span> <span class="s1">'updateSubscriptionError'</span>
+</span><span id="WebSocketEvents-34"><a href="#WebSocketEvents-34"><span class="linenos">34</span></a>    <span class="n">removeSubscriptionError</span> <span class="o">=</span> <span class="s1">'removeSubscriptionError'</span>
+</span><span id="WebSocketEvents-35"><a href="#WebSocketEvents-35"><span class="linenos">35</span></a>    <span class="n">subscriptionCreated</span> <span class="o">=</span> <span class="s1">'subscriptionCreated'</span>
+</span><span id="WebSocketEvents-36"><a href="#WebSocketEvents-36"><span class="linenos">36</span></a>    <span class="n">subscriptionUpdated</span> <span class="o">=</span> <span class="s1">'subscriptionUpdated'</span>
+</span><span id="WebSocketEvents-37"><a href="#WebSocketEvents-37"><span class="linenos">37</span></a>    <span class="n">subscriptionRemoved</span> <span class="o">=</span> <span class="s1">'subscriptionRemoved'</span>
+</span><span id="WebSocketEvents-38"><a href="#WebSocketEvents-38"><span class="linenos">38</span></a>    <span class="n">receiveSubscriptionNotification</span> <span class="o">=</span> <span class="s1">'receiveSubscriptionNotification'</span>
 </span><span id="WebSocketEvents-39"><a href="#WebSocketEvents-39"><span class="linenos">39</span></a>
 </span><span id="WebSocketEvents-40"><a href="#WebSocketEvents-40"><span class="linenos">40</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="WebSocketEvents-41"><a href="#WebSocketEvents-41"><span class="linenos">41</span></a>        <span class="k">pass</span>
