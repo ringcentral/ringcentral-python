@@ -80,6 +80,7 @@ def rejected_creation_response(request, status=403):
 
 
 EVENT_FILTERS = ["/restapi/v1.0/account/~/extension/~/presence"]
+OTHER_FILTERS = ["/restapi/v1.0/account/~/extension/~/message-store"]
 
 
 def server_notification():
@@ -225,6 +226,32 @@ class WebSocketSubscriptionTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(created.calls), 1)
         self.assertEqual(failed.calls, [])
         self.assertIsNotNone(subscription.get_subscription_info())
+
+    async def test_second_creation_while_pending_leaves_original_filters_for_update(self):
+        self.web_socket_client._responder = None
+        subscription = WebSocketSubscription(self.web_socket_client)
+        created = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionCreated, created)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+        self.assertEqual(len(self.web_socket_client.sent_messages), 1)
+
+        with self.assertRaises(Exception):
+            await subscription.subscribe(events=OTHER_FILTERS)
+
+        pending_request = self.web_socket_client.sent_messages[0]
+        self.web_socket_client._responder = creation_response
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(creation_response(pending_request))
+        )
+        self.assertEqual(len(created.calls), 1)
+
+        await subscription.update()
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertEqual(
+            self.web_socket_client.sent_messages[1][1]["eventFilters"], EVENT_FILTERS
+        )
 
     async def test_failed_send_clears_pending_and_new_listener_and_retry_succeeds(self):
         self.web_socket_client._responder = creation_response

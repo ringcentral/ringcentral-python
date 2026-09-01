@@ -49,14 +49,14 @@ class WebSocketSubscription(Observable):
         self._event_filters = events
 
     async def subscribe(self, events=None):
+        if self._pending_creation_message_id is not None:
+            raise Exception("Subscription creation is already in progress")
+
         if events:
             self.set_events(events)
 
         if not self._event_filters or len(self._event_filters) == 0:
             raise Exception("Events are undefined")
-
-        if self._pending_creation_message_id is not None:
-            raise Exception("Subscription creation is already in progress")
 
         newly_attached = False
         try:
