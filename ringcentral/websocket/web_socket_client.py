@@ -87,6 +87,7 @@ class WebSocketClient(Observable):
                 - When the receive loop terminates (receive failure, cancellation, or intentional closure), the client is marked not ready and its heartbeat task is cancelled.
                 - An intentional closure does not trigger the receiveMessageError event.
         """
+        self._done = False
         try:
             websocket = await websockets.connect(
                 f"{ws_uri}?access_token={ws_access_token}"

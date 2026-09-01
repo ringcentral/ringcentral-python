@@ -378,6 +378,53 @@ class WebSocketClientTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(connection_errors.calls, [])
         self.assertEqual(close_errors.calls, [])
 
+    async def test_receive_failure_on_reconnected_client_is_reported_after_intentional_close(self):
+        receive_error = RuntimeError("receive failure after reconnect")
+        receive_errors = RecordingHandler()
+        connection_errors = RecordingHandler()
+        close_errors = RecordingHandler()
+        self.client.on(WebSocketEvents.receiveMessageError, receive_errors)
+        self.client.on(WebSocketEvents.createConnectionError, connection_errors)
+        self.client.on(WebSocketEvents.closeConnectionError, close_errors)
+
+        sockets = []
+
+        def fail_latest_socket(*_):
+            sockets[-1].fail_next_receive(receive_error)
+
+        self.client.on(WebSocketEvents.connectionCreated, fail_latest_socket)
+
+        first_socket, connection_task = await self.start_receive_loop()
+        sockets.append(first_socket)
+        first_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        await self.client.close_connection()
+        await connection_task
+        self.assertTrue(first_socket.closed)
+
+        second_socket = FakeWebSocket()
+        sockets.append(second_socket)
+
+        async def connect_again(uri):
+            return second_socket
+
+        with mock.patch("websockets.connect", connect_again):
+            recovery_task = asyncio.create_task(self.client.recover_connection())
+            second_socket.push("[/heartbeat]")
+            await self.wait_until(lambda: self.client._is_ready)
+            result = await recovery_task
+
+        self.assertIsNone(result)
+        self.assertEqual(len(receive_errors.calls), 1)
+        self.assertEqual(len(receive_errors.calls[0]), 1)
+        self.assertIs(receive_errors.calls[0][0], receive_error)
+        self.assertEqual(connection_errors.calls, [])
+        self.assertEqual(close_errors.calls, [])
+        self.assertFalse(self.client._is_ready)
+        await self.wait_until(lambda: self.client._heartbeat_task.done())
+        self.assertTrue(self.client._heartbeat_task.cancelled())
+
     async def test_connection_establishment_failure_retains_create_connection_error(self):
         connect_error = RuntimeError("connect failure")
         receive_errors = RecordingHandler()
