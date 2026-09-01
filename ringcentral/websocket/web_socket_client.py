@@ -80,6 +80,7 @@ class WebSocketClient(Observable):
                 - Upon successful connection, sets up a heartbeat mechanism to maintain the connection.
                 - Triggers the connectionCreated event upon successful connection establishment.
                 - Listens for incoming messages and triggers the receiveMessage event for each received message.
+                - Isolates receive-message handler failures so a handler that raises does not stop delivery to the remaining handlers or reception of future messages; each failure triggers the receiveMessageError event with the original exception.
                 - Triggers the createConnectionError event if an error occurs during the connection process and raises the exception.
         """
         try:
@@ -112,6 +113,51 @@ class WebSocketClient(Observable):
         except Exception as e:
             self.trigger(WebSocketEvents.createConnectionError, e)
             raise
+
+    def trigger(self, event, *args, **kw):
+        """
+            Triggers the handlers registered for an event.
+
+            Args:
+                event (str): The event to trigger.
+                args: The event arguments.
+                kw: The event keyword arguments.
+
+            Returns:
+                bool: True if any handler was triggered, False if the event has no handlers.
+
+            Note:
+                - receiveMessage handlers are invoked independently: if one raises, the remaining handlers still receive the same raw message and one receiveMessageError event is triggered with the original exception.
+                - receiveMessageError handlers are also invoked independently: a failing error handler is contained so error reporting and reception continue.
+                - Every other event keeps the default dispatch behavior.
+        """
+        if event == WebSocketEvents.receiveMessage:
+            return self._trigger_receive_message(*args, **kw)
+        if event == WebSocketEvents.receiveMessageError:
+            return self._trigger_receive_message_error(*args, **kw)
+        return Observable.trigger(self, event, *args, **kw)
+
+    def _trigger_receive_message(self, *args, **kw):
+        handlers = list(self.events.get(WebSocketEvents.receiveMessage) or [])
+        if not handlers:
+            return False
+        for handler in handlers:
+            try:
+                handler(*args, **kw)
+            except Exception as e:
+                self.trigger(WebSocketEvents.receiveMessageError, e)
+        return True
+
+    def _trigger_receive_message_error(self, *args, **kw):
+        handlers = list(self.events.get(WebSocketEvents.receiveMessageError) or [])
+        if not handlers:
+            return False
+        for handler in handlers:
+            try:
+                handler(*args, **kw)
+            except Exception:
+                pass
+        return True
 
     def get_connection_info(self):
         return self._web_socket
