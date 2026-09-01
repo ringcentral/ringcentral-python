@@ -20,13 +20,26 @@ class FakeWebSocketClient(Observable):
     def __init__(self, responder=None, send_error=None):
         Observable.__init__(self)
         self.sent_messages = []
+        self.receive_message_listener_count = 0
         self._responder = responder
         self._send_error = send_error
+
+    def on(self, event, *handlers):
+        if event == WebSocketEvents.receiveMessage:
+            self.receive_message_listener_count += len(handlers)
+        return Observable.on(self, event, *handlers)
+
+    def off(self, event=None, *handlers):
+        if event == WebSocketEvents.receiveMessage:
+            self.receive_message_listener_count -= len(handlers)
+        return Observable.off(self, event, *handlers)
 
     async def send_message(self, message):
         self.sent_messages.append(message)
         if self._send_error is not None:
-            raise self._send_error
+            error = self._send_error
+            self._send_error = None
+            raise error
         if self._responder is not None:
             response = self._responder(message)
             if response is not None:
@@ -60,7 +73,27 @@ def creation_response(request):
     ]
 
 
+def rejected_creation_response(request, status=403):
+    response = creation_response(request)
+    response[0]["status"] = status
+    return response
+
+
 EVENT_FILTERS = ["/restapi/v1.0/account/~/extension/~/presence"]
+
+
+def server_notification():
+    return [
+        {
+            "type": "ServerNotification",
+            "messageId": str(uuid.uuid4()),
+            "headers": {"RoutingKey": "SJC01P07"},
+        },
+        {
+            "uri": "/restapi/v1.0/subscription/1b2a2e6b-2245-4278-b47c-16259ca003a8",
+            "event": {"/restapi/v1.0/account/~/extension/~/presence": {"activeCalls": []}},
+        },
+    ]
 
 
 class WebSocketSubscriptionTest(unittest.IsolatedAsyncioTestCase):
@@ -119,23 +152,127 @@ class WebSocketSubscriptionTest(unittest.IsolatedAsyncioTestCase):
         await subscription.subscribe(events=EVENT_FILTERS)
         self.assertEqual(len(created.calls), 1)
 
-        server_notification = [
-            {
-                "type": "ServerNotification",
-                "messageId": str(uuid.uuid4()),
-                "headers": {"RoutingKey": "SJC01P07"},
-            },
-            {
-                "uri": "/restapi/v1.0/subscription/1b2a2e6b-2245-4278-b47c-16259ca003a8",
-                "event": {"/restapi/v1.0/account/~/extension/~/presence": {"activeCalls": []}},
-            },
-        ]
-        self.web_socket_client.trigger(
-            WebSocketEvents.receiveMessage, json.dumps(server_notification)
-        )
+        notification = server_notification()
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(notification))
 
         self.assertEqual(len(notifications.calls), 1)
-        self.assertEqual(notifications.calls[0][0], server_notification)
+        self.assertEqual(notifications.calls[0][0], notification)
+
+    async def test_rejected_creation_emits_single_error_without_state_or_success(self):
+        self.web_socket_client._responder = rejected_creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        created = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionCreated, created)
+        self.web_socket_client.on(WebSocketEvents.createSubscriptionError, failed)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+
+        self.assertEqual(len(failed.calls), 1)
+        error = failed.calls[0][0]
+        self.assertIsInstance(error, Exception)
+        self.assertEqual(
+            str(error), "WebSocket subscription creation failed with status 403"
+        )
+        self.assertEqual(created.calls, [])
+        self.assertIsNone(subscription.get_subscription_info())
+
+    async def test_retry_after_rejected_creation_sends_new_request_and_can_succeed(self):
+        self.web_socket_client._responder = rejected_creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        created = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionCreated, created)
+        self.web_socket_client.on(WebSocketEvents.createSubscriptionError, failed)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+        self.assertEqual(len(failed.calls), 1)
+
+        self.web_socket_client._responder = creation_response
+        await subscription.subscribe(events=EVENT_FILTERS)
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertEqual(len(failed.calls), 1)
+        self.assertEqual(len(created.calls), 1)
+        self.assertIsNotNone(subscription.get_subscription_info())
+
+    async def test_second_creation_while_pending_is_rejected_without_new_request_or_listener(self):
+        self.web_socket_client._responder = None
+        subscription = WebSocketSubscription(self.web_socket_client)
+        created = RecordingHandler()
+        failed = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionCreated, created)
+        self.web_socket_client.on(WebSocketEvents.createSubscriptionError, failed)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+        self.assertEqual(len(self.web_socket_client.sent_messages), 1)
+        listeners_before = self.web_socket_client.receive_message_listener_count
+
+        with self.assertRaises(Exception):
+            await subscription.subscribe(events=EVENT_FILTERS)
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 1)
+        self.assertEqual(
+            self.web_socket_client.receive_message_listener_count, listeners_before
+        )
+
+        self.web_socket_client._responder = creation_response
+        pending_request = self.web_socket_client.sent_messages[0]
+        self.web_socket_client.trigger(
+            WebSocketEvents.receiveMessage, json.dumps(creation_response(pending_request))
+        )
+
+        self.assertEqual(len(created.calls), 1)
+        self.assertEqual(failed.calls, [])
+        self.assertIsNotNone(subscription.get_subscription_info())
+
+    async def test_failed_send_clears_pending_and_new_listener_and_retry_succeeds(self):
+        self.web_socket_client._responder = creation_response
+        self.web_socket_client._send_error = Exception("connection closed")
+        subscription = WebSocketSubscription(self.web_socket_client)
+        created = RecordingHandler()
+        notifications = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.subscriptionCreated, created)
+        self.web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        with self.assertRaises(Exception):
+            await subscription.subscribe(events=EVENT_FILTERS)
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 1)
+        self.assertIsNone(subscription.get_subscription_info())
+        self.assertEqual(created.calls, [])
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+
+        self.assertEqual(len(self.web_socket_client.sent_messages), 2)
+        self.assertEqual(len(created.calls), 1)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
+
+        notification = server_notification()
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(notification))
+        self.assertEqual(len(notifications.calls), 1)
+
+    async def test_removal_detaches_listener_and_later_retry_receives_notifications_once(self):
+        self.web_socket_client._responder = creation_response
+        subscription = WebSocketSubscription(self.web_socket_client)
+        notifications = RecordingHandler()
+        self.web_socket_client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+        notification = server_notification()
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(notification))
+        self.assertEqual(len(notifications.calls), 1)
+
+        await subscription.remove()
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(server_notification()))
+        self.assertEqual(len(notifications.calls), 1)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 0)
+
+        await subscription.subscribe(events=EVENT_FILTERS)
+        self.web_socket_client.trigger(WebSocketEvents.receiveMessage, json.dumps(server_notification()))
+        self.assertEqual(len(notifications.calls), 2)
+        self.assertEqual(self.web_socket_client.receive_message_listener_count, 1)
 
 
 if __name__ == "__main__":

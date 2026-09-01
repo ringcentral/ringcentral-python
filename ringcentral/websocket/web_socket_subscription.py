@@ -15,6 +15,7 @@ class WebSocketSubscription(Observable):
         self._event_filters = []
         self._subscription = None
         self._pending_creation_message_id = None
+        self._receive_message_listener_attached = False
 
     def on_message(self, message):
         message_json = json.loads(message)
@@ -22,11 +23,15 @@ class WebSocketSubscription(Observable):
             self._pending_creation_message_id is not None
             and message_json[0].get('type') == 'ClientRequest'
             and message_json[0].get('messageId') == self._pending_creation_message_id
-            and 200 <= message_json[0].get('status', 0) < 300
         ):
+            status = message_json[0].get('status', 0)
             self._pending_creation_message_id = None
-            self.set_subscription(message_json)
-            self._web_socket_client.trigger(WebSocketEvents.subscriptionCreated, self)
+            if 200 <= status < 300:
+                self.set_subscription(message_json)
+                self._web_socket_client.trigger(WebSocketEvents.subscriptionCreated, self)
+            else:
+                error = Exception(f"WebSocket subscription creation failed with status {status}")
+                self._web_socket_client.trigger(WebSocketEvents.createSubscriptionError, error)
         elif message_json[0].get('type') == 'ServerNotification':
             self._web_socket_client.trigger(WebSocketEvents.receiveSubscriptionNotification, message_json)
 
@@ -50,6 +55,10 @@ class WebSocketSubscription(Observable):
         if not self._event_filters or len(self._event_filters) == 0:
             raise Exception("Events are undefined")
 
+        if self._pending_creation_message_id is not None:
+            raise Exception("Subscription creation is already in progress")
+
+        newly_attached = False
         try:
             messageId = str(uuid.uuid4())
             self._pending_creation_message_id = messageId
@@ -65,10 +74,17 @@ class WebSocketSubscription(Observable):
                     "deliveryMode": {"transportType": "WebSocket"},
                 },
             ]
-            self._web_socket_client.on(WebSocketEvents.receiveMessage, self.on_message)
+            if not self._receive_message_listener_attached:
+                self._web_socket_client.on(WebSocketEvents.receiveMessage, self.on_message)
+                self._receive_message_listener_attached = True
+                newly_attached = True
             await self._web_socket_client.send_message(requestBodyJson)
 
         except Exception as e:
+            self._pending_creation_message_id = None
+            if newly_attached:
+                self._web_socket_client.off(WebSocketEvents.receiveMessage, self.on_message)
+                self._receive_message_listener_attached = False
             self.reset()
             print(e)
             raise
@@ -120,7 +136,9 @@ class WebSocketSubscription(Observable):
             ]
 
             await self._web_socket_client.send_message(requestBodyJson)
-            self._web_socket_client.off(WebSocketEvents.receiveMessage, self.on_message)
+            if self._receive_message_listener_attached:
+                self._web_socket_client.off(WebSocketEvents.receiveMessage, self.on_message)
+                self._receive_message_listener_attached = False
             self._web_socket_client.trigger(WebSocketEvents.subscriptionRemoved)
 
             self.reset()
