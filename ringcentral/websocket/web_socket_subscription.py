@@ -14,15 +14,21 @@ class WebSocketSubscription(Observable):
         self._web_socket_client = web_socket_client
         self._event_filters = []
         self._subscription = None
+        self._pending_creation_message_id = None
 
     def on_message(self, message):
         message_json = json.loads(message)
-        if(message_json[0]['type'] == 'ClientRequest' and 'WSG-SubscriptionId' in message_json[0]['headers']):
+        if(
+            self._pending_creation_message_id is not None
+            and message_json[0].get('type') == 'ClientRequest'
+            and message_json[0].get('messageId') == self._pending_creation_message_id
+            and 200 <= message_json[0].get('status', 0) < 300
+        ):
+            self._pending_creation_message_id = None
             self.set_subscription(message_json)
             self._web_socket_client.trigger(WebSocketEvents.subscriptionCreated, self)
-        else: 
-            if(message_json[0]['type'] == 'ServerNotification'):
-                self._web_socket_client.trigger(WebSocketEvents.receiveSubscriptionNotification, message_json)
+        elif message_json[0].get('type') == 'ServerNotification':
+            self._web_socket_client.trigger(WebSocketEvents.receiveSubscriptionNotification, message_json)
 
     async def register(self, events=None):
         if not self._subscription:
@@ -46,6 +52,7 @@ class WebSocketSubscription(Observable):
 
         try:
             messageId = str(uuid.uuid4())
+            self._pending_creation_message_id = messageId
             requestBodyJson = [
                 {
                     "type": "ClientRequest",
@@ -58,8 +65,8 @@ class WebSocketSubscription(Observable):
                     "deliveryMode": {"transportType": "WebSocket"},
                 },
             ]
-            await self._web_socket_client.send_message(requestBodyJson)
             self._web_socket_client.on(WebSocketEvents.receiveMessage, self.on_message)
+            await self._web_socket_client.send_message(requestBodyJson)
 
         except Exception as e:
             self.reset()
