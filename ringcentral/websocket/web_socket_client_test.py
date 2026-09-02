@@ -62,6 +62,31 @@ class FakeWebSocket:
         self._frames.put_nowait(None)
 
 
+class GatedSendWebSocket(FakeWebSocket):
+    def __init__(self):
+        super().__init__()
+        self.send_started = asyncio.Event()
+        self.send_gate = asyncio.Event()
+
+    async def send(self, message):
+        self.send_started.set()
+        await self.send_gate.wait()
+        await FakeWebSocket.send(self, message)
+
+
+class FlakySendWebSocket(FakeWebSocket):
+    def __init__(self, error):
+        super().__init__()
+        self._send_error = error
+
+    async def send(self, message):
+        if self._send_error is not None:
+            error = self._send_error
+            self._send_error = None
+            raise error
+        await FakeWebSocket.send(self, message)
+
+
 class RecordingHandler:
     def __init__(self, error=None):
         self.calls = []
@@ -74,14 +99,15 @@ class RecordingHandler:
 
 
 EVENT_FILTERS = ["/restapi/v1.0/account/~/extension/~/presence"]
+OTHER_FILTERS = ["/restapi/v1.0/account/~/extension/~/message-store"]
 
 
-def subscription_creation_frame(message_id):
+def subscription_creation_frame(message_id, status=200):
     return json.dumps([
         {
             "type": "ClientRequest",
             "messageId": message_id,
-            "status": 200,
+            "status": status,
         },
         {
             "uri": "/restapi/v1.0/subscription/fake-subscription",
@@ -89,6 +115,16 @@ def subscription_creation_frame(message_id):
             "status": "Active",
             "eventFilters": EVENT_FILTERS,
             "deliveryMode": {"transportType": "WebSocket"},
+        },
+    ])
+
+
+def subscription_removal_frame(message_id):
+    return json.dumps([
+        {
+            "type": "ClientRequest",
+            "messageId": message_id,
+            "status": 200,
         },
     ])
 
@@ -121,6 +157,22 @@ class WebSocketClientTest(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(patcher.stop)
         connection_task = asyncio.create_task(self.client.create_new_connection())
         return fake_socket, connection_task
+
+    async def start_receive_loop_with(self, fake_socket):
+        async def connect(uri):
+            return fake_socket
+
+        patcher = mock.patch("websockets.connect", connect)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        connection_task = asyncio.create_task(self.client.create_new_connection())
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+        return connection_task
+
+    async def deliver_creation_response(self, fake_socket, status=200):
+        request = json.loads(fake_socket.sent[0])
+        fake_socket.push(subscription_creation_frame(request[0]["messageId"], status=status))
 
     async def wait_until(self, predicate, limit=100):
         for _ in range(limit):
@@ -305,6 +357,265 @@ class WebSocketClientTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(failing.calls, [(self.client,)])
         self.assertEqual(healthy.calls, [])
+
+    async def test_create_subscription_requires_events_argument(self):
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        with self.assertRaises(TypeError):
+            await self.client.create_subscription()
+
+        await self.stop_receive_loop(connection_task)
+        self.assertEqual(fake_socket.sent, [])
+
+    async def test_create_subscription_rejects_none_and_empty_events(self):
+        creation_errors = RecordingHandler()
+        created = RecordingHandler()
+        notifications = RecordingHandler()
+        self.client.on(WebSocketEvents.createSubscriptionError, creation_errors)
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+        self.client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        for invalid_events in (None, []):
+            with self.assertRaises(Exception) as ctx:
+                await self.client.create_subscription(events=invalid_events)
+            self.assertEqual(str(ctx.exception), "Events are undefined")
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+
+        self.assertEqual(fake_socket.sent, [])
+        self.assertEqual(created.calls, [])
+        self.assertEqual(len(creation_errors.calls), 2)
+        for call in creation_errors.calls:
+            self.assertEqual(str(call[0]), "Events are undefined")
+        self.assertEqual(notifications.calls, [])
+        await self.stop_receive_loop(connection_task)
+
+    async def test_second_creation_while_first_is_pending_is_rejected(self):
+        creation_errors = RecordingHandler()
+        created = RecordingHandler()
+        notifications = RecordingHandler()
+        self.client.on(WebSocketEvents.createSubscriptionError, creation_errors)
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+        self.client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        fake_socket = GatedSendWebSocket()
+        connection_task = await self.start_receive_loop_with(fake_socket)
+
+        first_task = asyncio.create_task(self.client.create_subscription(events=EVENT_FILTERS))
+        await self.wait_until(lambda: fake_socket.send_started.is_set())
+
+        with self.assertRaises(Exception) as ctx:
+            await self.client.create_subscription(events=OTHER_FILTERS)
+        self.assertEqual(
+            str(ctx.exception),
+            "WebSocket subscription creation is already in progress; "
+            "wait for subscriptionCreated or createSubscriptionError before retrying",
+        )
+        self.assertEqual(len(creation_errors.calls), 1)
+        self.assertEqual(str(creation_errors.calls[0][0]), str(ctx.exception))
+
+        fake_socket.send_gate.set()
+        await first_task
+
+        self.assertEqual(len(fake_socket.sent), 1)
+        request = json.loads(fake_socket.sent[0])
+        self.assertEqual(request[0]["method"], "POST")
+        self.assertEqual(request[1]["eventFilters"], EVENT_FILTERS)
+
+        fake_socket.push(subscription_creation_frame(request[0]["messageId"]))
+        await self.wait_until(lambda: len(created.calls) == 1)
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+        self.assertEqual(len(notifications.calls), 1)
+
+        await self.stop_receive_loop(connection_task)
+        self.assertEqual(len(created.calls), 1)
+        self.assertEqual(len(creation_errors.calls), 1)
+
+    async def test_second_creation_after_confirmed_creation_is_rejected(self):
+        creation_errors = RecordingHandler()
+        created = RecordingHandler()
+        updated = RecordingHandler()
+        notifications = RecordingHandler()
+        self.client.on(WebSocketEvents.createSubscriptionError, creation_errors)
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+        self.client.on(WebSocketEvents.subscriptionUpdated, updated)
+        self.client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        await self.client.create_subscription(events=EVENT_FILTERS)
+        await self.deliver_creation_response(fake_socket)
+        await self.wait_until(lambda: len(created.calls) == 1)
+        subscription = created.calls[0][0]
+
+        with self.assertRaises(Exception) as ctx:
+            await self.client.create_subscription(events=OTHER_FILTERS)
+        self.assertEqual(
+            str(ctx.exception),
+            "A WebSocket subscription already exists; use update_subscription() "
+            "to change its events or remove_subscription() before creating another",
+        )
+        self.assertEqual(len(creation_errors.calls), 1)
+        self.assertEqual(str(creation_errors.calls[0][0]), str(ctx.exception))
+
+        self.assertEqual(len(fake_socket.sent), 1)
+        self.assertEqual(json.loads(fake_socket.sent[0])[0]["method"], "POST")
+        self.assertEqual(len(created.calls), 1)
+        self.assertEqual(updated.calls, [])
+        self.assertEqual(subscription.get_subscription_info()[1]["id"], "fake-subscription")
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+        self.assertEqual(len(notifications.calls), 1)
+
+        await self.stop_receive_loop(connection_task)
+
+    async def test_retry_after_send_failure_uses_new_events_without_duplicate_listeners(self):
+        creation_errors = RecordingHandler()
+        send_errors = RecordingHandler()
+        created = RecordingHandler()
+        notifications = RecordingHandler()
+        self.client.on(WebSocketEvents.createSubscriptionError, creation_errors)
+        self.client.on(WebSocketEvents.sendMessageError, send_errors)
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+        self.client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        fake_socket = FlakySendWebSocket(RuntimeError("send failure"))
+        connection_task = await self.start_receive_loop_with(fake_socket)
+
+        with self.assertRaises(Exception):
+            await self.client.create_subscription(events=EVENT_FILTERS)
+        self.assertEqual(len(send_errors.calls), 1)
+        self.assertEqual(len(creation_errors.calls), 1)
+        self.assertEqual(fake_socket.sent, [])
+
+        await self.client.create_subscription(events=OTHER_FILTERS)
+
+        self.assertEqual(len(fake_socket.sent), 1)
+        request = json.loads(fake_socket.sent[0])
+        self.assertEqual(request[1]["eventFilters"], OTHER_FILTERS)
+        fake_socket.push(subscription_creation_frame(request[0]["messageId"]))
+        await self.wait_until(lambda: len(created.calls) == 1)
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+        self.assertEqual(len(notifications.calls), 1)
+
+        await self.stop_receive_loop(connection_task)
+        self.assertEqual(len(created.calls), 1)
+
+    async def test_retry_after_rejected_creation_succeeds_without_duplicate_listeners(self):
+        creation_errors = RecordingHandler()
+        created = RecordingHandler()
+        notifications = RecordingHandler()
+        self.client.on(WebSocketEvents.createSubscriptionError, creation_errors)
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+        self.client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        await self.client.create_subscription(events=EVENT_FILTERS)
+        await self.deliver_creation_response(fake_socket, status=403)
+        await self.wait_until(lambda: len(creation_errors.calls) == 1)
+        self.assertEqual(
+            str(creation_errors.calls[0][0]),
+            "WebSocket subscription creation failed with status 403",
+        )
+        self.assertEqual(created.calls, [])
+
+        await self.client.create_subscription(events=OTHER_FILTERS)
+
+        self.assertEqual(len(fake_socket.sent), 2)
+        retry_request = json.loads(fake_socket.sent[1])
+        self.assertEqual(retry_request[0]["method"], "POST")
+        self.assertEqual(retry_request[1]["eventFilters"], OTHER_FILTERS)
+        fake_socket.push(subscription_creation_frame(retry_request[0]["messageId"]))
+        await self.wait_until(lambda: len(created.calls) == 1)
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+        self.assertEqual(len(notifications.calls), 1)
+
+        await self.stop_receive_loop(connection_task)
+        self.assertEqual(len(created.calls), 1)
+        self.assertEqual(len(creation_errors.calls), 1)
+
+    async def test_creation_after_removal_reuses_client_subscription_without_duplicate_listeners(self):
+        created = RecordingHandler()
+        removed = RecordingHandler()
+        notifications = RecordingHandler()
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+        self.client.on(WebSocketEvents.subscriptionRemoved, removed)
+        self.client.on(WebSocketEvents.receiveSubscriptionNotification, notifications)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        await self.client.create_subscription(events=EVENT_FILTERS)
+        await self.deliver_creation_response(fake_socket)
+        await self.wait_until(lambda: len(created.calls) == 1)
+        subscription = created.calls[0][0]
+
+        await self.client.remove_subscription(subscription)
+        removal_request = json.loads(fake_socket.sent[1])
+        self.assertEqual(removal_request[0]["method"], "DELETE")
+        fake_socket.push(subscription_removal_frame(removal_request[0]["messageId"]))
+        await self.wait_until(lambda: len(removed.calls) == 1)
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+        self.assertEqual(notifications.calls, [])
+
+        await self.client.create_subscription(events=OTHER_FILTERS)
+
+        self.assertEqual(len(fake_socket.sent), 3)
+        recreated_request = json.loads(fake_socket.sent[2])
+        self.assertEqual(recreated_request[0]["method"], "POST")
+        self.assertEqual(recreated_request[1]["eventFilters"], OTHER_FILTERS)
+        fake_socket.push(subscription_creation_frame(recreated_request[0]["messageId"]))
+        await self.wait_until(lambda: len(created.calls) == 2)
+
+        fake_socket.push(server_notification_frame())
+        await self.wait_until_frames_delivered(fake_socket)
+        self.assertEqual(len(notifications.calls), 1)
+
+        await self.stop_receive_loop(connection_task)
+        self.assertEqual(len(created.calls), 2)
+        self.assertEqual(len(removed.calls), 1)
+
+    async def test_successful_creation_returns_none_and_delivers_subscription_via_event(self):
+        created = RecordingHandler()
+        self.client.on(WebSocketEvents.subscriptionCreated, created)
+
+        fake_socket, connection_task = await self.start_receive_loop()
+        fake_socket.push("[/heartbeat]")
+        await self.wait_until(lambda: self.client._is_ready)
+
+        result = await self.client.create_subscription(events=EVENT_FILTERS)
+        self.assertIsNone(result)
+
+        await self.deliver_creation_response(fake_socket)
+        await self.wait_until(lambda: len(created.calls) == 1)
+
+        self.assertEqual(len(created.calls), 1)
+        subscription = created.calls[0][0]
+        self.assertEqual(subscription.get_subscription_info()[1]["id"], "fake-subscription")
+
+        await self.stop_receive_loop(connection_task)
 
     async def test_recv_failure_after_handshake_reports_receive_error_and_cleans_up(self):
         receive_error = RuntimeError("receive failure")

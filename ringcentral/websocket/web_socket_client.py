@@ -17,6 +17,7 @@ class WebSocketClient(Observable):
         self._is_ready = False
         self._heartbeat_task = None
         self._send_attempt_counter = 0
+        self._subscription = None
 
     async def create_new_connection(self):
         """
@@ -249,26 +250,41 @@ class WebSocketClient(Observable):
             self.trigger(WebSocketEvents.sendMessageError, e)
             raise
 
-    async def create_subscription(self, events=None):
+    async def create_subscription(self, events):
         """
             Creates a subscription to WebSocket events.
 
             Args:
-                events (list, optional): A list of events to subscribe to. Default is None.
+                events (list): A required, non-empty list of events to subscribe to.
 
             Raises:
-                Exception: If any error occurs during the process or if the connection is not ready after multiple attempts.
+                Exception: If any error occurs during the process, if events are omitted, None, or empty, if a subscription creation is already in progress, or if a subscription already exists.
 
             Note:
-                - If the WebSocket connection is ready (`_is_ready` flag), resets the send attempt counter and creates a WebSocketSubscription instance.
-                - Registers the subscription with the specified events.
+                - Events are required: an omitted argument is rejected by ordinary Python argument checking, and None or empty events raise "Events are undefined" before any request is sent or any receive listener is attached.
+                - The client retains and reuses a single subscription object; a retry after a failed creation and a creation after removal reuse the retained object's existing registration flow with the newly supplied events.
+                - Rejects a call while a subscription creation is already in progress with "WebSocket subscription creation is already in progress; wait for subscriptionCreated or createSubscriptionError before retrying".
+                - Rejects a call after a subscription has been created with "A WebSocket subscription already exists; use update_subscription() to change its events or remove_subscription() before creating another".
+                - Rejections are delivered through the createSubscriptionError event and raised to the caller.
+                - If the WebSocket connection is ready (`_is_ready` flag), resets the send attempt counter and registers the retained subscription with the specified events.
                 - If the connection is not ready, retries after a delay and increments the send attempt counter.
                 - If the send attempt counter exceeds a threshold, triggers the connectionNotReady event and raises an exception.
         """
         try:
+            if not events or len(events) == 0:
+                raise Exception("Events are undefined")
+
+            if self._subscription is None:
+                self._subscription = WebSocketSubscription(self)
+            subscription = self._subscription
+
+            if subscription._pending_creation_message_id is not None:
+                raise Exception("WebSocket subscription creation is already in progress; wait for subscriptionCreated or createSubscriptionError before retrying")
+            if subscription.get_subscription_info() is not None:
+                raise Exception("A WebSocket subscription already exists; use update_subscription() to change its events or remove_subscription() before creating another")
+
             if self._is_ready:
                 self._send_attempt_counter = 0
-                subscription = WebSocketSubscription(self)
                 await subscription.register(events)
             else:
                 await asyncio.sleep(1)
