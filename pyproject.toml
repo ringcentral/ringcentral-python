@@ -25,6 +25,17 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/ringcentral/ringcentral-python"
 
+[dependency-groups]
+dev = [
+    "coverage>=4.3.1",
+    "coveralls>=1.1",
+    "requests-mock>=1.2.0",
+    "python-dotenv>=1.0.0",
+    "twine",
+    "build",
+    "pdoc==14.4.0",
+]
+
 [tool.setuptools.packages.find]
 include = ["ringcentral*"]
 namespaces = false
