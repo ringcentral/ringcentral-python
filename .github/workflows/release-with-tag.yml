@@ -1,6 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Release
 
 on:
@@ -11,35 +8,27 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11"]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version}}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
 
-      - name: Test with pytest
+      - name: Set up Python 3.11 and uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.11"
+
+      - name: Run unittest with coverage
         run: |
-          #Create virtual environment
-            python -m venv venv
-          #Activate virtual environment
-            source venv/bin/activate
-          #Install dependencies
-           pip install -r requirements.txt
-           pip install -r requirements-dev.txt
-           #Run unit tests
-           coverage run -m unittest discover . --pattern '*test.py'
-           coverage report
-      - name: release
+          uv sync --locked
+          uv run --locked coverage run -m unittest discover . --pattern '*test.py'
+          uv run --locked coverage report
+
+      - name: Build distributions
+        run: uv build --no-sources
+
+      - name: Upload to PyPI
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          python3 -m pip install --upgrade build
-          python3 -m pip install --upgrade twine
-          python -m build
-          twine upload dist/*
+        run: uv run --locked twine upload dist/*

@@ -1,6 +1,3 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Unit Tests
 
 on: [push, pull_request]
@@ -10,24 +7,120 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.11", "3.14"]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version}}
-        uses: actions/setup-python@v3
+
+      - name: Set up Python ${{ matrix.python-version }} and uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
+          version: "0.12.8"
           python-version: ${{ matrix.python-version }}
 
-      - name: Test with pytest
+      - name: Sync locked environment
+        run: uv sync --locked
+
+      - name: Run unittest with coverage
         run: |
-          #Create virtual environment
-            python -m venv venv
-          #Activate virtual environment
-            source venv/bin/activate
-          #Install dependencies
-           pip install -r requirements.txt
-           pip install -r requirements-dev.txt
-           #Run unit tests
-           coverage run -m unittest discover . --pattern '*test.py'
-           coverage report
+          uv run --locked coverage run -m unittest discover . --pattern '*test.py'
+          uv run --locked coverage report
+
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.11 and uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.11"
+
+      - name: Sync locked environment
+        run: uv sync --locked
+
+      - name: Build source and wheel distributions
+        run: uv build --no-sources
+
+      - name: Inspect distribution metadata and payload
+        run: |
+          uv run --locked python - <<'EOF'
+          import email.parser
+          import pathlib
+          import tarfile
+          import tomllib
+          import zipfile
+
+          expected_dependencies = [
+              "observable==0.3.*",
+              "requests==2.*",
+              "websockets==15.*",
+          ]
+          expected_classifiers = [
+              "Programming Language :: Python :: 3",
+              "Programming Language :: Python :: 3.11",
+              "Programming Language :: Python :: 3 :: Only",
+              "Programming Language :: Python :: Implementation :: CPython",
+          ]
+
+          dist = pathlib.Path("dist")
+          wheel_path = next(dist.glob("ringcentral-*.whl"))
+          sdist_path = next(dist.glob("ringcentral-*.tar.gz"))
+
+          with zipfile.ZipFile(wheel_path) as wheel:
+              wheel_names = wheel.namelist()
+              wheel_metadata_path = next(
+                  name for name in wheel_names if name.endswith(".dist-info/METADATA")
+              )
+              wheel_metadata = email.parser.Parser().parsestr(
+                  wheel.read(wheel_metadata_path).decode()
+              )
+
+          with open("pyproject.toml", "rb") as file:
+              project = tomllib.load(file)["project"]
+
+          assert wheel_metadata["Name"] == "ringcentral"
+          assert wheel_metadata["Version"] == project["version"]
+          assert wheel_metadata["Requires-Python"] == ">=3.11"
+          assert wheel_metadata.get_all("Requires-Dist") == expected_dependencies
+          assert wheel_metadata.get_all("Classifier") == expected_classifiers
+
+          wheel_top_levels = {name.split("/")[0] for name in wheel_names}
+          assert wheel_top_levels == {"ringcentral", wheel_metadata_path.split("/")[0]}
+          assert "ringcentral/test/testcase.py" in wheel_names
+          assert "ringcentral/test/spy.py" in wheel_names
+          assert any(name.endswith("_test.py") for name in wheel_names)
+          assert not any("demo" in name.lower() for name in wheel_names)
+
+          with tarfile.open(sdist_path) as sdist:
+              sdist_files = {
+                  member.name.split("/", 1)[1]
+                  for member in sdist.getmembers()
+                  if member.isfile()
+              }
+              sdist_names = sdist.getnames()
+
+          assert sdist_files == {
+              "PKG-INFO",
+              "README.md",
+              "LICENSE.md",
+              "MANIFEST.in",
+              "pyproject.toml",
+              "requirements.txt",
+              "setup.cfg",
+              "setup.py",
+              "ringcentral.egg-info/PKG-INFO",
+              "ringcentral.egg-info/SOURCES.txt",
+              "ringcentral.egg-info/dependency_links.txt",
+              "ringcentral.egg-info/requires.txt",
+              "ringcentral.egg-info/top_level.txt",
+          } | {name for name in wheel_names if name.startswith("ringcentral/")}
+          assert not any("demo" in name.lower() for name in sdist_names)
+          EOF
+
+      - name: Install and import the wheel in a clean environment
+        run: |
+          wheel=$(ls dist/ringcentral-*.whl)
+          uv run --no-project --with "$wheel" python -c "import ringcentral; from importlib.metadata import version; print('imported', version('ringcentral'))"
