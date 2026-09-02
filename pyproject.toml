@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ringcentral"
+version = "0.9.2"
+description = "RingCentral Python SDK"
+readme = "README.md"
+authors = [{ name = "Kirill Konshin" }]
+keywords = ["sdk", "ringcentral", "connect", "platform", "api", "python"]
+requires-python = ">=3.11"
+dependencies = [
+    "observable==0.3.*",
+    "requests==2.*",
+    "websockets==15.*",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[project.urls]
+Homepage = "https://github.com/ringcentral/ringcentral-python"
+
+[tool.setuptools.packages.find]
+include = ["ringcentral*"]
+namespaces = false

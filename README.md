@@ -22,7 +22,7 @@ __[Voice](https://developer.ringcentral.com/api-products/voice), [SMS/MMS](https
 
 ## Installation
 
-This SDK is tested against Python 3.7 so we recommend [installing using it with Python 3.7 or newer](https://www.python.org/downloads/)
+This SDK is tested against Python 3.11 so we recommend [installing using it with Python 3.11 or newer](https://www.python.org/downloads/)
 
 ```sh
 $ pip3 install ringcentral
