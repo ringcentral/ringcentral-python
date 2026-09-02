@@ -1,4 +1,4 @@
-import urllib
+import urllib.request
 from dotenv import dotenv_values
 from ringcentral import SDK
 
@@ -19,7 +19,7 @@ def main():
 
     binary = (
         'test.mp3',
-        urllib.urlopen('https://freesound.org/data/previews/85/85785_14771-lq.mp3').read(),
+        urllib.request.urlopen('https://freesound.org/data/previews/85/85785_14771-lq.mp3').read(),
         'audio/mpeg'
     )
     builder = sdk.create_multipart_builder()

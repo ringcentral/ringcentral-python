@@ -37,11 +37,6 @@ uv run --locked coverage run -m unittest discover . --pattern '*test.py'
 
 uv run --locked coverage report
 ```
-Coverage Report Supported On
-<ol>
-    <li>Python 3.8 through 3.12, and 3.13.0a3 and up.</li>
-    <li>PyPy3 versions 3.8 through 3.10</li>
-</ol>
 
 ## Generate API documentation
 
@@ -96,13 +91,13 @@ uv sync --locked
 
 ### Note
 
-Subscription test requires necessary credentials in .env file. Your app will need "Websocket Subscriptions" permission.
+Unit tests, including the WebSocket subscription tests, use mocks. They are deterministic and require no RingCentral credentials.
 
 ## Run demos
 
 Copy `.env.sample` to `.env`.
 
-Edit `.env` to specify credentials
+Edit `.env` to specify credentials. Live demos read credentials from this local environment file created from the existing sample.
 
 Run a demo file like this:
 
@@ -110,18 +105,18 @@ Run a demo file like this:
 uv run --locked python ringcentral/demos/demo_fax.py
 ```
 
+The WebSocket subscription demo (`demo_subscription.py`) requires an application with the "WebSocket Subscriptions" permission.
+
 
 ## Release
 
-Release will be done by GitHub Action once a tag is pushed to remote repo.
+Release is done by GitHub Action once a tag is pushed to the remote repo.
 
-GitHub Action will run the following commands to release:
+GitHub Action runs the following commands to release:
 
 ```
-python3 -m pip install --upgrade build
-python3 -m pip install --upgrade twine
-python3 -m build
-twine upload dist/*
+uv build --no-sources
+uv run --locked twine upload dist/*
 ```
 
 If you want to release it from your laptop, you need to have a ~/.pypirc file like this:
@@ -134,4 +129,11 @@ index-servers = pypi
 repository = https://upload.pypi.org/legacy/
 username = __token__
 password = pypi-<your-token>
+```
+
+Then run the same release commands locally:
+
+```
+uv build --no-sources
+uv run --locked twine upload dist/*
 ```

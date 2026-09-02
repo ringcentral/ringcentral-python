@@ -50,6 +50,7 @@ Please refer to [demo_subscription.py](./ringcentral/demos/demo_subscription.py)
 
 ## Send sms
 ```py
+import time
 from ringcentral import SDK
 
 database = []
@@ -76,7 +77,7 @@ def sendSMS(message, number):
 def main():
     for i in range(len(database)):
         customer = database[i]
-        if customer['Payment'] is "Due":
+        if customer['Payment'] == "Due":
             sendSMS("Hi " + customer['Customer'] + ". Your payment is due.", customer['PhoneNumber'])
         time.sleep(5)
     print("Send payment reminder done.")
