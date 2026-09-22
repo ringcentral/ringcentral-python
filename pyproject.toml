@@ -33,7 +33,7 @@ dev = [
     "python-dotenv>=1.0.0",
     "twine",
     "build",
-    "pdoc==14.4.0",
+    "pdoc==14.5.1",
 ]
 
 [tool.setuptools.packages.find]

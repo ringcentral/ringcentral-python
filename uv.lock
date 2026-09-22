@@ -695,16 +695,16 @@ wheels = [
 
 [[package]]
 name = "pdoc"
-version = "14.4.0"
+version = "14.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
     { name = "markupsafe" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/87/fa/8137c9cc9996a258bfa16cc881b453222d880eef9ca59c41d25f2c4c54d7/pdoc-14.4.0.tar.gz", hash = "sha256:c92edc425429ccbe287ace2a027953c24f13de53eab484c1a6d31ca72dd2fda9", size = 142410, upload-time = "2024-01-17T23:56:08.311Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e1/32/0022d28c48bba5ef6c76e9b4e23087f5bd30530cab8eb3e202662c0019bd/pdoc-14.5.1.tar.gz", hash = "sha256:4ddd9c5123a79f511cedffd7231bf91a6e0bd0968610f768342ec5d00b5eefee", size = 143718, upload-time = "2024-06-25T21:34:00.946Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/fd/7bd691c546c030c44585029267896c148e8711e4d4a4af5ba2f61d9232ef/pdoc-14.4.0-py3-none-any.whl", hash = "sha256:6ea4fe07620b1f7601e2708a307a257636ec206e20b5611640b30f2e3cab47d6", size = 133860, upload-time = "2024-01-17T23:56:05.553Z" },
+    { url = "https://files.pythonhosted.org/packages/b2/20/386b3bec808bcb701a053b20c6719eb5d6914d750586edfbed6c36a79826/pdoc-14.5.1-py3-none-any.whl", hash = "sha256:fda6365a06e438b43ca72235b58a2e2ecd66445fcc444313f6ebbde4b0abd94b", size = 134325, upload-time = "2024-06-25T21:33:58.687Z" },
 ]
 
 [[package]]
@@ -860,7 +860,7 @@ dev = [
     { name = "build" },
     { name = "coverage", specifier = ">=4.3.1" },
     { name = "coveralls", specifier = ">=1.1" },
-    { name = "pdoc", specifier = "==14.4.0" },
+    { name = "pdoc", specifier = "==14.5.1" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "requests-mock", specifier = ">=1.2.0" },
     { name = "twine" },
