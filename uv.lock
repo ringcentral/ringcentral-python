@@ -852,7 +852,7 @@ dev = [
 requires-dist = [
     { name = "observable", specifier = "==0.3.*" },
     { name = "requests", specifier = "==2.*" },
-    { name = "websockets", specifier = "==15.*" },
+    { name = "websockets", specifier = ">=15,<18" },
 ]
 
 [package.metadata.requires-dev]
